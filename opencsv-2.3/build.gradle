@@ -1,0 +1,5 @@
+configurations.create("default")
+artifacts.add("default", file('opencsv-2.3.jar'))
+dependencies {
+    compile files('opencsv-2.3.jar')
+}
