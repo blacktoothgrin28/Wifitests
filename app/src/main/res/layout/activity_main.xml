@@ -1,0 +1,106 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity"
+    tools:ignore="MergeRootFrame">
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left|top"
+        android:text="izquio" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|top"
+        android:text="DEl medio" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right|top"
+        android:alpha="0.5"
+        android:src="@mipmap/ic_launcher" />
+
+    <Button
+        android:id="@+id/button_send_not"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="62dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left|bottom"
+        android:onClick="clickSendNotification"
+        android:text="@string/send_notif" />
+
+    <Button
+        android:id="@+id/button_stop_not"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|bottom"
+        android:onClick="clickStopNotification"
+        android:text="@string/stop_notif" />
+
+    <Button
+        android:id="@+id/button_wifi"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right|bottom"
+        android:onClick="clickConnect"
+        android:text="Conn Wifi" />
+
+    <Button
+        android:id="@+id/load"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="62dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left|center_vertical"
+        android:onClick="clickLoadPage"
+        android:text="load" />
+
+    <WebView
+        android:id="@+id/webViewTest"
+        android:layout_width="fill_parent"
+        android:layout_height="214dp"
+        android:layout_gravity="center_horizontal|top" />
+
+    <TextView
+        android:id="@+id/fieldStrength"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="Field strength" />
+
+    <FrameLayout
+        android:layout_width="122dp"
+        android:layout_height="192dp"
+        android:layout_gravity="right|center_vertical">
+
+        <Button
+            android:id="@+id/StopSearch"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right|center_vertical"
+            android:gravity="top"
+            android:onClick="clickStopSearch"
+            android:text="Stp search" />
+
+        <Button
+            android:id="@+id/startSearching"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|right"
+            android:onClick="clickStartSearching"
+            android:text="Start Search" />
+    </FrameLayout>
+
+</FrameLayout>
+
