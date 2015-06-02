@@ -13,7 +13,10 @@ import android.support.v4.app.NotificationCompat;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 
 import util.Weacon;
 
@@ -21,18 +24,26 @@ import util.Weacon;
  * Created by Milenko on 27/05/2015.
  */
 public class WifiUpdater implements Runnable {
+    private static HashMap<String, Weacon> weaconsLaunchedTable;
+    private final Boolean demo;
     WifiManager wifi;
     TextView textView;
     Activity act;
     private int cont;
     private int levelOld = -100;
+    private int demoCount;
+    private int ntimes = 30;//numbers of ticks for launching a fake weacon
 
-    public WifiUpdater(TextView tv, Activity activity) {
+    public WifiUpdater(TextView tv, Activity activity, Boolean demo) {
         this.textView = tv;
         this.act = activity;
+        this.demo = demo;
+        weaconsLaunchedTable = new HashMap<>();
         wifi = (WifiManager) activity.getSystemService(Context.WIFI_SERVICE);
 //        this.act = activity;
         cont = 1;
+        demoCount = 1;
+
     }
 
     private static void sendNotification(Activity act, Weacon we) {
@@ -112,15 +123,23 @@ public class WifiUpdater implements Runnable {
         NotificationManager mNotificationManager = (NotificationManager) act.getSystemService(Context.NOTIFICATION_SERVICE);
         int mId = 1;
         mNotificationManager.notify(mId, mBuilder.build());
+
+        weaconsLaunchedTable.put(we.getSSID(), we);
     }
 
     @Override
     public void run() {
-        wifi.startScan();
-        List<ScanResult> sr = wifi.getScanResults();
-        List<String> list = new ArrayList<String>();
+        if (demo) {
+            if (demoCount == 1 || demoCount % ntimes == 0) {
+                findFakeWeacon();
+            }
+            demoCount++;
+        } else {
+            wifi.startScan();
+            List<ScanResult> sr = wifi.getScanResults();
+            List<String> list = new ArrayList<String>();
 
-        for (ScanResult r : sr) {
+            for (ScanResult r : sr) {
 //            if (r.SSID.equals("piripiri")) {
 //                String intensidad = Integer.toString(r.level);
 //                textView.setText(Integer.toString(cont) + "piripiri int=" + intensidad);
@@ -129,15 +148,30 @@ public class WifiUpdater implements Runnable {
 //                }
 //                levelOld = r.level;
 //                break;
-            if (MainActivity.weaconsTable.containsKey(r.SSID)) {
-                Weacon we = MainActivity.weaconsTable.get(r.SSID);
-                int umbral = we.getLevel();
-                if (levelOld < umbral && r.level > umbral) {
-                    sendNotification(act, we);
+                if (MainActivity.weaconsTable.containsKey(r.SSID) && !weaconsLaunchedTable.containsKey(r.SSID)) {
+                    Weacon we = MainActivity.weaconsTable.get(r.SSID);
+                    int threshold = we.getLevel();
+                    if (levelOld < threshold && r.level > threshold) {
+                        sendNotification(act, we);
+                    }
+                    levelOld = r.level;
                 }
-                levelOld = r.level;
             }
+            cont++;
         }
-        cont++;
+    }
+
+    /**
+     * Launch a fake weacon, randomly from the file
+     */
+    private void findFakeWeacon() {
+        Random generator = new Random();
+        Weacon we;
+        Collection<Weacon> intermediate = MainActivity.weaconsTable.values();
+        Object[] values = intermediate.toArray();
+        do {
+            we = (Weacon) values[generator.nextInt(values.length)];
+        } while (weaconsLaunchedTable.containsKey(we.getSSID()));
+        sendNotification(act, we);
     }
 }

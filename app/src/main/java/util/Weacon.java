@@ -23,7 +23,6 @@ public class Weacon {
     private String name, url;
     private String SSID;
     private String message;
-
     public Weacon(String[] register, Activity act) {
 
         SSID = register[0];
@@ -55,6 +54,10 @@ public class Weacon {
         drawable.draw(canvas);
 
         return bitmap;
+    }
+
+    public String getSSID() {
+        return SSID;
     }
 
     public String getName() {

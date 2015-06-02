@@ -26,8 +26,16 @@
             android:icon="@mipmap/ic_launcher"
             android:label="@string/title_activity_second"
             android:logo="@mipmap/ic_launcher" />
-        <!--android:logo="@drawable/abc_ic_menu_paste_mtrl_am_alpha" />-->
+        <!-- android:logo="@drawable/abc_ic_menu_paste_mtrl_am_alpha" /> -->
 
+        <activity
+            android:name=".SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.herenow.fase1.MainActivity" />
+        </activity>
     </application>
 
 </manifest>

@@ -15,13 +15,14 @@ import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
+import android.widget.CompoundButton;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import java.io.BufferedReader;
@@ -38,22 +39,60 @@ import util.Weacon;
 
 public class MainActivity extends ActionBarActivity {
     public static HashMap<String, Weacon> weaconsTable = new HashMap<String, Weacon>();
+    public static boolean demoMode; //in demo mode doesn't look for wifi's, it just lunch the events
     NotificationManager mNotificationManager;
     WebView wb;
     private WifiUpdater wifiUpdater;
     private Timer t;
+    private Switch mySwitch;
+    private TextView tv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        tv = (TextView) findViewById(R.id.fieldStrength);
+        mySwitch = (Switch) findViewById(R.id.switch1);
+        //set the switch to ON
+        mySwitch.setChecked(false);
+        //attach a listener to check for changes in state
+        mySwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView,
+                                         boolean isChecked) {
+                demoMode = isChecked;
+                modeChange(isChecked);
+            }
+        });
+
+        //check the current state before we display the screen
+        demoMode = mySwitch.isChecked();
+        if (mySwitch.isChecked()) {
+            tv.setText("demo ON");
+        } else {
+            tv.setText("demo OFF");
+        }
 //        if (savedInstanceState == null) {
 //            getSupportFragmentManager().beginTransaction()
 //                    .add(R.id.container, new PlaceholderFragment())
 //                    .commit();
 //        }
-
         readWeacons();
+    }
+
+    private void modeChange(boolean Demo) {
+
+        t = new Timer();
+        wifiUpdater = new WifiUpdater((TextView) findViewById(R.id.fieldStrength), this, Demo);
+        t.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                runOnUiThread(wifiUpdater);
+            }
+        }, 0, 500);
+
     }
 
     /**
@@ -212,26 +251,10 @@ public class MainActivity extends ActionBarActivity {
         // connect to piripi con la contrasena
     }
 
-    public void clickLoadPage(View view) {
-        String url = "http://milenko.multiscreensite.com";
-
-        try {
-            wb = (WebView) this.findViewById(R.id.webViewTest);
-//        wb.setWebChromeClient(new WebChromeClient());
-//        wb.setWebViewClient(new WebViewClient());
-
-            wb.getSettings().setJavaScriptEnabled(true);
-            wb.loadUrl(url);
-        } catch (Exception e) {
-            e.printStackTrace();
-            Log.d("mhp", "ppp" + e.getMessage());
-        }
-
-    }
 
     public void clickStartSearching(View view) {
         t = new Timer();
-        wifiUpdater = new WifiUpdater((TextView) findViewById(R.id.fieldStrength), this);
+        wifiUpdater = new WifiUpdater((TextView) findViewById(R.id.fieldStrength), this, demoMode);
 
 
         t.schedule(new TimerTask() {
