@@ -1,12 +1,14 @@
 package com.herenow.fase1;
 
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 
 
 public class SecondActivity extends ActionBarActivity {
@@ -29,20 +31,23 @@ public class SecondActivity extends ActionBarActivity {
         wLogo = (Bitmap) b.get("wLogo");
 //        tv = (TextView) findViewById(R.id.msgSeg);
 //        tv.setText(wName); //TEst
-        this.setTitle(wName);
+        setTitle(wName);
+
+
+//        getActionBar().setIcon(getResources().getDrawable(R.drawable.ic_action_filter))
+//        this.getActionBar().setIcon(wLogo);
 
         try {
             wb = (WebView) this.findViewById(R.id.webView); //TODO set a progress bar for loading
 //        wb.setWebChromeClient(new WebChromeClient()); //TODO fetching or cache
 //        wb.setWebViewClient(new WebViewClient());
             wb.getSettings().setJavaScriptEnabled(true);
+            wb.setWebViewClient(new Callback());// THis avoid opening browser when url changes
             wb.loadUrl(wUrl);
         } catch (Exception e) {
             e.printStackTrace();
             Log.d("mhp", "ppp" + e.getMessage());
         }
-
-
     }
 
     @Override
@@ -53,9 +58,19 @@ public class SecondActivity extends ActionBarActivity {
         getMenuInflater().inflate(R.menu.menu_second, menu);
 //        MenuItem menuItem = menu.findItem(R.id.browserMenu);
 //        menuItem.setTitle(wName);
+//        Drawable d=
+        android.support.v7.app.ActionBar ab = this.getSupportActionBar();
+//        ab.setTitle("pepe");
+        ab.setDisplayUseLogoEnabled(true); //TODO makes logo appear in action bar
+        ab.setDisplayHomeAsUpEnabled(true);
+        ab.setDisplayShowHomeEnabled(true);
+
+//        ab.setLogo(R.mipmap.ic_launcher);
+//        ab.setLogo(new BitmapDrawable(wLogo));
+        ab.setIcon(new BitmapDrawable(getResources(), wLogo));
+//        ab.setIcon(R.mipmap.ic_launcher);
         return true;
     }
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -70,5 +85,14 @@ public class SecondActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private class Callback extends WebViewClient {
+
+        @Override
+        public boolean shouldOverrideUrlLoading(WebView view, String url) {
+            return (false);
+        }
+
     }
 }

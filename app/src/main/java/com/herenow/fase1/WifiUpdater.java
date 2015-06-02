@@ -91,7 +91,7 @@ public class WifiUpdater implements Runnable {
 
         NotificationCompat.Action myaction = new NotificationCompat.Action(R.drawable.ic_silence, "Turn Off", resultPendingIntent);//TODO Turn off this notifification
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(act)
-                .setSmallIcon(R.drawable.ic_stat_name)//TODO put HN logo
+                .setSmallIcon(R.drawable.ic_stat_name_hn)
                 .setLargeIcon(we.getLogo())
                 .setContentTitle(we.getName())
                 .setContentText(we.getMessage())

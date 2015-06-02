@@ -38,7 +38,7 @@ public class Weacon {
             logo = drawableToBitmap(new RoundImage(bm));
         } else {
             //Default logo
-            logo = BitmapFactory.decodeResource(act.getResources(), R.mipmap.ic_aurora);
+            logo = BitmapFactory.decodeResource(act.getResources(), R.mipmap.ic_launcher);
         }
 //                getBitmap();
 //        logo = new RoundImage(bm);

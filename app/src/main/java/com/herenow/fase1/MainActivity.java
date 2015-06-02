@@ -69,6 +69,8 @@ public class MainActivity extends ActionBarActivity {
             String line;
             line = br.readLine();//headers
             while ((line = br.readLine()) != null) {
+                if (line.toCharArray()[0] == '/' && line.toCharArray()[1] == '/')
+                    continue; //skip comment lines (//)
                 String[] parts = line.split("; ");
                 Weacon we = new Weacon(parts, this);
                 weaconsTable.put(parts[0], we);
@@ -124,7 +126,7 @@ public class MainActivity extends ActionBarActivity {
         stackBuilder.addNextIntent(resultIntent);
         resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        Bitmap bm = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_aurora);
+        Bitmap bm = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
 
         NotificationCompat.Action myaction = new NotificationCompat.Action(R.drawable.ic_stat_name, "Call", resultPendingIntent);
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)

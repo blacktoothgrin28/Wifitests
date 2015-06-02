@@ -23,7 +23,11 @@
         </activity>
         <activity
             android:name=".SecondActivity"
-            android:label="@string/title_activity_second" />
+            android:icon="@mipmap/ic_launcher"
+            android:label="@string/title_activity_second"
+            android:logo="@mipmap/ic_launcher" />
+        <!--android:logo="@drawable/abc_ic_menu_paste_mtrl_am_alpha" />-->
+
     </application>
 
 </manifest>
