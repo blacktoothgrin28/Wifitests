@@ -48,7 +48,7 @@
         android:text="Demo Mode" />
 
     <TextView
-        android:id="@+id/fieldStrength"
+        android:id="@+id/tv_fieldStrength"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal|top"

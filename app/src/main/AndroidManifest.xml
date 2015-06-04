@@ -25,7 +25,13 @@
             android:name=".SecondActivity"
             android:icon="@mipmap/ic_launcher"
             android:label="@string/title_activity_second"
-            android:logo="@mipmap/ic_launcher" />
+            android:logo="@mipmap/ic_launcher"
+            android:parentActivityName=".MainActivity">
+            <!-- Parent activity meta-data to support 4.0 and lower -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="MainActivity" />
+        </activity>
         <!-- android:logo="@drawable/abc_ic_menu_paste_mtrl_am_alpha" /> -->
 
         <activity

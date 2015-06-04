@@ -61,7 +61,7 @@ public class SecondActivity extends ActionBarActivity {
 //        Drawable d=
         android.support.v7.app.ActionBar ab = this.getSupportActionBar();
 //        ab.setTitle("pepe");
-        ab.setDisplayUseLogoEnabled(true); //TODO makes logo appear in action bar
+        ab.setDisplayUseLogoEnabled(true);
         ab.setDisplayHomeAsUpEnabled(true);
         ab.setDisplayShowHomeEnabled(true);
 

@@ -52,10 +52,11 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        tv = (TextView) findViewById(R.id.fieldStrength);
+        tv = (TextView) findViewById(R.id.tv_fieldStrength);
         mySwitch = (Switch) findViewById(R.id.switch1);
-        //set the switch to ON
+        //set the switch to off
         mySwitch.setChecked(false);
+        tv.setText("demo OFF");
         //attach a listener to check for changes in state
         mySwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 
@@ -69,11 +70,7 @@ public class MainActivity extends ActionBarActivity {
 
         //check the current state before we display the screen
         demoMode = mySwitch.isChecked();
-        if (mySwitch.isChecked()) {
-            tv.setText("demo ON");
-        } else {
-            tv.setText("demo OFF");
-        }
+
 //        if (savedInstanceState == null) {
 //            getSupportFragmentManager().beginTransaction()
 //                    .add(R.id.container, new PlaceholderFragment())
@@ -85,13 +82,19 @@ public class MainActivity extends ActionBarActivity {
     private void modeChange(boolean Demo) {
 
         t = new Timer();
-        wifiUpdater = new WifiUpdater((TextView) findViewById(R.id.fieldStrength), this, Demo);
+        wifiUpdater = new WifiUpdater((TextView) findViewById(R.id.tv_fieldStrength), this, Demo);
+
+        if (Demo) {
+            tv.setText("demo ON");
+        } else {
+            tv.setText("demo OFF");
+        }
         t.schedule(new TimerTask() {
             @Override
             public void run() {
                 runOnUiThread(wifiUpdater);
             }
-        }, 0, 500);
+        }, 4000, 500);
 
     }
 
@@ -254,7 +257,7 @@ public class MainActivity extends ActionBarActivity {
 
     public void clickStartSearching(View view) {
         t = new Timer();
-        wifiUpdater = new WifiUpdater((TextView) findViewById(R.id.fieldStrength), this, demoMode);
+        wifiUpdater = new WifiUpdater((TextView) findViewById(R.id.tv_fieldStrength), this, demoMode);
 
 
         t.schedule(new TimerTask() {
