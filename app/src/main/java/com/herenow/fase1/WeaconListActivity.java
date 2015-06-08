@@ -22,7 +22,8 @@ import util.Weacon;
 public class WeaconListActivity extends ActionBarActivity {
     private RecyclerView mRecyclerView;
     private WeaconAdapter adapter;
-    private List<WeaconItem> weaconItemList = new ArrayList<WeaconItem>();
+//    private List<WeaconItem> weaconItemList = new ArrayList<WeaconItem>();
+    private List<Weacon> weaconItemList = new ArrayList<Weacon>();
     private Intent intentWeb;
 
     @Override
@@ -39,7 +40,8 @@ public class WeaconListActivity extends ActionBarActivity {
         Collection<Weacon> intermediate = MainActivity.weaconsTable.values();
         for (Object obj : intermediate.toArray()) {
             Weacon wec = (Weacon) obj;
-            weaconItemList.add(new WeaconItem(wec.getName(), wec.getMessage(), wec.getPath().toString()));
+//            weaconItemList.add(new WeaconItem(wec.getName(), wec.getMessage(), wec.getImagePath().toString(), wec.getUrl()));
+            weaconItemList.add(wec);
         }
 
         adapter = new WeaconAdapter(this, weaconItemList);
@@ -48,11 +50,17 @@ public class WeaconListActivity extends ActionBarActivity {
             public void onClick(View v) {
                 Log.d("mhp", "clickado el " + mRecyclerView.getChildPosition(v));
 
+                Weacon we = (Weacon) v.getTag();
+                Log.d("mhp", "esta es la url: " + we.getUrl());
+
                 intentWeb = new Intent(WeaconListActivity.this, SecondActivity.class);
 
                 //TODO recupear el weacon correcto
-                Weacon we = MainActivity.weaconsTable.get("AIA");
+//                Weacon we = MainActivity.weaconsTable.get("AIA");
 //                intentWeb.putExtra("wName", (Parcelable) we); //TODO check if weacon can be serializable or parceable
+//                intentWeb.putExtra("wName", we.getName());
+//                intentWeb.putExtra("wUrl", we.getUrl());
+//                intentWeb.putExtra("wLogo", we.getLogo());
                 intentWeb.putExtra("wName", we.getName());
                 intentWeb.putExtra("wUrl", we.getUrl());
                 intentWeb.putExtra("wLogo", we.getLogo());

@@ -6,14 +6,21 @@ package util;
 
 
 public class WeaconItem {
+    private String url;
     private String message;
     private String title;
     private String thumbnail;
+//    private String imagePath;
 
-    public WeaconItem(String title, String Message, String thumbnail) {
+    public WeaconItem(String title, String Message, String thumbnail, String url) {
         this.title = title;
         this.thumbnail = thumbnail;
         this.message = Message;
+        this.url = url;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getMessage() {
@@ -24,8 +31,8 @@ public class WeaconItem {
         return title;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public String getUrl() {
+        return url;
     }
 
     public String getThumbnail() {
@@ -35,4 +42,6 @@ public class WeaconItem {
     public void setThumbnail(String thumbnail) {
         this.thumbnail = thumbnail;
     }
+
+
 }

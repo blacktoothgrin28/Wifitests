@@ -23,7 +23,7 @@ public class Weacon {
     private String name, url;
     private String SSID;
     private String message;
-    private File path;
+    private File imagePath;
 
 
     public Weacon(String[] register, Activity act) {
@@ -35,9 +35,9 @@ public class Weacon {
         url = register[3];
         logoFileName = register[4];
         message = register[5];
-        path = new File(Environment.getExternalStorageDirectory(), "HNdata/Images/" + logoFileName);
-        if (path.isFile()) {
-            Bitmap bm = Bitmap.createScaledBitmap(BitmapFactory.decodeFile(path.getPath()), 120, 120, false);
+        imagePath = new File(Environment.getExternalStorageDirectory(), "HNdata/Images/" + logoFileName);
+        if (imagePath.isFile()) {
+            Bitmap bm = Bitmap.createScaledBitmap(BitmapFactory.decodeFile(imagePath.getPath()), 120, 120, false);
             logo = drawableToBitmap(new RoundImage(bm));
         } else {
             //Default logo
@@ -81,8 +81,8 @@ public class Weacon {
         return logo;
     }
 
-    public File getPath() {
-        return path;
+    public File getImagePath() {
+        return imagePath;
     }
     public int getLevel() {
         return level;
