@@ -14,15 +14,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import util.FeedItem;
-import util.MyRecyclerAdapter;
+import util.WeaconItem;
+import util.WeaconAdapter;
 import util.Weacon;
 
 
 public class WeaconListActivity extends ActionBarActivity {
     private RecyclerView mRecyclerView;
-    private MyRecyclerAdapter adapter;
-    private List<FeedItem> feedItemList = new ArrayList<FeedItem>();
+    private WeaconAdapter adapter;
+    private List<WeaconItem> weaconItemList = new ArrayList<WeaconItem>();
     private Intent intentWeb;
 
     @Override
@@ -30,35 +30,34 @@ public class WeaconListActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_weacon_list);
 
-
         mRecyclerView = new RecyclerView(this);
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-
-        Log.d("mhp", "ponirndole el linear LY");
+        mRecyclerView.hasFixedSize();
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         //Fill the list for the example
         Collection<Weacon> intermediate = MainActivity.weaconsTable.values();
         for (Object obj : intermediate.toArray()) {
             Weacon wec = (Weacon) obj;
-            feedItemList.add(new FeedItem(wec.getName(), wec.getMessage(), wec.getPath().toString()));
+            weaconItemList.add(new WeaconItem(wec.getName(), wec.getMessage(), wec.getPath().toString()));
         }
 
-        adapter = new MyRecyclerAdapter(this, feedItemList);
+        adapter = new WeaconAdapter(this, weaconItemList);
         adapter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Log.d("mhp", "clickado el " + mRecyclerView.getChildPosition(v));
+
                 intentWeb = new Intent(WeaconListActivity.this, SecondActivity.class);
 
                 //TODO recupear el weacon correcto
                 Weacon we = MainActivity.weaconsTable.get("AIA");
+//                intentWeb.putExtra("wName", (Parcelable) we); //TODO check if weacon can be serializable or parceable
                 intentWeb.putExtra("wName", we.getName());
                 intentWeb.putExtra("wUrl", we.getUrl());
                 intentWeb.putExtra("wLogo", we.getLogo());
 
                 WeaconListActivity.this.startActivity(intentWeb);
-
             }
         });
 

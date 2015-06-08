@@ -28,7 +28,7 @@
             android:layout_alignParentLeft="true"
             android:layout_marginBottom="2dp"
             android:layout_marginLeft="6dp"
-            android:layout_marginTop="9dp"
+            android:layout_marginTop="3dp"
             android:maxLines="1"
             android:text="Name"
             android:textColor="@color/abc_primary_text_material_light"
@@ -38,13 +38,14 @@
 
             android:id="@+id/description"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="fill_parent"
             android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true"
             android:layout_margin="1dp"
             android:maxLines="2"
             android:text="Description"
-            android:textColor="@color/abc_secondary_text_material_light" />
+            android:textColor="@color/abc_secondary_text_material_light"
+            android:textStyle="italic" />
     </LinearLayout>
 
 </LinearLayout>

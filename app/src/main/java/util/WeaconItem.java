@@ -5,12 +5,12 @@ package util;
  */
 
 
-public class FeedItem {
+public class WeaconItem {
     private String message;
     private String title;
     private String thumbnail;
 
-    public FeedItem(String title, String Message, String thumbnail) {
+    public WeaconItem(String title, String Message, String thumbnail) {
         this.title = title;
         this.thumbnail = thumbnail;
         this.message = Message;
