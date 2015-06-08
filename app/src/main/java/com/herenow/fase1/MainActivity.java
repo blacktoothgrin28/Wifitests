@@ -42,6 +42,7 @@ public class MainActivity extends ActionBarActivity {
     public static boolean demoMode; //in demo mode doesn't look for wifi's, it just lunch the events
     NotificationManager mNotificationManager;
     WebView wb;
+    Intent intentList;
     private WifiUpdater wifiUpdater;
     private Timer t;
     private Switch mySwitch;
@@ -52,8 +53,8 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        tv = (TextView) findViewById(R.id.tv_fieldStrength);
-        mySwitch = (Switch) findViewById(R.id.switch1);
+        tv = (TextView) findViewById(R.id.tv_demoStatus);
+        mySwitch = (Switch) findViewById(R.id.sw_demo);
         //set the switch to off
         mySwitch.setChecked(false);
         tv.setText("demo OFF");
@@ -82,7 +83,7 @@ public class MainActivity extends ActionBarActivity {
     private void modeChange(boolean Demo) {
 
         t = new Timer();
-        wifiUpdater = new WifiUpdater((TextView) findViewById(R.id.tv_fieldStrength), this, Demo);
+        wifiUpdater = new WifiUpdater((TextView) findViewById(R.id.tv_demoStatus), this, Demo);
 
         if (Demo) {
             tv.setText("demo ON");
@@ -211,6 +212,7 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void clickConnect(View view) {
+
         String networkSSID = "piripiri";
         String networkPass = "spideyhg3711";
 
@@ -257,7 +259,7 @@ public class MainActivity extends ActionBarActivity {
 
     public void clickStartSearching(View view) {
         t = new Timer();
-        wifiUpdater = new WifiUpdater((TextView) findViewById(R.id.tv_fieldStrength), this, demoMode);
+        wifiUpdater = new WifiUpdater((TextView) findViewById(R.id.tv_demoStatus), this, demoMode);
 
 
         t.schedule(new TimerTask() {
@@ -271,6 +273,15 @@ public class MainActivity extends ActionBarActivity {
 
     public void clickStopSearch(View view) {
         t.cancel();
+    }
+
+    public void clickShowListActivity(View view) {
+        try {
+            intentList = new Intent(this, WeaconListActivity.class);
+            startActivity(intentList);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 

@@ -5,4 +5,5 @@
     <string name="send_notif">Send notif</string>
     <string name="stop_notif">stopem</string>
     <string name="title_activity_second">H&amp;N Weacon</string>
+    <string name="title_activity_weacon_list">WeaconList</string>
 </resources>
