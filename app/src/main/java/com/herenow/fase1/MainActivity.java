@@ -38,8 +38,9 @@ import util.Weacon;
 
 
 public class MainActivity extends ActionBarActivity {
-    public static HashMap<String, Weacon> weaconsTable = new HashMap<String, Weacon>();
+    public static HashMap<String, Weacon> weaconsTable = new HashMap<String, Weacon>(); //Total list of weacons
     public static boolean demoMode; //in demo mode doesn't look for wifi's, it just lunch the events
+    public static HashMap<String, Weacon> weaconsLaunchedTable;
     NotificationManager mNotificationManager;
     WebView wb;
     Intent intentList;

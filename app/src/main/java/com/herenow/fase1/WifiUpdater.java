@@ -26,7 +26,7 @@ import util.Weacon;
  * Created by Milenko on 27/05/2015.
  */
 public class WifiUpdater implements Runnable {
-    private static HashMap<String, Weacon> weaconsLaunchedTable;
+    //    private static HashMap<String, Weacon> weaconsLaunchedTable;
     private static ArrayList<Object> showedNotifications;
     private static int mId;
     private static NotificationCompat.Builder mBuilder;
@@ -44,7 +44,7 @@ public class WifiUpdater implements Runnable {
         this.textView = tv;
         this.act = activity;
         this.demo = demo;
-        weaconsLaunchedTable = new HashMap<>();
+        MainActivity.weaconsLaunchedTable = new HashMap<>();
         showedNotifications = new ArrayList<>(); //Weacons showed in notification
         wifi = (WifiManager) activity.getSystemService(Context.WIFI_SERVICE);
 //        this.act = activity;
@@ -54,76 +54,28 @@ public class WifiUpdater implements Runnable {
     }
 
     private static void sendNotification(Activity act, Weacon we) {
-//        PendingIntent resultPendingIntent = null;
-        Intent resultIntent = new Intent(act.getBaseContext(), BrowserActivity.class);
-
-        resultIntent.putExtra("wName", we.getName());
-        resultIntent.putExtra("wUrl", we.getUrl());
-        resultIntent.putExtra("wLogo", we.getLogo());
+        Intent resultIntent;
+        PendingIntent resultPendingIntent;
+        TaskStackBuilder stackBuilder;
 
 
-//        Context ctx = act.getBaseContext();
-//
-//        Intent backIntent = new Intent(ctx, MainActivity.class);
-//        backIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//
-//        Intent intent = new Intent(ctx, BrowserActivity.class);
-//        intent.putExtra("whatever", "whatever");
-//        final PendingIntent pendingIntent = PendingIntent.getActivities(ctx, UNIQUE_REQUEST_CODE++,
-//                new Intent[] {backIntent, intent}, PendingIntent.FLAG_ONE_SHOT);
-//
-//
-
-
-
-        // The stack builder object will contain an artificial back stack for the
-        // started Activity.
-        // This ensures that navigating backward from the Activity leads out of
-        // your application to the Home screen.
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(act.getBaseContext());//TODO puede que necesite un contexto, no una actividad
-        // Adds the back stack for the Intent (but not the Intent itself)
-        stackBuilder.addParentStack(BrowserActivity.class);
-        // Adds the Intent that starts the Activity to the top of the stack
-        stackBuilder.addNextIntent(resultIntent);
-        PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        //example
-       /* Bitmap bm = BitmapFactory.decodeResource(act.getResources(), R.mipmap.ic_aurora);
-        NotificationCompat.Action myaction = new NotificationCompat.Action(R.drawable.ic_stat_name, "Call", resultPendingIntent);
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(act)
-                .setSmallIcon(R.drawable.ic_stat_name)
-                .setLargeIcon(bm)
-                .setContentTitle("Weacons available")
-                .setContentText(act.getString(R.string.cid))
-                .setAutoCancel(true)
-                .setDefaults(Notification.DEFAULT_VIBRATE | Notification.DEFAULT_SOUND | Notification.FLAG_SHOW_LIGHTS)
-                .setLights(0xff00ff00, 300, 100)
-                .setLights(0xE6D820, 300, 100)
-                .setTicker("HearNow weacons detected");
-                .addAction(myaction);*/
-        //NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
-
-      /*  String[] events = {"H&M", "ZARA", "AIA", "USA Ambassay", "Starbucks", "Bus station"};
-
-        // Sets a title for the Inbox in expanded layout
-        inboxStyle.setBigContentTitle("Available weacons");
-
-        // Moves events into the expanded layout
-        for (String event : events) {
-            inboxStyle.addLine(event);
-        }
-        // Moves the expanded layout object into the notification object.
-        mBuilder.setStyle(inboxStyle);
-
-        mBuilder.setContentIntent(resultPendingIntent);
-        NotificationManager mNotificationManager = (NotificationManager) act.getSystemService(Context.NOTIFICATION_SERVICE);
-        // mId allows you to update the notification later on.
-       */
 
         if (showedNotifications.size() == 0) { //New Notification
             mId = 1;
             showedNotifications.add(we);
-            NotificationCompat.Action myAction = new NotificationCompat.Action(R.drawable.ic_silence, "Turn Off", resultPendingIntent);//TODO Turn off this notifification
+
+            resultIntent = new Intent(act.getBaseContext(), BrowserActivity.class);
+//            resultIntent.putExtra("weacon",  we);
+            resultIntent.putExtra("wName", we.getName());
+            resultIntent.putExtra("wUrl", we.getUrl());
+            resultIntent.putExtra("wLogo", we.getLogo());
+            stackBuilder = TaskStackBuilder.create(act.getBaseContext());
+            stackBuilder.addParentStack(BrowserActivity.class);
+            stackBuilder.addNextIntent(resultIntent);
+            resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+
+
+            NotificationCompat.Action myAction = new NotificationCompat.Action(R.drawable.ic_silence, "Turn Off", resultPendingIntent);
             mBuilder = new NotificationCompat.Builder(act)
                     .setSmallIcon(R.drawable.ic_stat_name_hn)
                     .setLargeIcon(we.getLogo())
@@ -138,13 +90,10 @@ public class WifiUpdater implements Runnable {
             bigTextStyle.setBigContentTitle(we.getName());
             bigTextStyle.bigText(we.getMessage());
 
-            // Moves the expanded layout object into the notification object.
             mBuilder.setStyle(bigTextStyle);
-
             mBuilder.setContentIntent(resultPendingIntent);
 
         } else { // Update the notification already sent
-
             mNotificationManager.cancel(mId);
             mId = 2;
 
@@ -169,11 +118,21 @@ public class WifiUpdater implements Runnable {
                 inboxStyle.addLine(((Weacon) weacon).getName());
             }
             mBuilder.setStyle(inboxStyle);
+
+            resultIntent = new Intent(act.getBaseContext(), WeaconListActivity.class);
+            resultIntent.putExtra("wName", we.getName());
+            resultIntent.putExtra("wUrl", we.getUrl());
+            resultIntent.putExtra("wLogo", we.getLogo());
+            stackBuilder = TaskStackBuilder.create(act.getBaseContext());
+            stackBuilder.addParentStack(WeaconListActivity.class);
+            stackBuilder.addNextIntent(resultIntent);
+            resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+
             mBuilder.setContentIntent(resultPendingIntent);
         }
 
         mNotificationManager.notify(mId, mBuilder.build());
-        weaconsLaunchedTable.put(we.getSSID(), we);
+        MainActivity.weaconsLaunchedTable.put(we.getSSID(), we);
     }
 
     @Override
@@ -197,7 +156,7 @@ public class WifiUpdater implements Runnable {
 //                }
 //                levelOld = r.level;
 //                break;
-                if (MainActivity.weaconsTable.containsKey(r.SSID) && !weaconsLaunchedTable.containsKey(r.SSID)) {
+                if (MainActivity.weaconsTable.containsKey(r.SSID) && !MainActivity.weaconsLaunchedTable.containsKey(r.SSID)) {
                     Weacon we = MainActivity.weaconsTable.get(r.SSID);
                     int threshold = we.getLevel();
                     if (levelOld < threshold && r.level >= threshold) {
@@ -220,7 +179,7 @@ public class WifiUpdater implements Runnable {
         Object[] values = intermediate.toArray();
         do {
             we = (Weacon) values[generator.nextInt(values.length)];
-        } while (weaconsLaunchedTable.containsKey(we.getSSID()));
+        } while (MainActivity.weaconsLaunchedTable.containsKey(we.getSSID()));
         sendNotification(act, we);
     }
 }

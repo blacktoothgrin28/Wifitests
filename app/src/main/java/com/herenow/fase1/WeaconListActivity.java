@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
+import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -44,11 +45,18 @@ public class WeaconListActivity extends ActionBarActivity {
 
 
         //Fill the list for the example
-        Collection<Weacon> intermediate = MainActivity.weaconsTable.values();
+//        Collection<Weacon> intermediate = MainActivity.weaconsTable.values();
+//        for (Object obj : intermediate.toArray()) {
+//            Weacon wec = (Weacon) obj;
+////            weaconItemList.add(new WeaconItem(wec.getName(), wec.getMessage(), wec.getImagePath().toString(), wec.getUrl()));
+//            weaconItemList.add(wec);
+//        }
+        //Fill the list with launched
+        Collection<Weacon> intermediate = MainActivity.weaconsLaunchedTable.values();
         for (Object obj : intermediate.toArray()) {
             Weacon wec = (Weacon) obj;
-//            weaconItemList.add(new WeaconItem(wec.getName(), wec.getMessage(), wec.getImagePath().toString(), wec.getUrl()));
-            weaconItemList.add(wec);
+            weaconItemList.add(wec); //To the shohwed list.
+
         }
 
         adapter = new WeaconAdapter(this, weaconItemList);
@@ -104,6 +112,11 @@ class DividerItemDecoration extends RecyclerView.ItemDecoration {
     }
 
     public DividerItemDecoration(Drawable divider) {
+//        mDivider = divider;
+
+//        mDivider = divider.setColorFilter( 0xffff0000, PorterDuff.Mode.MULTIPLY );
+//        mDivider = divider.setColorFilter(Color.parseColor("#AE6118"));
+        divider.setColorFilter(0xFF5068F2, PorterDuff.Mode.MULTIPLY);
         mDivider = divider;
     }
 
