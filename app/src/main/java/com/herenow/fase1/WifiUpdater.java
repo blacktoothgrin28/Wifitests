@@ -55,7 +55,7 @@ public class WifiUpdater implements Runnable {
 
     private static void sendNotification(Activity act, Weacon we) {
 //        PendingIntent resultPendingIntent = null;
-        Intent resultIntent = new Intent(act.getBaseContext(), SecondActivity.class);
+        Intent resultIntent = new Intent(act.getBaseContext(), BrowserActivity.class);
 
         resultIntent.putExtra("wName", we.getName());
         resultIntent.putExtra("wUrl", we.getUrl());
@@ -67,7 +67,7 @@ public class WifiUpdater implements Runnable {
 //        Intent backIntent = new Intent(ctx, MainActivity.class);
 //        backIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 //
-//        Intent intent = new Intent(ctx, SecondActivity.class);
+//        Intent intent = new Intent(ctx, BrowserActivity.class);
 //        intent.putExtra("whatever", "whatever");
 //        final PendingIntent pendingIntent = PendingIntent.getActivities(ctx, UNIQUE_REQUEST_CODE++,
 //                new Intent[] {backIntent, intent}, PendingIntent.FLAG_ONE_SHOT);
@@ -82,7 +82,7 @@ public class WifiUpdater implements Runnable {
         // your application to the Home screen.
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(act.getBaseContext());//TODO puede que necesite un contexto, no una actividad
         // Adds the back stack for the Intent (but not the Intent itself)
-        stackBuilder.addParentStack(SecondActivity.class);
+        stackBuilder.addParentStack(BrowserActivity.class);
         // Adds the Intent that starts the Activity to the top of the stack
         stackBuilder.addNextIntent(resultIntent);
         PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);

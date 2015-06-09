@@ -156,7 +156,7 @@ public class MainActivity extends ActionBarActivity {
 //        }
 
         PendingIntent resultPendingIntent = null;
-        Intent resultIntent = new Intent(this, SecondActivity.class);
+        Intent resultIntent = new Intent(this, BrowserActivity.class);
 
         // The stack builder object will contain an artificial back stack for the
         // started Activity.
@@ -164,7 +164,7 @@ public class MainActivity extends ActionBarActivity {
         // your application to the Home screen.
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
         // Adds the back stack for the Intent (but not the Intent itself)
-        stackBuilder.addParentStack(SecondActivity.class);
+        stackBuilder.addParentStack(BrowserActivity.class);
         // Adds the Intent that starts the Activity to the top of the stack
         stackBuilder.addNextIntent(resultIntent);
         resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);

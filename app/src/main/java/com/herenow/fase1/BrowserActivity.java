@@ -11,7 +11,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 
-public class SecondActivity extends ActionBarActivity {
+public class BrowserActivity extends ActionBarActivity {
 
     private String wName;
     private String wUrl;
@@ -24,6 +24,8 @@ public class SecondActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_second);
+        overridePendingTransition(R.transition.trans_left_in, R.transition.trans_left_out);
+
 
         Bundle b = getIntent().getExtras();
         wName = b.getString("wName");
@@ -83,9 +85,20 @@ public class SecondActivity extends ActionBarActivity {
         if (id == R.id.browserMenu) {
             return true;
         }
-
+        if (id == android.R.id.home) {
+            finish();
+            overridePendingTransition(R.transition.trans_right_in, R.transition.trans_right_out);
+            return true;
+        }
         return super.onOptionsItemSelected(item);
     }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        overridePendingTransition(R.transition.trans_right_in, R.transition.trans_right_out);
+    }
+
 
     private class Callback extends WebViewClient {
 
@@ -95,4 +108,6 @@ public class SecondActivity extends ActionBarActivity {
         }
 
     }
+
+
 }

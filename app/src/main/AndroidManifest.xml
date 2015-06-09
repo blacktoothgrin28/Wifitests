@@ -22,11 +22,11 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".SecondActivity"
+            android:name=".BrowserActivity"
             android:icon="@mipmap/ic_launcher"
             android:label="@string/title_activity_second"
             android:logo="@mipmap/ic_launcher"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".WeaconListActivity">
 
             <!-- Parent activity meta-data to support 4.0 and lower -->
             <meta-data
