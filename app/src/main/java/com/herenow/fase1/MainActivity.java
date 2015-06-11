@@ -25,7 +25,14 @@ import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.parse.FindCallback;
+import com.parse.Parse;
+import com.parse.ParseFile;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
+
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -73,12 +80,36 @@ public class MainActivity extends ActionBarActivity {
         //check the current state before we display the screen
         demoMode = mySwitch.isChecked();
 
-//        if (savedInstanceState == null) {
-//            getSupportFragmentManager().beginTransaction()
-//                    .add(R.id.container, new PlaceholderFragment())
-//                    .commit();
-//        }
-        readWeacons();
+        // Enable Local Datastore.
+        Parse.enableLocalDatastore(this);
+        Parse.initialize(this, "CADa4nX2Lx29QEJlC3LUY1snbjq9zySlF5S3YSVG", "hC9VWCmGEBxb9fSGQPiOjSInaAPnYMZ0t8k3V0UO");
+
+//        UploadFileWeacons(); //From file to cloud
+        DownloadWeacons();
+    }
+
+    /**
+     * takes all weacons from internet and put in local Hash
+     */
+    private void DownloadWeacons() {
+        String name;
+        //TODO download few weacons only, in the area
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("Weacon");
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> objects, com.parse.ParseException e) {
+                if (e == null) {
+                    for (ParseObject obj : objects) {
+                        Weacon we = new Weacon(obj);
+                        weaconsTable.put(we.getSSID(), we);
+                    }
+//                    objectsWereRetrievedSuccessfully(objects);
+                } else {
+//                    objectRetrievalFailed();
+                }
+            }
+
+        });
     }
 
     private void modeChange(boolean Demo) {
@@ -101,9 +132,9 @@ public class MainActivity extends ActionBarActivity {
     }
 
     /**
-     * Read the file from sd card (dropbox) with weacons description and put them in the hashmap
+     * Read the file from sd card (dropbox) and put them in cloud
      */
-    private void readWeacons() {
+    private void UploadFileWeacons() {
         //1. read file
         File sdcard = new File(Environment.getExternalStorageDirectory(), "HNdata");
         File file = new File(sdcard, "weacons.txt");
@@ -117,12 +148,43 @@ public class MainActivity extends ActionBarActivity {
                     continue; //skip comment lines (//)
                 String[] parts = line.split("; ");
                 Weacon we = new Weacon(parts, this);
-                weaconsTable.put(parts[0], we);
+//                weaconsTable.put(parts[0], we); //TODO populate this table from internec
+                uploadWeacon(we);
             }
             br.close();
         } catch (IOException e) {
             //You'll need to add proper error handling here
         }
+    }
+
+    private void uploadWeacon(Weacon we) {
+
+        //Check if is already present: (now SSID is the key) //TODO change the key
+
+        ParseObject parseWeacon = new ParseObject("Weacon");
+        parseWeacon.put("SSID", we.getSSID()); // ="" means no SSID, is like monuments. detect several around. system of rules
+        parseWeacon.put("BSSID", we.getBSSID()); //
+        parseWeacon.put("Name", we.getName());
+        parseWeacon.put("Description", we.getMessage());
+
+        //Upload Logo
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        we.getLogo().compress(Bitmap.CompressFormat.PNG, 100, stream);
+        byte[] byteArray = stream.toByteArray();
+        ParseFile fileLogo = new ParseFile(we.getImagePath().getName(), byteArray);
+        parseWeacon.put("Logo", fileLogo); //TODO check that file to upload is small
+
+        parseWeacon.put("MainUrl", we.getUrl());
+//        parseWeacon.put("MultipleURL", we.getUrl()); //TODO think how to store several
+        parseWeacon.put("Level", we.getLevel());
+
+        parseWeacon.put("Validated", we.isValidated()); // The check to guarantee that is the propietary has been done
+
+        parseWeacon.put("GPS", we.getParseGps()); //TODO near coordinates
+        parseWeacon.put("Type", we.getTypeString());
+
+        parseWeacon.saveInBackground();
+
     }
 
 

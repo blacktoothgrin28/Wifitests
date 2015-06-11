@@ -68,7 +68,7 @@ public class WifiUpdater implements Runnable {
 //            resultIntent.putExtra("weacon",  we);
             resultIntent.putExtra("wName", we.getName());
             resultIntent.putExtra("wUrl", we.getUrl());
-            resultIntent.putExtra("wLogo", we.getLogo());
+            resultIntent.putExtra("wLogo", we.getLogoRounded());
             stackBuilder = TaskStackBuilder.create(act.getBaseContext());
             stackBuilder.addParentStack(BrowserActivity.class);
             stackBuilder.addNextIntent(resultIntent);
@@ -78,7 +78,7 @@ public class WifiUpdater implements Runnable {
             NotificationCompat.Action myAction = new NotificationCompat.Action(R.drawable.ic_silence, "Turn Off", resultPendingIntent);
             mBuilder = new NotificationCompat.Builder(act)
                     .setSmallIcon(R.drawable.ic_stat_name_hn)
-                    .setLargeIcon(we.getLogo())
+                    .setLargeIcon(we.getLogoRounded())
                     .setContentTitle(we.getName())
                     .setContentText(we.getMessage())
                     .setAutoCancel(true)
@@ -122,7 +122,7 @@ public class WifiUpdater implements Runnable {
             resultIntent = new Intent(act.getBaseContext(), WeaconListActivity.class);
             resultIntent.putExtra("wName", we.getName());
             resultIntent.putExtra("wUrl", we.getUrl());
-            resultIntent.putExtra("wLogo", we.getLogo());
+            resultIntent.putExtra("wLogo", we.getLogoRounded());
             stackBuilder = TaskStackBuilder.create(act.getBaseContext());
             stackBuilder.addParentStack(WeaconListActivity.class);
             stackBuilder.addNextIntent(resultIntent);
