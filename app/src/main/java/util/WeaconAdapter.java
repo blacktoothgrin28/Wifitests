@@ -37,18 +37,18 @@ public class WeaconAdapter extends RecyclerView.Adapter<WeaconHolder> implements
 
     @Override
     public void onBindViewHolder(WeaconHolder weaconHolder, int i) {
-//        WeaconItem weaconItem = weaconItemList.get(i);
         Weacon weaconItem = weaconItemList.get(i);
-        String imageUrl = "file:" + weaconItem.getImagePath(); //Necessary for local files
+//        String imageUrl = "file:" + weaconItem.getImagePath(); //Necessary for local files
+        String imageUrl = weaconItem.getImageParseUrl();
         Picasso.with(mContext).load(imageUrl)
                 .error(R.drawable.abc_ic_ab_back_mtrl_am_alpha)
-                .placeholder(R.drawable.abc_btn_check_to_on_mtrl_015)
+                .placeholder(R.mipmap.ic_launcher)
                 .into(weaconHolder.thumbnail);
 
 //        weaconHolder.title.setText(Html.fromHtml(weaconItem.getTitle()));
         weaconHolder.title.setText(weaconItem.getName());
         weaconHolder.description.setText(weaconItem.getMessage());
-        weaconHolder.itemView.setTag(weaconItem); //TODO test, remove?
+        weaconHolder.itemView.setTag(weaconItem);
     }
 
     @Override

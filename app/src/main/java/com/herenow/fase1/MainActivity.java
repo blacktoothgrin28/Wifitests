@@ -99,6 +99,7 @@ public class MainActivity extends ActionBarActivity {
             @Override
             public void done(List<ParseObject> objects, com.parse.ParseException e) {
                 if (e == null) {
+                    tv.setText("Weacons downloaded");
                     for (ParseObject obj : objects) {
                         Weacon we = new Weacon(obj);
                         weaconsTable.put(we.getSSID(), we);
@@ -340,8 +341,9 @@ public class MainActivity extends ActionBarActivity {
 
     public void clickShowListActivity(View view) {
         try {
-            intentList = new Intent(this, WeaconListActivity.class);
-            startActivity(intentList);
+//            intentList = new Intent(this, WeaconListActivity.class);
+//            startActivity(intentList);
+            DownloadWeacons();
         } catch (Exception e) {
             e.printStackTrace();
         }

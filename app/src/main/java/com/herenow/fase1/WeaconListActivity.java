@@ -68,7 +68,7 @@ public class WeaconListActivity extends ActionBarActivity {
                 intentWeb = new Intent(WeaconListActivity.this, BrowserActivity.class);
                 intentWeb.putExtra("wName", we.getName());
                 intentWeb.putExtra("wUrl", we.getUrl());
-                intentWeb.putExtra("wLogo", we.getLogo());
+                intentWeb.putExtra("wLogo", we.getLogoRounded());
 
                 WeaconListActivity.this.startActivity(intentWeb);
             }

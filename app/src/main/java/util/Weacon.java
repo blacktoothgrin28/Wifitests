@@ -10,6 +10,7 @@ import android.os.Environment;
 import android.util.Log;
 
 import com.herenow.fase1.R;
+import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 
@@ -81,12 +82,18 @@ public class Weacon {
         this.type = TYPE.valueOf(obj.getString("Type"));
 
         try {
-            this.gps.setLatitude(obj.getParseGeoPoint("GPS").getLatitude());
-            this.gps.setLongitude(obj.getParseGeoPoint("GPS").getLongitude());
-            this.imageParseUrl = obj.getParseFile("Logo").getUrl();
+            this.gps = new GPSCoordinates(obj.getParseGeoPoint("GPS").getLatitude(), obj.getParseGeoPoint("GPS").getLongitude());
+            this.imageParseUrl = obj.getParseFile("Logo").getUrl();//
             this.validated = obj.getBoolean("Validated");
             this.createAt = obj.getCreatedAt();
             this.updatedAt = obj.getUpdatedAt();
+
+            //Obtaining the bitmap //TODO do not load all images, only urls to images
+            ParseFile parseFile = obj.getParseFile("Logo");
+            byte[] bitmapdata = parseFile.getData();
+            Bitmap bm = BitmapFactory.decodeByteArray(bitmapdata, 0, bitmapdata.length);
+            this.logo = bm;
+            logoRounded = drawableToBitmap(new RoundImage(bm));
 //                this.createdby
         } catch (Exception e) {
             e.printStackTrace();
@@ -172,6 +179,9 @@ public class Weacon {
         return point;
     }
 
+    public String getImageParseUrl() {
+        return imageParseUrl;
+    }
 }
 
 class GPSCoordinates {
