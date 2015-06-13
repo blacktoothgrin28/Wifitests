@@ -20,19 +20,16 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebView;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
 
 import com.parse.FindCallback;
 import com.parse.Parse;
-import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -49,7 +46,6 @@ public class MainActivity extends ActionBarActivity {
     public static boolean demoMode; //in demo mode doesn't look for wifi's, it just lunch the events
     public static HashMap<String, Weacon> weaconsLaunchedTable;
     NotificationManager mNotificationManager;
-    WebView wb;
     Intent intentList;
     private WifiUpdater wifiUpdater;
     private Timer t;
@@ -132,63 +128,6 @@ public class MainActivity extends ActionBarActivity {
 
     }
 
-    /**
-     * Read the file from sd card (dropbox) and put them in cloud
-     */
-    private void UploadFileWeacons() {
-        //1. read file
-        File sdcard = new File(Environment.getExternalStorageDirectory(), "HNdata");
-        File file = new File(sdcard, "weacons.txt");
-
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(file));
-            String line;
-            line = br.readLine();//headers
-            while ((line = br.readLine()) != null) {
-                if (line.toCharArray()[0] == '/' && line.toCharArray()[1] == '/')
-                    continue; //skip comment lines (//)
-                String[] parts = line.split("; ");
-                Weacon we = new Weacon(parts, this);
-//                weaconsTable.put(parts[0], we); //TODO populate this table from internec
-                uploadWeacon(we);
-            }
-            br.close();
-        } catch (IOException e) {
-            //You'll need to add proper error handling here
-        }
-    }
-
-    private void uploadWeacon(Weacon we) {
-
-        //Check if is already present: (now SSID is the key) //TODO change the key
-
-        ParseObject parseWeacon = new ParseObject("Weacon");
-        parseWeacon.put("SSID", we.getSSID()); // ="" means no SSID, is like monuments. detect several around. system of rules
-        parseWeacon.put("BSSID", we.getBSSID()); //
-        parseWeacon.put("Name", we.getName());
-        parseWeacon.put("Description", we.getMessage());
-
-        //Upload Logo
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        we.getLogo().compress(Bitmap.CompressFormat.PNG, 100, stream);
-        byte[] byteArray = stream.toByteArray();
-        ParseFile fileLogo = new ParseFile(we.getImagePath().getName(), byteArray);
-        parseWeacon.put("Logo", fileLogo); //TODO check that file to upload is small
-
-        parseWeacon.put("MainUrl", we.getUrl());
-//        parseWeacon.put("MultipleURL", we.getUrl()); //TODO think how to store several
-        parseWeacon.put("Level", we.getLevel());
-
-        parseWeacon.put("Validated", we.isValidated()); // The check to guarantee that is the propietary has been done
-
-        parseWeacon.put("GPS", we.getParseGps()); //TODO near coordinates
-        parseWeacon.put("Type", we.getTypeString());
-
-        parseWeacon.saveInBackground();
-
-    }
-
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -209,6 +148,73 @@ public class MainActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void clickConnect(View view) {
+
+        String networkSSID = "piripiri";
+        String networkPass = "spideyhg3711";
+
+        WifiConfiguration conf = new WifiConfiguration();
+        conf.SSID = "\"" + networkSSID + "\"";
+
+        //WEP In case of WEP, if your password is in hex, you do not need to surround it with quotes.
+//        conf.wepKeys[0] = "\"" + networkPass + "\"";
+//        conf.wepTxKeyIndex = 0;
+//        conf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
+//        conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP40);
+
+        //WPA
+        conf.preSharedKey = "\"" + networkPass + "\"";
+
+        //open
+//        conf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
+
+        WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+        if (!wifiManager.isWifiEnabled()) {
+            wifiManager.setWifiEnabled(true);
+        }
+        wifiManager.addNetwork(conf);
+
+        List<WifiConfiguration> list = wifiManager.getConfiguredNetworks();
+
+        for (WifiConfiguration i : list) {
+            if (i.SSID != null && i.SSID.equals("\"" + networkSSID + "\"")) {
+                wifiManager.disconnect();
+                wifiManager.enableNetwork(i.networkId, true);
+                wifiManager.reconnect();
+
+                break;
+            }
+        }
+
+    }
+
+
+    public void clickStartSearching(View view) {
+        t = new Timer();
+        wifiUpdater = new WifiUpdater((TextView) findViewById(R.id.tv_demoStatus), this, demoMode);
+        t.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                runOnUiThread(wifiUpdater);
+            }
+        }, 0, 500);
+    }
+
+    public void clickDownloadWeacons(View view) {
+        try {
+//            intentList = new Intent(this, WeaconListActivity.class);
+//            startActivity(intentList);
+            DownloadWeacons();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void clickAddWeacon(View view) {
+        intentList = new Intent(this, AddWeaconActivity.class);
+        startActivity(intentList);
     }
 
     public void clickSendNotification(View view) {
@@ -271,84 +277,42 @@ public class MainActivity extends ActionBarActivity {
         mNotificationManager.notify(mId, mBuilder.build());
     }
 
+    //////////////////////////////////
+    //Deprecated
+
     public void clickStopNotification(View view) {
         mNotificationManager.cancel(1);
     }
 
-    public void clickConnect(View view) {
+    /**
+     * Read the file from sd card (dropbox) and put them in cloud
+     */
+    private void UploadFileWeacons() {
+        //1. read file
+        File sdcard = new File(Environment.getExternalStorageDirectory(), "HNdata");
+        File file = new File(sdcard, "weacons.txt");
 
-        String networkSSID = "piripiri";
-        String networkPass = "spideyhg3711";
-
-
-        WifiConfiguration conf = new WifiConfiguration();
-        conf.SSID = "\"" + networkSSID + "\"";
-
-        //WEP In case of WEP, if your password is in hex, you do not need to surround it with quotes.
-//        conf.wepKeys[0] = "\"" + networkPass + "\"";
-//        conf.wepTxKeyIndex = 0;
-//        conf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
-//        conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP40);
-
-        //WPA
-        conf.preSharedKey = "\"" + networkPass + "\"";
-
-        //open
-//        conf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
-
-        WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-        if (!wifiManager.isWifiEnabled()) {
-            wifiManager.setWifiEnabled(true);
-        }
-        wifiManager.addNetwork(conf);
-
-        List<WifiConfiguration> list = wifiManager.getConfiguredNetworks();
-
-        for (WifiConfiguration i : list) {
-            if (i.SSID != null && i.SSID.equals("\"" + networkSSID + "\"")) {
-                wifiManager.disconnect();
-                wifiManager.enableNetwork(i.networkId, true);
-                wifiManager.reconnect();
-
-                break;
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(file));
+            String line;
+            line = br.readLine();//headers
+            while ((line = br.readLine()) != null) {
+                if (line.toCharArray()[0] == '/' && line.toCharArray()[1] == '/')
+                    continue; //skip comment lines (//)
+                String[] parts = line.split("; ");
+                Weacon we = new Weacon(parts, this);
+//                weaconsTable.put(parts[0], we); //TODO populate this table from internec
+                we.upload();
             }
+            br.close();
+        } catch (IOException e) {
+            //You'll need to add proper error handling here
         }
-
-
-        // Turn on wifi if off
-
-        // connect to piripi con la contrasena
-    }
-
-
-    public void clickStartSearching(View view) {
-        t = new Timer();
-        wifiUpdater = new WifiUpdater((TextView) findViewById(R.id.tv_demoStatus), this, demoMode);
-
-
-        t.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                runOnUiThread(wifiUpdater);
-            }
-        }, 0, 500);
-
     }
 
     public void clickStopSearch(View view) {
         t.cancel();
     }
-
-    public void clickShowListActivity(View view) {
-        try {
-//            intentList = new Intent(this, WeaconListActivity.class);
-//            startActivity(intentList);
-            DownloadWeacons();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
 
     /**
      * A placeholder fragment containing a simple view.
@@ -365,6 +329,4 @@ public class MainActivity extends ActionBarActivity {
             return rootView;
         }
     }
-
-
 }

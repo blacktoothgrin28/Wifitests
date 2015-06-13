@@ -27,4 +27,6 @@ dependencies {
     compile files('libs/picasso-2.3.4.jar')
     compile 'com.parse.bolts:bolts-android:1.+'
     compile fileTree(dir: 'libs', include: 'Parse-*.jar')
+    compile 'com.google.android.gms:play-services:7.5.0'
+    compile 'com.theartofdev.edmodo:android-image-cropper:1.0.+'
 }

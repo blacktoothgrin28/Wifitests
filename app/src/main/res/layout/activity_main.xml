@@ -22,15 +22,15 @@
         android:layout_gravity="right|center_vertical">
 
         <Button
-            android:id="@+id/StopSearch"
+            android:id="@+id/bt_add_weacon"
             style="?android:attr/buttonStyleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="right|center_vertical"
             android:gravity="top"
-            android:onClick="clickStopSearch"
-            android:text="Stp search"
-            android:visibility="invisible" />
+            android:onClick="clickAddWeacon"
+            android:text="add weacon"
+            android:visibility="visible" />
 
         <Button
             android:id="@+id/startSearching"
@@ -63,7 +63,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal|bottom"
-        android:onClick="clickShowListActivity"
+        android:onClick="clickDownloadWeacons"
         android:text="Download" />
 
 </FrameLayout>

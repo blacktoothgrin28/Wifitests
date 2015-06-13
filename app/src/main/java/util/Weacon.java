@@ -14,13 +14,9 @@ import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.Date;
-
-enum TYPE {
-    TOURISM, PRIVATE, COMPANY, SPORT, EDUCATIONAL, GOVERNMENT, PUBLIC_SERVICE, TRANSPORT,
-    HEALTH, RETAIL, RESTAURANT, OTHER
-}
 
 /**
  * Created by Milenko on 28/05/2015.
@@ -44,6 +40,19 @@ public class Weacon {
     private GPSCoordinates gps;
     private TYPE type = TYPE.OTHER; //Type of weacon,
     private String[] SecondaryUrls = null;
+
+    public Weacon(String SSID, String BSSID, String name, String url, String message, GPSCoordinates gps, boolean validated, TYPE type, int level, Bitmap logo) {
+        this.SSID = SSID;
+        this.BSSID = BSSID;
+        this.name = name;
+        this.url = url;
+        this.message = message;
+        this.gps = gps;
+        this.validated = validated;
+        this.type = type;
+        this.level = level;
+        this.logo = logo;
+    }
 //    private String[] MultipleSSIDS= null; //TODO rules for monument detection
 
 
@@ -115,6 +124,38 @@ public class Weacon {
         return bitmap;
     }
 
+    /**
+     * upload this weacon to Parse.com (cloud)
+     */
+    public void upload() {
+        //Check if is already present: (now SSID is the key) //TODO change the key
+
+        ParseObject parseWeacon = new ParseObject("Weacon");
+        parseWeacon.put("SSID", this.getSSID()); // ="" means no SSID, is like monuments. detect several around. system of rules
+        parseWeacon.put("BSSID", this.getBSSID()); //
+        parseWeacon.put("Name", this.getName());
+        parseWeacon.put("Description", this.getMessage());
+
+        //Upload Logo
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        this.getLogo().compress(Bitmap.CompressFormat.PNG, 100, stream);
+        byte[] byteArray = stream.toByteArray();
+        ParseFile fileLogo = new ParseFile(this.getImagePath().getName(), byteArray);
+        parseWeacon.put("Logo", fileLogo); //TODO check that file to upload is small
+
+        parseWeacon.put("MainUrl", this.getUrl());
+//        parseWeacon.put("MultipleURL", this.getUrl()); //TODO think how to store several
+        parseWeacon.put("Level", this.getLevel());
+
+        parseWeacon.put("Validated", this.isValidated()); // The check to guarantee that is the propietary has been done
+
+        parseWeacon.put("GPS", this.getParseGps()); //TODO near coordinates
+        parseWeacon.put("Type", this.getTypeString());
+
+        parseWeacon.saveInBackground();
+
+    }
+
     public String getSSID() {
         return SSID;
     }
@@ -184,28 +225,3 @@ public class Weacon {
     }
 }
 
-class GPSCoordinates {
-    private double latitude = 0;
-    private double longitude = 0;
-
-    public GPSCoordinates(double latitude, double longitude) {
-        this.latitude = latitude;
-        this.longitude = longitude;
-    }
-
-    public double getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(double longitude) {
-        this.longitude = longitude;
-    }
-
-    public double getLatitude() {
-        return latitude;
-    }
-
-    public void setLatitude(double latitude) {
-        this.latitude = latitude;
-    }
-}
