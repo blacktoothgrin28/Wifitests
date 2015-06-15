@@ -46,7 +46,8 @@
         android:text="Send"
         android:layout_below="@+id/bt_crop"
         android:layout_toRightOf="@+id/iv_logo"
-        android:layout_toEndOf="@+id/iv_logo" />
+        android:layout_toEndOf="@+id/iv_logo"
+        android:focusable="true" />
 
     <EditText
         android:id="@+id/tv_url"

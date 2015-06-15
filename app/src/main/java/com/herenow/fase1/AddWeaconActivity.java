@@ -67,6 +67,7 @@ public class AddWeaconActivity extends ActionBarActivity implements GoogleApiCli
         mCropImageView = (CropImageView) findViewById(R.id.iv_logo);
         tvMessage = (TextView) this.findViewById(R.id.tv_Message);
         buttonSend = (Button) this.findViewById(R.id.send_weacon_button);
+        buttonSend .setFocusableInTouchMode(true);
         tvMessage.setOnKeyListener(new View.OnKeyListener() {
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 if (keyCode == 66) {
