@@ -6,7 +6,7 @@
     <string name="stop_notif">stopem</string>
     <string name="title_activity_second">H&amp;N Weacon</string>
     <string name="title_activity_weacon_list">Weacons Around</string>
-    <string name="title_activity_add_weacon">AddWeaconActivity</string>
+    <string name="title_activity_add_weacon">New Weacon</string>
 
     <string name="hello_world">Hello world!</string>
 </resources>

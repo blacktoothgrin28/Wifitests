@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.net.Uri;
 import android.net.wifi.ScanResult;
@@ -19,6 +20,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -45,19 +47,28 @@ public class AddWeaconActivity extends ActionBarActivity implements GoogleApiCli
     private Spinner spinner;
     private ArrayList<String> lista;
     private String selectedSSID;
+    private String selectedBSSID;
     private CropImageView mCropImageView;
     private Bitmap logo;
     private GoogleApiClient mGoogleApiClient;
     private Location mLastLocation;
     private GPSCoordinates gps;
+    private TextView tvMessage;
+    private Bitmap croppedImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_weacon);
-        mCropImageView = (CropImageView) findViewById(R.id.iv_logo);
 
-//        FillSpinner();
+        mCropImageView = (CropImageView) findViewById(R.id.iv_logo);
+        tvMessage = (TextView) this.findViewById(R.id.tv_Message);
+
+        mCropImageView.setImageResource(R.mipmap.ic_launcher);
+
+//        mCropImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+
+        FillSpinner();
         GetLocation();
     }
 
@@ -72,22 +83,13 @@ public class AddWeaconActivity extends ActionBarActivity implements GoogleApiCli
     }
 
     private void GetLocation() {
-        //gps = //TODO
         buildGoogleApiClient();
-
     }
 
-
     private void FillSpinner() {
-//        wifi = (WifiManager) this.getSystemService(Context.WIFI_SERVICE);//pede
-        try {
-            wifi = (WifiManager) this.getSystemService(this.getBaseContext().WIFI_SERVICE);//or pass the activity to his activityjust as wifiuyploader
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        wifi = (WifiManager) this.getSystemService(this.getBaseContext().WIFI_SERVICE);
         wifi.startScan();
-        List<ScanResult> sr = wifi.getScanResults();
+        final List<ScanResult> sr = wifi.getScanResults();
         lista = new ArrayList<String>();
 
         spinner = (Spinner) this.findViewById(R.id.spinner);
@@ -101,9 +103,10 @@ public class AddWeaconActivity extends ActionBarActivity implements GoogleApiCli
 
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-                Toast.makeText(arg0.getContext(), "Seleccionado: " + arg0.getItemAtPosition(arg2).toString(), Toast.LENGTH_SHORT).show();
-                selectedSSID = arg0.getItemAtPosition(arg2).toString(); //TODO atachar el r, para obtener el BSSID
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Toast.makeText(parent.getContext(), "Seleccionado: " + parent.getItemAtPosition(position).toString(), Toast.LENGTH_SHORT).show();
+                selectedSSID = parent.getItemAtPosition(position).toString();
+                selectedBSSID = sr.get(position).BSSID;
             }
 
             @Override
@@ -112,9 +115,7 @@ public class AddWeaconActivity extends ActionBarActivity implements GoogleApiCli
         });
     }
 
-    public void OnClickAddLogo() {
-        //TODO
-        startActivityForResult(getPickImageChooserIntent(), 200);
+    public void OnClickAddLogo(View view) {
 
 //        ImageView imageView = (ImageView) this.findViewById(R.id.iv_logo);
 //        imageView.setImageBitmap(logo);
@@ -123,12 +124,11 @@ public class AddWeaconActivity extends ActionBarActivity implements GoogleApiCli
     /**
      * Crop the image and set it back to the cropping view.
      */
-    public void onCropImageClick(View view) {
-        Bitmap cropped = mCropImageView.getCroppedImage(500, 500);
-        if (cropped != null)
-            mCropImageView.setImageBitmap(cropped);
-    }
-
+//    public void onCropImageClick(View view) {
+//        Bitmap cropped = mCropImageView.getCroppedImage(500, 500);
+//        if (cropped != null)
+//            mCropImageView.setImageBitmap(cropped);
+//    }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == Activity.RESULT_OK) {
@@ -220,25 +220,28 @@ public class AddWeaconActivity extends ActionBarActivity implements GoogleApiCli
         return isCamera ? getCaptureImageOutputUri() : data.getData();
     }
 
-    public void SendWeacon() {
+    public void SendWeacon(View view) {
         int level = -76;
         boolean validated = false;
         TYPE type = OTHER;
-
+//TODO validation of fields
         TextView tvName = (TextView) this.findViewById(R.id.tv_name);
         TextView tvUrl = (TextView) this.findViewById(R.id.tv_url);
-        TextView tvMessage = (TextView) this.findViewById(R.id.tv_Message);
+
 
         String name = tvName.getText().toString();
         String url = tvUrl.getText().toString();
         String message = tvMessage.getText().toString();
-        String SSID = ""; //TODO from the spinner
-        String BSSID = "";
+        logo = Bitmap.createScaledBitmap(croppedImage, 120, 120, true);
 
-
-        Weacon weacon = new Weacon(SSID, BSSID, name, url, message, gps, validated, type, level, logo);
+        try {
+            Weacon weacon = new Weacon(selectedSSID, selectedBSSID, name, url, message, gps, validated, type, level, logo);
 //        Weacon weacon=new Weacon(name,SSID,url,gps,logo,message, level,validated,type);//TODO constructor
-        weacon.upload();
+            weacon.upload();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(this.getBaseContext(), e.toString(), Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
@@ -273,7 +276,7 @@ public class AddWeaconActivity extends ActionBarActivity implements GoogleApiCli
 //            cityText.setText(mLastLocation.toString());
         }
         gps = new GPSCoordinates(mLastLocation);
-        TextView textView = (TextView) this.findViewById(R.id.tv_Message);//testing
+//        TextView textView = (TextView) this.findViewById(R.id.tv_Message);//testing
 //        textView.setText("Recibida localización: " + gps);
 //        textView.setText("Recibida localización: " + mLastLocation.toString());
     }
@@ -286,5 +289,21 @@ public class AddWeaconActivity extends ActionBarActivity implements GoogleApiCli
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
 
+    }
+
+    public void OnClickCrop(View view) {
+        croppedImage = mCropImageView.getCroppedImage();
+
+//        ImageView croppedImageView = (ImageView) findViewById(R.id.croppedImageView);
+        mCropImageView.setImageBitmap(croppedImage);
+
+    }
+
+    public void OnClickLoadImage(View view) {
+        startActivityForResult(getPickImageChooserIntent(), 200);
+
+        mCropImageView.setAspectRatio(200, 200);
+        mCropImageView.setFixedAspectRatio(true);
+        mCropImageView.setGuidelines(2);
     }
 }

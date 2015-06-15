@@ -21,8 +21,8 @@
 
     <com.theartofdev.edmodo.cropper.CropImageView
         android:id="@+id/iv_logo"
-        android:layout_width="120dp"
-        android:layout_height="120dp"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:background="@color/accent_material_dark"
@@ -33,48 +33,47 @@
         android:id="@+id/spinner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/iv_logo"
-        android:layout_marginTop="34dp" />
+        android:layout_below="@+id/send_weacon_button"
+        android:layout_toRightOf="@+id/iv_logo"
+        android:layout_toEndOf="@+id/iv_logo" />
 
     <Button
         android:id="@+id/send_weacon_button"
         style="?android:attr/buttonStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignEnd="@+id/spinner"
-        android:layout_alignRight="@+id/spinner"
-        android:layout_below="@+id/tv_url"
-        android:layout_marginTop="52dp"
         android:onClick="SendWeacon"
-        android:text="Send" />
+        android:text="Send"
+        android:layout_below="@+id/bt_crop"
+        android:layout_toRightOf="@+id/iv_logo"
+        android:layout_toEndOf="@+id/iv_logo" />
 
-    <TextView
+    <EditText
         android:id="@+id/tv_url"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
+        android:hint="Url of the Weacon"
+        android:layout_below="@+id/tv_name"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/spinner"
-        android:text="URL of weacon" />
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:lines="1" />
 
-    <TextView
+    <EditText
         android:id="@+id/tv_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:hint="Name"
+        android:layout_below="@+id/iv_logo"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/tv_url"
-        android:layout_marginEnd="49dp"
-        android:layout_marginRight="49dp"
-        android:layout_toLeftOf="@+id/send_weacon_button"
-        android:text="Name"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:lines="1" />
 
-    <TextView
+    <EditText
         android:id="@+id/tv_Message"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -83,8 +82,34 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/send_weacon_button"
-        android:text="Description"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:inputType="textLongMessage|text|textMultiLine"
+        android:layout_below="@+id/tv_url"
+        android:lines="6"
+        android:textStyle="italic"
+        android:hint="Description"
+        android:gravity="top" />
+
+    <Button
+        android:id="@+id/bt_crop"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="OnClickCrop"
+        android:text="Crop"
+        android:layout_below="@+id/bt_load"
+        android:layout_toRightOf="@+id/iv_logo"
+        android:layout_toEndOf="@+id/iv_logo" />
+
+    <Button
+        android:id="@+id/bt_load"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="OnClickLoadImage"
+        android:text="Load"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/iv_logo"
+        android:layout_toEndOf="@+id/iv_logo" />
 
 </RelativeLayout>

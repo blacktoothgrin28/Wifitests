@@ -13,6 +13,7 @@ import com.herenow.fase1.R;
 import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
+import com.parse.ParseUser;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -89,6 +90,7 @@ public class Weacon {
         this.idParseObject = obj.getString("objectId");
         this.message = obj.getString("Description");
         this.type = TYPE.valueOf(obj.getString("Type"));
+        this.level = obj.getInt("Level");
 
         try {
             this.gps = new GPSCoordinates(obj.getParseGeoPoint("GPS").getLatitude(), obj.getParseGeoPoint("GPS").getLongitude());
@@ -140,7 +142,8 @@ public class Weacon {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         this.getLogo().compress(Bitmap.CompressFormat.PNG, 100, stream);
         byte[] byteArray = stream.toByteArray();
-        ParseFile fileLogo = new ParseFile(this.getImagePath().getName(), byteArray);
+//        ParseFile fileLogo = new ParseFile(this.getImagePath().getName(), byteArray);
+        ParseFile fileLogo = new ParseFile(this.getName().replace(" ", "_") + ".png", byteArray);
         parseWeacon.put("Logo", fileLogo); //TODO check that file to upload is small
 
         parseWeacon.put("MainUrl", this.getUrl());
@@ -151,6 +154,10 @@ public class Weacon {
 
         parseWeacon.put("GPS", this.getParseGps()); //TODO near coordinates
         parseWeacon.put("Type", this.getTypeString());
+
+
+        ParseUser pu = new ParseUser(); //TODO to understand parseuser
+        pu.getUsername();
 
         parseWeacon.saveInBackground();
 

@@ -12,6 +12,7 @@ import android.graphics.BitmapFactory;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -57,7 +58,6 @@ public class WifiUpdater implements Runnable {
         Intent resultIntent;
         PendingIntent resultPendingIntent;
         TaskStackBuilder stackBuilder;
-
 
 
         if (showedNotifications.size() == 0) { //New Notification
@@ -137,6 +137,7 @@ public class WifiUpdater implements Runnable {
 
     @Override
     public void run() {
+//        Log.d("mhp", "Wifiuploader |run. demo =" + demo.toString());
         if (demo) {
             if (demoCount == 1 || demoCount % ntimes == 0) {
                 findFakeWeacon();
@@ -156,8 +157,11 @@ public class WifiUpdater implements Runnable {
 //                }
 //                levelOld = r.level;
 //                break;
+//                Log.d("mhp", "Wifiuploader |run. scanning ssid's = " + r.toString());
                 if (MainActivity.weaconsTable.containsKey(r.SSID) && !MainActivity.weaconsLaunchedTable.containsKey(r.SSID)) {
                     Weacon we = MainActivity.weaconsTable.get(r.SSID);
+//                    Log.d("mhp", "Wifiuploader |run. entrado en doble if = " + r.SSID + "old y new |umbral: " + Integer.toString(levelOld) + " | " + Integer.toString(r.level) +
+//                           " |"+ Integer.toString(we.getLevel()));
                     int threshold = we.getLevel();
                     if (levelOld < threshold && r.level >= threshold) {
                         sendNotification(act, we);
