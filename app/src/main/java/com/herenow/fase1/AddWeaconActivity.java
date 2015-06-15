@@ -15,11 +15,13 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -55,6 +57,7 @@ public class AddWeaconActivity extends ActionBarActivity implements GoogleApiCli
     private GPSCoordinates gps;
     private TextView tvMessage;
     private Bitmap croppedImage;
+    private Button buttonSend;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +66,16 @@ public class AddWeaconActivity extends ActionBarActivity implements GoogleApiCli
 
         mCropImageView = (CropImageView) findViewById(R.id.iv_logo);
         tvMessage = (TextView) this.findViewById(R.id.tv_Message);
+        buttonSend = (Button) this.findViewById(R.id.send_weacon_button);
+        tvMessage.setOnKeyListener(new View.OnKeyListener() {
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (keyCode == 66) {
+                    buttonSend.requestFocus();
+                }
+                return false;
+            }
+        });
+
 
         mCropImageView.setImageResource(R.mipmap.ic_launcher);
 

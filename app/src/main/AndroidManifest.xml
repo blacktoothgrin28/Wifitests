@@ -58,6 +58,7 @@
         </activity>
         <activity
             android:name=".AddWeaconActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_add_weacon"
             android:parentActivityName=".MainActivity">
             <meta-data
