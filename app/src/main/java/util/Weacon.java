@@ -1,6 +1,7 @@
 package util;
 
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -8,7 +9,9 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Environment;
 import android.util.Log;
+import android.widget.Toast;
 
+import com.herenow.fase1.MainActivity;
 import com.herenow.fase1.R;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -147,13 +150,12 @@ public class Weacon {
     /**
      * upload the SSID and the weacon, and then relate them
      */
-    public void upload() {
+    public void upload(final Context context) {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         this.getLogo().compress(Bitmap.CompressFormat.PNG, 100, stream);
         byte[] byteArray = stream.toByteArray();
         ParseFile fileLogo = new ParseFile(this.getName().replace(" ", "_") + ".png", byteArray);
 
-        // Experiment :  upload in one call
         try {
             ParseObject parseWeacon = new ParseObject("Weacon");
             parseWeacon.put("Name", this.getName());
@@ -183,76 +185,20 @@ public class Weacon {
                     if (e == null) {
                         // Saved successfully.
                         Log.e("mhp", "Increidble, it worked!");
+                        Toast.makeText(context, "Weacon Uploaded", Toast.LENGTH_SHORT).show();
                         //                    String id = po.getObjectId();
                         //                    Log.d(TAG, "The object id is: " + id);
                     } else {
                         // The save failed.
                         Log.e("mhp", "Sorry, error: " + e);
+                        Toast.makeText(context, "Sorry, error: " + e, Toast.LENGTH_SHORT).show();
                     }
                 }
             });
         } catch (Exception e) {
             e.printStackTrace();
             Log.e("mhp", "Sorry, pff, error: " + e);
-
         }
-
-
-
- /*       // 1. weacon, then the SSID
-        ParseObject parseWeacon = null;
-        try {
-            parseWeacon = new ParseObject("Weacon");
-            parseWeacon.put("Name", this.getName());
-            parseWeacon.put("GPS", this.getParseGps());
-            parseWeacon.put("Logo", fileLogo); //TODO check that file to upload is small
-            parseWeacon.put("MainUrl", this.getUrl());
-            parseWeacon.put("Url2", this.getUrl2());
-            parseWeacon.put("Url3", this.getUrl3());
-            parseWeacon.put("Automatic", false);
-            parseWeacon.put("Description", this.getMessage());
-            parseWeacon.put("Type", this.getTypeString());
-            parseWeacon.put("Rating", -1);
-            parseWeacon.put("Owner", ParseUser.getCurrentUser()); //Todo check if this works
-            parseWeacon.saveInBackground(new SaveCallback() {
-                public void done(ParseException e) {
-                    if (e == null) {
-                        // Saved successfully.
-                        Log.d("mhp" "User update saved!");
-                        String id = po.getObjectId();
-                        Log.d(TAG, "The object id is: " + id);
-                    } else {
-                        // The save failed.
-                        Log.d(TAG, "User update error: " + e);
-                    }
-                }
-            });
-        } catch (Exception e) {
-            e.printStackTrace();
-            Log.d("mhp", "Weacon |upload place . error="+e.getMessage());
-
-        }
-
-        // 2. upload the SSID
-        //Todo check if already used by other, Validation cycle
-
-        try {
-            ParseObject parseSSID = new ParseObject("SSIDS");
-            parseSSID.put("ssid", this.getSSID());
-            parseSSID.put("bssid", this.getBSSID());
-            parseSSID.put("Automatic", false);
-            parseSSID.put("GPS", this.getParseGps());
-            parseSSID.put("Level", this.getLevel());
-            parseSSID.put("owner", ParseUser.getCurrentUser());
-            parseSSID.put("validated", this.isValidated());
-            parseSSID.put("associated_place", placeId);
-            parseWeacon.saveInBackground();
-        } catch (Exception e) {
-            e.printStackTrace();
-            Log.d("mhp", "Weacon |upload ssid. error=" + e.getMessage());
-        }
-
-*/
     }
 
     public String getObjectId() {

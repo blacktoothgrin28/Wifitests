@@ -32,17 +32,21 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.parse.LogInCallback;
 import com.parse.Parse;
 import com.parse.ParseException;
+import com.parse.ParseSession;
 import com.parse.ParseUser;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import util.AppendLog;
 import util.Weacon;
 
 
@@ -78,6 +82,24 @@ public class MainActivity extends ActionBarActivity {
         mPos = new Position(this); //Automatically obtain weacons and ssids
         //TODO correct, is awful
 
+        //Write  unhandled exceptions in a log file in the phone
+        AppendLog.initialize();
+        Thread.currentThread().setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            @Override
+            public void uncaughtException(Thread thread, Throwable ex) {
+                PrintWriter pw;
+                try {
+                    pw = new PrintWriter(
+                            new FileWriter(Environment.getExternalStorageDirectory() + "/rt.log", true));
+                    ex.printStackTrace(pw);
+                    pw.flush();
+                    pw.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
 
         tv = (TextView) findViewById(R.id.tv_demoStatus);
         mySwitch = (Switch) findViewById(R.id.sw_demo);
@@ -97,27 +119,38 @@ public class MainActivity extends ActionBarActivity {
         //check the current state before we display the screen
         demoMode = mySwitch.isChecked();
 
+        //PARSE
+        //TODO initilize Parse in Application class: http://stackoverflow.com/questions/30969612/android-parse-error-when-initializing-activity
         Parse.enableLocalDatastore(this);
         Parse.initialize(this, "CADa4nX2Lx29QEJlC3LUY1snbjq9zySlF5S3YSVG", "hC9VWCmGEBxb9fSGQPiOjSInaAPnYMZ0t8k3V0UO");
+        ParseUserLogIn();
 
-        LogInParse();
-//        DownloadWeacons(); Deprecated,now load from mPos
+        //Wifi
         mainWifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
         receiverWifi = new WifiReceiver();
         registerReceiver(receiverWifi, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
 
     }
 
-    private void LogInParse() {
-        ParseUser.logInInBackground("sorrento", "spidey", new LogInCallback() {
-            public void done(ParseUser user, ParseException e) {
-                if (user != null) {
-                    Log.d("mhp", "Logged in =");
-                } else {
-                    Log.d("mhp", "Not Logged in =");
+    private void ParseUserLogIn() {
+//        Parse.User.current()
+        ParseUser curr = ParseUser.getCurrentUser();
+        if (curr == null) {
+            Log.d("mhp", "sin usert, vamos a loggear");
+
+            ParseUser.logInInBackground("sorrento", "spidey", new LogInCallback() {
+                public void done(ParseUser user, ParseException e) {
+                    if (user != null) {
+                        Log.d("mhp", "Logged in");
+                    } else {
+                        Log.d("mhp", "Not Logged in");
+                    }
                 }
-            }
-        });
+            });
+
+        } else {
+            Log.d("mhp", "Ya tenia user,");
+        }
     }
 
     class WifiReceiver extends BroadcastReceiver {
@@ -275,6 +308,7 @@ public class MainActivity extends ActionBarActivity {
 
     public void clickDownloadWeacons(View view) {
         try {
+            mPos.retrieveSSIDSFromParse(false);
 //            intentList = new Intent(this, WeaconListActivity.class);
 //            startActivity(intentList);
 //            DownloadWeacons(); Deprecated,now load from mPos2
@@ -373,7 +407,7 @@ public class MainActivity extends ActionBarActivity {
                 String[] parts = line.split("; ");
                 Weacon we = new Weacon(parts, this);
 //                weaconsTable.put(parts[0], we); //TODO populate this table from internec
-                we.upload();
+                we.upload(this.getBaseContext());
             }
             br.close();
         } catch (IOException e) {

@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
+import util.AppendLog;
 import util.Weacon;
 
 /**
@@ -145,9 +146,11 @@ public class WifiUpdater implements Runnable {
             demoCount++;
         } else {
             wifi.startScan();
+            AppendLog.appendLog("Realizando scanner");
             List<ScanResult> sr = wifi.getScanResults();
             List<String> list = new ArrayList<String>();
 
+            AppendLog.appendLog("se obtienen resultados:"+sr.size());
             for (ScanResult r : sr) {
 //            if (r.SSID.equals("piripiri")) {
 //                String intensidad = Integer.toString(r.level);
@@ -158,8 +161,10 @@ public class WifiUpdater implements Runnable {
 //                levelOld = r.level;
 //                break;
 //                Log.d("mhp", "Wifiuploader |run. scanning ssid's = " + r.toString());
-                if (MainActivity.weaconsTable.containsKey(r.SSID) && !MainActivity.weaconsLaunchedTable.containsKey(r.SSID)) {
-                    Weacon we = MainActivity.weaconsTable.get(r.SSID);
+                AppendLog.appendLog("detectada la red "+r.SSID);
+                if (MainActivity.SSIDSTable.containsKey(r.SSID)) {//TODO manage the launched && !MainActivity.weaconsLaunchedTable.containsKey(r.SSID)) {
+                    String obId = MainActivity.SSIDSTable.get(r.SSID);
+                    Weacon we = MainActivity.weaconsTable.get(obId);
 //                    Log.d("mhp", "Wifiuploader |run. entrado en doble if = " + r.SSID + "old y new |umbral: " + Integer.toString(levelOld) + " | " + Integer.toString(r.level) +
 //                           " |"+ Integer.toString(we.getLevel()));
                     int threshold = we.getLevel();
@@ -167,6 +172,8 @@ public class WifiUpdater implements Runnable {
                         sendNotification(act, we);
                     }
                     levelOld = r.level;
+                }else {
+                    AppendLog.appendLog("**La ssid no se encuentra en la tabla");
                 }
             }
             cont++;

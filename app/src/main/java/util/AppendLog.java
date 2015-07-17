@@ -1,18 +1,42 @@
 package util;
 
+import android.os.Environment;
+import android.util.Log;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Created by Milenko on 16/07/2015.
  */
 public class AppendLog {
 
+    public static void initialize() {
+        //Delete files if too greater than 1M
+        File logFile = new File(Environment.getExternalStorageDirectory(), "logWeacon.txt");
+        int file_size = Integer.parseInt(String.valueOf(logFile.length() / 1024));
+        if (file_size > 1000) logFile.delete();
+        logFile = new File(Environment.getExternalStorageDirectory() + "/rt.log");
+        file_size = Integer.parseInt(String.valueOf(logFile.length() / 1024));
+        if (file_size > 1000) logFile.delete();
 
-    public void appendLog(String text) {
-        File logFile = new File("sdcard/log.file");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
+        String currentDateandTime = sdf.format(new Date());
+        appendLog(file_size + "************ Session: " + currentDateandTime);
+    }
+
+    public static void appendLog(String text) {
+        appendLog(text, "mhp");
+    }
+
+    public static void appendLog(String text, String TAG) {
+        Log.d(TAG, text);
+
+        File logFile = new File(Environment.getExternalStorageDirectory(), "logWeacon.txt");
         if (!logFile.exists()) {
             try {
                 logFile.createNewFile();

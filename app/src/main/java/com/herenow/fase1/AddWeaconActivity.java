@@ -248,7 +248,7 @@ public class AddWeaconActivity extends ActionBarActivity implements GoogleApiCli
 
         try {
             Weacon weacon = new Weacon(selectedSSID, selectedBSSID, name, url, message, gps, validated, type, level, logo);
-            weacon.upload();
+            weacon.upload(this.getBaseContext());
         } catch (Exception e) {
             e.printStackTrace();
             Toast.makeText(this.getBaseContext(), e.toString(), Toast.LENGTH_SHORT).show();

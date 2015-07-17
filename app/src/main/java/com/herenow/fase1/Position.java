@@ -13,6 +13,8 @@ import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import java.util.List;
 
@@ -27,6 +29,7 @@ public class Position implements GoogleApiClient.ConnectionCallbacks, GoogleApiC
     private Context context;
     private Location mLastLocation;
     private GPSCoordinates gps;
+    private final static boolean bFromLocalParse = true;
 
     //TODO for now receive location only onces. see http://blog.teamtreehouse.com/beginners-guide-location-android
     public Position(Context context) {
@@ -55,49 +58,71 @@ public class Position implements GoogleApiClient.ConnectionCallbacks, GoogleApiC
     public void onConnected(Bundle bundle) {
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
 
+        //TODO decide when ask places to Cloud (change in position , etc)
         if (mLastLocation != null) {
             gps = new GPSCoordinates(mLastLocation);
+            retrieveSSIDSFromParse(bFromLocalParse);
+        } else {
+            gps = new GPSCoordinates(0, 0);
+            Log.d("mhp", "Not possible to retrieve last place from Google");
+            retrieveSSIDSFromParse(true);
+        }
+    }
 
+    public void retrieveSSIDSFromParse(final boolean bLocal) {
+        try {
+            Log.d("mhp", "retrieving SSIDS from local:" + bLocal+ " user: "+ ParseUser.getCurrentUser());
             ParseQuery<ParseObject> query = ParseQuery.getQuery("SSIDS");
             query.whereWithinKilometers("GPS", new ParseGeoPoint(gps.getLatitude(), gps.getLongitude()), 5);
             query.setLimit(700);
+            if (bLocal) query.fromLocalDatastore();
             query.findInBackground(new FindCallback<ParseObject>() {
                 @Override
-                public void done(List<ParseObject> objects, com.parse.ParseException e) {
+                public void done(List<ParseObject> objects, ParseException e) {
                     if (e == null) {
+                        Log.d("mhp", "number of SSIDS:"+objects.size());
+                        if (!bLocal) ParseObject.pinAllInBackground(objects);
                         for (ParseObject obj : objects) {
-                            ParseObject we = new ParseObject("Weacon");
-                            we = obj.getParseObject("associated_place");
+                            ParseObject we = obj.getParseObject("associated_place");
                             MainActivity.SSIDSTable.put(obj.getString("ssid"), we.getObjectId());
                         }
-                        ParseObject.pinAllInBackground(objects);
-                        retrivePlaces();
-//                    objectsWereRetrievedSuccessfully(objects);
+                        retrievePlacesFromParse(bLocal);
                     } else {
                         objectRetrievalFailed(e);
                     }
                 }
             });
-        } else {
-            gps = new GPSCoordinates(0, 0);
-            Log.d("mph", "Not possible to retrieve last place from Google");
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.d("mhp", "failed retrieving ssids: " + e.getMessage());
+
         }
     }
 
-    private void retrivePlaces() {
+    private void retrievePlacesFromParse(final boolean bLocal) {
+        Log.d("mhp", "retrieving place from local:" + bLocal);
         ParseQuery<ParseObject> query = ParseQuery.getQuery("Weacon");
         query.whereContainedIn("objectId", MainActivity.SSIDSTable.values());
         query.setLimit(200);
+        if (bLocal) query.fromLocalDatastore();
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> objects, com.parse.ParseException e) {
                 if (e == null) {
+                    Log.d("mhp", "number of places:"+objects.size());
+                    if (!bLocal) ParseObject.pinAllInBackground(objects, new SaveCallback() {
+                        @Override
+                        public void done(ParseException e) {
+                            if (e == null) {
+                                Log.d("mhp", "Ive pinned the places:" );
+                            }
+                        }
+                    });
                     for (ParseObject obj : objects) {
                         Weacon we = new Weacon(obj);
                         MainActivity.weaconsTable.put(obj.getObjectId(), we);
                     }
                     ParseObject.pinAllInBackground(objects);
-//                    objectsWereRetrievedSuccessfully(objects);
                 } else {
                     objectRetrievalFailed(e);
                 }
@@ -107,8 +132,7 @@ public class Position implements GoogleApiClient.ConnectionCallbacks, GoogleApiC
     }
 
     private void objectRetrievalFailed(ParseException e) {
-        Log.d("mhp", "eerer " + e.getMessage());
-//        Log.d("mhp", "eerer " + e.getMessage());
+        Log.d("mhp", "Failed to retrieve objects " + e.getMessage());
     }
 
     @Override
