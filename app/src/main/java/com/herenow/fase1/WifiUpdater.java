@@ -146,11 +146,11 @@ public class WifiUpdater implements Runnable {
             demoCount++;
         } else {
             wifi.startScan();
-            AppendLog.appendLog("Realizando scanner");
+//            AppendLog.appendLog("Realizando scanner");
             List<ScanResult> sr = wifi.getScanResults();
             List<String> list = new ArrayList<String>();
 
-            AppendLog.appendLog("se obtienen resultados:"+sr.size());
+//            AppendLog.appendLog("se obtienen resultados:"+sr.size());
             for (ScanResult r : sr) {
 //            if (r.SSID.equals("piripiri")) {
 //                String intensidad = Integer.toString(r.level);
@@ -161,19 +161,21 @@ public class WifiUpdater implements Runnable {
 //                levelOld = r.level;
 //                break;
 //                Log.d("mhp", "Wifiuploader |run. scanning ssid's = " + r.toString());
-                AppendLog.appendLog("detectada la red "+r.SSID);
+//                AppendLog.appendLog("detectada la red "+r.SSID);
                 if (MainActivity.SSIDSTable.containsKey(r.SSID)) {//TODO manage the launched && !MainActivity.weaconsLaunchedTable.containsKey(r.SSID)) {
-                    String obId = MainActivity.SSIDSTable.get(r.SSID);
+                    SSID ssid = MainActivity.SSIDSTable.get(r.SSID);
+                    String obId = ssid.getPlaceId();
                     Weacon we = MainActivity.weaconsTable.get(obId);
 //                    Log.d("mhp", "Wifiuploader |run. entrado en doble if = " + r.SSID + "old y new |umbral: " + Integer.toString(levelOld) + " | " + Integer.toString(r.level) +
 //                           " |"+ Integer.toString(we.getLevel()));
-                    int threshold = we.getLevel();
+                    int threshold = ssid.getLevel();
+                    AppendLog.appendLog("****Bingo!!: " + r.SSID + " Intensity=" + r.level + " threshold= " + threshold);
                     if (levelOld < threshold && r.level >= threshold) {
                         sendNotification(act, we);
                     }
                     levelOld = r.level;
-                }else {
-                    AppendLog.appendLog("**La ssid no se encuentra en la tabla");
+                } else {
+//                    AppendLog.appendLog("**La ssid no se encuentra en la tabla");
                 }
             }
             cont++;

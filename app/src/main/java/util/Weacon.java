@@ -104,14 +104,13 @@ public class Weacon {
         this.automatic = obj.getBoolean("Automatic");
 //        this.level = obj.getInt("Level");
         this.phone = obj.getString("Phone");
-
+        this.gps = new GPSCoordinates(obj.getParseGeoPoint("GPS").getLatitude(), obj.getParseGeoPoint("GPS").getLongitude());
+        this.validated = obj.getBoolean("Validated");
+        this.createAt = obj.getCreatedAt();
+        this.updatedAt = obj.getUpdatedAt();
         try {
-            this.gps = new GPSCoordinates(obj.getParseGeoPoint("GPS").getLatitude(), obj.getParseGeoPoint("GPS").getLongitude());
-            this.imageParseUrl = obj.getParseFile("Logo").getUrl();//
-            this.validated = obj.getBoolean("Validated");
-            this.createAt = obj.getCreatedAt();
-            this.updatedAt = obj.getUpdatedAt();
 
+            this.imageParseUrl = obj.getParseFile("Logo").getUrl();//
             //Obtaining the bitmap //TODO do not load all images, only urls to images
             ParseFile parseFile = obj.getParseFile("Logo");
             byte[] bitmapdata = parseFile.getData();
@@ -121,9 +120,8 @@ public class Weacon {
 //                this.createdby
         } catch (Exception e) {
             e.printStackTrace();
-            Log.d("mhp", e.toString());
+            Log.d("mhp", name + "hasn't any image" + e.toString());
         }
-
     }
 
     private static Bitmap drawableToBitmap(Drawable drawable) {

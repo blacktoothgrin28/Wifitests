@@ -16,6 +16,9 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 import util.GPSCoordinates;
@@ -71,7 +74,7 @@ public class Position implements GoogleApiClient.ConnectionCallbacks, GoogleApiC
 
     public void retrieveSSIDSFromParse(final boolean bLocal) {
         try {
-            Log.d("mhp", "retrieving SSIDS from local:" + bLocal+ " user: "+ ParseUser.getCurrentUser());
+            Log.d("mhp", "retrieving SSIDS from local:" + bLocal + " user: " + ParseUser.getCurrentUser());
             ParseQuery<ParseObject> query = ParseQuery.getQuery("SSIDS");
             query.whereWithinKilometers("GPS", new ParseGeoPoint(gps.getLatitude(), gps.getLongitude()), 5);
             query.setLimit(700);
@@ -80,13 +83,15 @@ public class Position implements GoogleApiClient.ConnectionCallbacks, GoogleApiC
                 @Override
                 public void done(List<ParseObject> objects, ParseException e) {
                     if (e == null) {
-                        Log.d("mhp", "number of SSIDS:"+objects.size());
+                        Log.d("mhp", "number of SSIDS:" + objects.size());
                         if (!bLocal) ParseObject.pinAllInBackground(objects);
+                        ArrayList ids = new ArrayList();
                         for (ParseObject obj : objects) {
-                            ParseObject we = obj.getParseObject("associated_place");
-                            MainActivity.SSIDSTable.put(obj.getString("ssid"), we.getObjectId());
+                            SSID ssid = new SSID(obj);
+                            MainActivity.SSIDSTable.put(obj.getString("ssid"), ssid);
+                            ids.add(ssid.getPlaceId());
                         }
-                        retrievePlacesFromParse(bLocal);
+                        retrievePlacesFromParse(bLocal, ids);
                     } else {
                         objectRetrievalFailed(e);
                     }
@@ -99,22 +104,22 @@ public class Position implements GoogleApiClient.ConnectionCallbacks, GoogleApiC
         }
     }
 
-    private void retrievePlacesFromParse(final boolean bLocal) {
+    private void retrievePlacesFromParse(final boolean bLocal, Collection weaconsIds) {
         Log.d("mhp", "retrieving place from local:" + bLocal);
         ParseQuery<ParseObject> query = ParseQuery.getQuery("Weacon");
-        query.whereContainedIn("objectId", MainActivity.SSIDSTable.values());
+        query.whereContainedIn("objectId", weaconsIds);
         query.setLimit(200);
         if (bLocal) query.fromLocalDatastore();
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> objects, com.parse.ParseException e) {
                 if (e == null) {
-                    Log.d("mhp", "number of places:"+objects.size());
+                    Log.d("mhp", "number of places:" + objects.size());
                     if (!bLocal) ParseObject.pinAllInBackground(objects, new SaveCallback() {
                         @Override
                         public void done(ParseException e) {
                             if (e == null) {
-                                Log.d("mhp", "Ive pinned the places:" );
+                                Log.d("mhp", "Ive pinned the places:");
                             }
                         }
                     });

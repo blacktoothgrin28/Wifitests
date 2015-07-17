@@ -52,7 +52,7 @@ import util.Weacon;
 
 public class MainActivity extends ActionBarActivity {
     public static HashMap<String, Weacon> weaconsTable = new HashMap<String, Weacon>(); //Total list of weacons
-    public static HashMap<String, String> SSIDSTable = new HashMap<String, String>(); //list {SSids , weacons objId
+    public static HashMap<String, SSID> SSIDSTable = new HashMap<>(); //list {SSids , SSID
 
     //TODO Consider also the BSSID in the detection
     public static boolean demoMode; //in demo mode doesn't look for wifi's, it just lunch the events
@@ -121,8 +121,7 @@ public class MainActivity extends ActionBarActivity {
 
         //PARSE
         //TODO initilize Parse in Application class: http://stackoverflow.com/questions/30969612/android-parse-error-when-initializing-activity
-        Parse.enableLocalDatastore(this);
-        Parse.initialize(this, "CADa4nX2Lx29QEJlC3LUY1snbjq9zySlF5S3YSVG", "hC9VWCmGEBxb9fSGQPiOjSInaAPnYMZ0t8k3V0UO");
+
         ParseUserLogIn();
 
         //Wifi
