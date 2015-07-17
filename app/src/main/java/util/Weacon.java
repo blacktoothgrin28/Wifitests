@@ -10,10 +10,12 @@ import android.os.Environment;
 import android.util.Log;
 
 import com.herenow.fase1.R;
+import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -24,10 +26,15 @@ import java.util.Date;
  */
 public class Weacon {
 
+    private String phone;
+    private boolean automatic;
+    private String typeGoogle;
+    private String url3 = "None";
+    private String url2 = "None";
     private Date createAt;
     private Date updatedAt;
     private String imageParseUrl;
-    private String idParseObject;
+    private String ObjectId;
     private boolean validated = false;
     private Bitmap logoRounded;
     private int level; // Threshold fot detection. default=-72
@@ -85,12 +92,15 @@ public class Weacon {
     public Weacon(ParseObject obj) {
         this.name = obj.getString("Name");
         this.url = obj.getString("MainUrl");
-        this.SSID = obj.getString("SSID");
-        this.BSSID = obj.getString("BSSID");
-        this.idParseObject = obj.getString("objectId");
+        this.url2 = obj.getString("Url2");
+        this.url3 = obj.getString("Url3");
+        this.ObjectId = obj.getObjectId();
         this.message = obj.getString("Description");
-        this.type = TYPE.valueOf(obj.getString("Type"));
-        this.level = obj.getInt("Level");
+//        this.type = TYPE.valueOf(obj.getString("Type"));
+        this.typeGoogle = obj.getString("type");//TODO homegineze types, probably use google's
+        this.automatic = obj.getBoolean("Automatic");
+//        this.level = obj.getInt("Level");
+        this.phone = obj.getString("Phone");
 
         try {
             this.gps = new GPSCoordinates(obj.getParseGeoPoint("GPS").getLatitude(), obj.getParseGeoPoint("GPS").getLongitude());
@@ -126,41 +136,127 @@ public class Weacon {
         return bitmap;
     }
 
+    public String getUrl3() {
+        return url3;
+    }
+
+    public String getUrl2() {
+        return url2;
+    }
+
     /**
-     * upload this weacon to Parse.com (cloud)
+     * upload the SSID and the weacon, and then relate them
      */
     public void upload() {
-        //Check if is already present: (now SSID is the key) //TODO change the key
-
-        ParseObject parseWeacon = new ParseObject("Weacon");
-        parseWeacon.put("SSID", this.getSSID()); // ="" means no SSID, is like monuments. detect several around. system of rules
-        parseWeacon.put("BSSID", this.getBSSID()); //
-        parseWeacon.put("Name", this.getName());
-        parseWeacon.put("Description", this.getMessage());
-
-        //Upload Logo
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         this.getLogo().compress(Bitmap.CompressFormat.PNG, 100, stream);
         byte[] byteArray = stream.toByteArray();
-//        ParseFile fileLogo = new ParseFile(this.getImagePath().getName(), byteArray);
         ParseFile fileLogo = new ParseFile(this.getName().replace(" ", "_") + ".png", byteArray);
-        parseWeacon.put("Logo", fileLogo); //TODO check that file to upload is small
 
-        parseWeacon.put("MainUrl", this.getUrl());
-//        parseWeacon.put("MultipleURL", this.getUrl()); //TODO think how to store several
-        parseWeacon.put("Level", this.getLevel());
+        // Experiment :  upload in one call
+        try {
+            ParseObject parseWeacon = new ParseObject("Weacon");
+            parseWeacon.put("Name", this.getName());
+            parseWeacon.put("GPS", this.getParseGps());
+            parseWeacon.put("Logo", fileLogo); //TODO check that file to upload is small
+            parseWeacon.put("MainUrl", this.getUrl());
+            parseWeacon.put("Url2", this.getUrl2());
+            parseWeacon.put("Url3", this.getUrl3());
+            parseWeacon.put("Automatic", false);
+            parseWeacon.put("Description", this.getMessage());
+            parseWeacon.put("Type", this.getTypeString());
+            parseWeacon.put("Rating", -1);
+            parseWeacon.put("Owner", ParseUser.getCurrentUser()); //Todo check if this works
 
-        parseWeacon.put("Validated", this.isValidated()); // The check to guarantee that is the propietary has been done
+            ParseObject parseSSID = new ParseObject("SSIDS");
+            parseSSID.put("ssid", this.getSSID());
+            parseSSID.put("bssid", this.getBSSID());
+            parseSSID.put("Automatic", false);
+            parseSSID.put("GPS", this.getParseGps());
+            parseSSID.put("Level", this.getLevel());
+            parseSSID.put("owner", ParseUser.getCurrentUser());
+            parseSSID.put("validated", this.isValidated());
+            parseSSID.put("associated_place", parseWeacon);
 
-        parseWeacon.put("GPS", this.getParseGps()); //TODO near coordinates
-        parseWeacon.put("Type", this.getTypeString());
+            parseSSID.saveInBackground(new SaveCallback() {
+                public void done(ParseException e) {
+                    if (e == null) {
+                        // Saved successfully.
+                        Log.e("mhp", "Increidble, it worked!");
+                        //                    String id = po.getObjectId();
+                        //                    Log.d(TAG, "The object id is: " + id);
+                    } else {
+                        // The save failed.
+                        Log.e("mhp", "Sorry, error: " + e);
+                    }
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("mhp", "Sorry, pff, error: " + e);
+
+        }
 
 
-        ParseUser pu = new ParseUser(); //TODO to understand parseuser
-        pu.getUsername();
 
-        parseWeacon.saveInBackground();
+ /*       // 1. weacon, then the SSID
+        ParseObject parseWeacon = null;
+        try {
+            parseWeacon = new ParseObject("Weacon");
+            parseWeacon.put("Name", this.getName());
+            parseWeacon.put("GPS", this.getParseGps());
+            parseWeacon.put("Logo", fileLogo); //TODO check that file to upload is small
+            parseWeacon.put("MainUrl", this.getUrl());
+            parseWeacon.put("Url2", this.getUrl2());
+            parseWeacon.put("Url3", this.getUrl3());
+            parseWeacon.put("Automatic", false);
+            parseWeacon.put("Description", this.getMessage());
+            parseWeacon.put("Type", this.getTypeString());
+            parseWeacon.put("Rating", -1);
+            parseWeacon.put("Owner", ParseUser.getCurrentUser()); //Todo check if this works
+            parseWeacon.saveInBackground(new SaveCallback() {
+                public void done(ParseException e) {
+                    if (e == null) {
+                        // Saved successfully.
+                        Log.d("mhp" "User update saved!");
+                        String id = po.getObjectId();
+                        Log.d(TAG, "The object id is: " + id);
+                    } else {
+                        // The save failed.
+                        Log.d(TAG, "User update error: " + e);
+                    }
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.d("mhp", "Weacon |upload place . error="+e.getMessage());
 
+        }
+
+        // 2. upload the SSID
+        //Todo check if already used by other, Validation cycle
+
+        try {
+            ParseObject parseSSID = new ParseObject("SSIDS");
+            parseSSID.put("ssid", this.getSSID());
+            parseSSID.put("bssid", this.getBSSID());
+            parseSSID.put("Automatic", false);
+            parseSSID.put("GPS", this.getParseGps());
+            parseSSID.put("Level", this.getLevel());
+            parseSSID.put("owner", ParseUser.getCurrentUser());
+            parseSSID.put("validated", this.isValidated());
+            parseSSID.put("associated_place", placeId);
+            parseWeacon.saveInBackground();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.d("mhp", "Weacon |upload ssid. error=" + e.getMessage());
+        }
+
+*/
+    }
+
+    public String getObjectId() {
+        return ObjectId;
     }
 
     public String getSSID() {

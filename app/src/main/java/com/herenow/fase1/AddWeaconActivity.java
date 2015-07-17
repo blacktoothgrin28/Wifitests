@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.net.Uri;
 import android.net.wifi.ScanResult;
@@ -22,7 +21,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -67,7 +65,7 @@ public class AddWeaconActivity extends ActionBarActivity implements GoogleApiCli
         mCropImageView = (CropImageView) findViewById(R.id.iv_logo);
         tvMessage = (TextView) this.findViewById(R.id.tv_Message);
         buttonSend = (Button) this.findViewById(R.id.send_weacon_button);
-        buttonSend .setFocusableInTouchMode(true);
+        buttonSend.setFocusableInTouchMode(true);
         tvMessage.setOnKeyListener(new View.OnKeyListener() {
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 if (keyCode == 66) {
@@ -238,7 +236,7 @@ public class AddWeaconActivity extends ActionBarActivity implements GoogleApiCli
         int level = -76;
         boolean validated = false;
         TYPE type = OTHER;
-//TODO validation of fields
+        //TODO validation of fields
         TextView tvName = (TextView) this.findViewById(R.id.tv_name);
         TextView tvUrl = (TextView) this.findViewById(R.id.tv_url);
 
@@ -250,7 +248,6 @@ public class AddWeaconActivity extends ActionBarActivity implements GoogleApiCli
 
         try {
             Weacon weacon = new Weacon(selectedSSID, selectedBSSID, name, url, message, gps, validated, type, level, logo);
-//        Weacon weacon=new Weacon(name,SSID,url,gps,logo,message, level,validated,type);//TODO constructor
             weacon.upload();
         } catch (Exception e) {
             e.printStackTrace();
@@ -282,6 +279,7 @@ public class AddWeaconActivity extends ActionBarActivity implements GoogleApiCli
 
     @Override
     public void onConnected(Bundle bundle) {
+        //TODO replace by Position.GetlastPosition
 
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
         if (mLastLocation != null) {

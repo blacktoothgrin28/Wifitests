@@ -4,10 +4,13 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.TaskStackBuilder;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.wifi.ScanResult;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
@@ -15,6 +18,7 @@ import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -24,10 +28,11 @@ import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
 
-import com.parse.FindCallback;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.parse.LogInCallback;
 import com.parse.Parse;
-import com.parse.ParseObject;
-import com.parse.ParseQuery;
+import com.parse.ParseException;
+import com.parse.ParseUser;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -43,6 +48,9 @@ import util.Weacon;
 
 public class MainActivity extends ActionBarActivity {
     public static HashMap<String, Weacon> weaconsTable = new HashMap<String, Weacon>(); //Total list of weacons
+    public static HashMap<String, String> SSIDSTable = new HashMap<String, String>(); //list {SSids , weacons objId
+
+    //TODO Consider also the BSSID in the detection
     public static boolean demoMode; //in demo mode doesn't look for wifi's, it just lunch the events
     public static HashMap<String, Weacon> weaconsLaunchedTable;
     NotificationManager mNotificationManager;
@@ -51,11 +59,25 @@ public class MainActivity extends ActionBarActivity {
     private Timer t;
     private Switch mySwitch;
     private TextView tv;
+    StringBuilder sb = new StringBuilder();
+    WifiReceiver receiverWifi;
+    List<ScanResult> wifiList;
+    WifiManager mainWifi;
+    int im = 1;
+    private long newTime, oldTime;
+    private String msg = "";
+    public GoogleApiClient mGoogleApiClient;
+    private Position mPos;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mPos = new Position(this); //Automatically obtain weacons and ssids
+        //TODO correct, is awful
+
 
         tv = (TextView) findViewById(R.id.tv_demoStatus);
         mySwitch = (Switch) findViewById(R.id.sw_demo);
@@ -64,7 +86,6 @@ public class MainActivity extends ActionBarActivity {
         tv.setText("demo OFF");
         //attach a listener to check for changes in state
         mySwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-
             @Override
             public void onCheckedChanged(CompoundButton buttonView,
                                          boolean isChecked) {
@@ -76,37 +97,87 @@ public class MainActivity extends ActionBarActivity {
         //check the current state before we display the screen
         demoMode = mySwitch.isChecked();
 
-        // Enable Local Datastore.
         Parse.enableLocalDatastore(this);
         Parse.initialize(this, "CADa4nX2Lx29QEJlC3LUY1snbjq9zySlF5S3YSVG", "hC9VWCmGEBxb9fSGQPiOjSInaAPnYMZ0t8k3V0UO");
 
-//        UploadFileWeacons(); //From file to cloud
-        DownloadWeacons();
+        LogInParse();
+//        DownloadWeacons(); Deprecated,now load from mPos
+        mainWifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+        receiverWifi = new WifiReceiver();
+        registerReceiver(receiverWifi, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
+
+    }
+
+    private void LogInParse() {
+        ParseUser.logInInBackground("sorrento", "spidey", new LogInCallback() {
+            public void done(ParseUser user, ParseException e) {
+                if (user != null) {
+                    Log.d("mhp", "Logged in =");
+                } else {
+                    Log.d("mhp", "Not Logged in =");
+                }
+            }
+        });
+    }
+
+    class WifiReceiver extends BroadcastReceiver {
+
+        public void onReceive(Context c, Intent intent) {
+            sb = new StringBuilder();
+            wifiList = mainWifi.getScanResults();
+            for (int i = 0; i < wifiList.size(); i++) {
+                sb.append(new Integer(i + 1).toString() + ".");
+                sb.append((wifiList.get(i)).SSID);
+                sb.append("|");
+            }
+            oldTime = newTime;
+            newTime = System.currentTimeMillis();
+            long diff = Math.round((newTime - oldTime) / 1000);
+
+            im++;
+//            String msg = Integer.toString(im) + ". " +
+//            Toast.makeText(getParent().getBaseContext(), Integer.toString(im) + sb, Toast.LENGTH_SHORT).show();
+//            mainText.setText(sb);
+            msg = Integer.toString(im) + ".(" + Long.toString(diff) + "s|n=" + Integer.toString(wifiList.size()) + ") ";
+//            tv.setText(msg);
+            tv.append(msg);
+        }
     }
 
     /**
-     * takes all weacons from internet and put in local Hash
+     * Get the weacons from the city, and put in in a hash
      */
     private void DownloadWeacons() {
-        String name;
-        //TODO download few weacons only, in the area
-        ParseQuery<ParseObject> query = ParseQuery.getQuery("Weacon");
-        query.findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(List<ParseObject> objects, com.parse.ParseException e) {
-                if (e == null) {
-                    tv.setText("Weacons downloaded");
-                    for (ParseObject obj : objects) {
-                        Weacon we = new Weacon(obj);
-                        weaconsTable.put(we.getSSID(), we);
-                    }
-//                    objectsWereRetrievedSuccessfully(objects);
-                } else {
-//                    objectRetrievalFailed();
-                }
-            }
 
-        });
+        //  Two tables, one for SSIDS and other for weacons
+        // 1. Ask location to google:
+
+//        GPSCoordinates here = mPos.GetLastPosition();
+//
+//        // 2. Ask Parse all places in a radius around here, that have places associated
+//        ParseQuery<ParseObject> query = ParseQuery.getQuery("SSIDS");
+//        query.whereWithinKilometers("GPS",new ParseGeoPoint(here.getLatitude(),here.getLongitude()),5 );
+//        query.whereDoesNotExist("associated_place");
+//
+//
+//        query.findInBackground(new FindCallback<ParseObject>() {
+//            @Override
+//            public void done(List<ParseObject> objects, com.parse.ParseException e) {
+//                if (e == null) {
+//                    tv.setText("SSIDS downloaded");
+//                    for (ParseObject obj : objects) {
+////                        Weacon we = new Weacon(obj);
+////                        weaconsTable.put(we.getSSID(), we);
+//                        SSIDSTable.put(obj.getString("ssid"), obj.getString("associated_place"));
+//                    }
+////                    objectsWereRetrievedSuccessfully(objects);
+//                } else {
+////                    objectRetrievalFailed();
+//                }
+//            }
+//            //TODO download the corresponding weacons
+//
+//        });
     }
 
     private void modeChange(boolean Demo) {
@@ -124,7 +195,7 @@ public class MainActivity extends ActionBarActivity {
             public void run() {
                 runOnUiThread(wifiUpdater);
             }
-        }, 4000, 500);
+        }, 4000, 3000);
 
     }
 
@@ -206,7 +277,7 @@ public class MainActivity extends ActionBarActivity {
         try {
 //            intentList = new Intent(this, WeaconListActivity.class);
 //            startActivity(intentList);
-            DownloadWeacons();
+//            DownloadWeacons(); Deprecated,now load from mPos2
         } catch (Exception e) {
             e.printStackTrace();
         }

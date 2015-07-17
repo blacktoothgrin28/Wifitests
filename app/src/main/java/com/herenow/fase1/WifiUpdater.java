@@ -39,7 +39,7 @@ public class WifiUpdater implements Runnable {
     private int cont;
     private int levelOld = -100;
     private int demoCount;
-    private int ntimes = 30;//numbers of ticks for launching a fake weacon
+    private int ntimes = 5;//numbers of ticks for launching a fake weacon
 
     public WifiUpdater(TextView tv, Activity activity, Boolean demo) {
         this.textView = tv;
@@ -132,12 +132,12 @@ public class WifiUpdater implements Runnable {
         }
 
         mNotificationManager.notify(mId, mBuilder.build());
-        MainActivity.weaconsLaunchedTable.put(we.getSSID(), we);
+        MainActivity.weaconsLaunchedTable.put(we.getObjectId(), we);
     }
 
     @Override
     public void run() {
-//        Log.d("mhp", "Wifiuploader |run. demo =" + demo.toString());
+        Log.d("mhp", "Wifiuploader | run. demo =" + demo.toString());
         if (demo) {
             if (demoCount == 1 || demoCount % ntimes == 0) {
                 findFakeWeacon();
@@ -181,9 +181,15 @@ public class WifiUpdater implements Runnable {
         Weacon we;
         Collection<Weacon> intermediate = MainActivity.weaconsTable.values();
         Object[] values = intermediate.toArray();
+
         do {
-            we = (Weacon) values[generator.nextInt(values.length)];
-        } while (MainActivity.weaconsLaunchedTable.containsKey(we.getSSID()));
+            int randomInt = generator.nextInt(values.length);
+
+            Log.d("mhp", "WifiUpdater |findFakeWeacon. i= " + randomInt);
+            we = (Weacon) values[randomInt];
+        } while (MainActivity.weaconsLaunchedTable.containsKey(we.getObjectId()));
+
+        Log.d("mhp", "WifiUpdater |findFakeWeacon. lauchin= " + we.getName());
         sendNotification(act, we);
     }
 }
