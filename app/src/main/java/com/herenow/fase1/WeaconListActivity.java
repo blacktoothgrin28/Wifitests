@@ -52,7 +52,7 @@ public class WeaconListActivity extends ActionBarActivity {
 //            weaconItemList.add(wec);
 //        }
         //Fill the list with launched
-        Collection<Weacon> intermediate = MainActivity.weaconsLaunchedTable.values();
+        Collection<Weacon> intermediate = Notifications.weaconsLaunchedTable.values();
         for (Object obj : intermediate.toArray()) {
             Weacon wec = (Weacon) obj;
             weaconItemList.add(wec); //To the shohwed list.

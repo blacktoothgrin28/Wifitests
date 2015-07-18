@@ -17,16 +17,16 @@ public class AppendLog {
 
     public static void initialize() {
         //Delete files if too greater than 1M
-        File logFile = new File(Environment.getExternalStorageDirectory(), "logWeacon.txt");
+        File logFile = new File(Environment.getExternalStorageDirectory()+"/WCLOG/logWeacon.txt");
         int file_size = Integer.parseInt(String.valueOf(logFile.length() / 1024));
-        if (file_size > 1000) logFile.delete();
-        logFile = new File(Environment.getExternalStorageDirectory() + "/rt.log");
+        if (file_size > 80) logFile.delete();
+        logFile = new File(Environment.getExternalStorageDirectory() + "/WCLOG/rt.log");
         file_size = Integer.parseInt(String.valueOf(logFile.length() / 1024));
-        if (file_size > 1000) logFile.delete();
+        if (file_size > 10) logFile.delete();
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
         String currentDateandTime = sdf.format(new Date());
-        appendLog(file_size + "************ Session: " + currentDateandTime);
+        appendLog("filesize = " + file_size + "************ Session: " + currentDateandTime);
     }
 
     public static void appendLog(String text) {
@@ -46,9 +46,12 @@ public class AppendLog {
             }
         }
         try {
+            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss (dd)| ");
+            String currentDateandTime = sdf.format(new Date());
+
             //BufferedWriter for performance, true to set append to file flag
             BufferedWriter buf = new BufferedWriter(new FileWriter(logFile, true));
-            buf.append(text);
+            buf.append(currentDateandTime + text);
             buf.newLine();
             buf.flush();
             buf.close();

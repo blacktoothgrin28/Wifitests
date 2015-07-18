@@ -1,5 +1,6 @@
 package com.herenow.fase1;
 
+import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -10,6 +11,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Location;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
@@ -30,9 +32,7 @@ import android.widget.TextView;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.parse.LogInCallback;
-import com.parse.Parse;
 import com.parse.ParseException;
-import com.parse.ParseSession;
 import com.parse.ParseUser;
 
 import java.io.BufferedReader;
@@ -56,28 +56,29 @@ public class MainActivity extends ActionBarActivity {
 
     //TODO Consider also the BSSID in the detection
     public static boolean demoMode; //in demo mode doesn't look for wifi's, it just lunch the events
-    public static HashMap<String, Weacon> weaconsLaunchedTable;
-    NotificationManager mNotificationManager;
     Intent intentList;
-    private WifiUpdater wifiUpdater;
+    private WifiUpdater wu;
     private Timer t;
     private Switch mySwitch;
     private TextView tv;
     StringBuilder sb = new StringBuilder();
     WifiReceiver receiverWifi;
-    List<ScanResult> wifiList;
+    //    List<ScanResult> wifiList;
     WifiManager mainWifi;
     int im = 1;
     private long newTime, oldTime;
     private String msg = "";
     public GoogleApiClient mGoogleApiClient;
-    private Position mPos;
+    public Position mPos;
+//    private int levelOld = -100;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Notifications.Initialize(this);
 
         mPos = new Position(this); //Automatically obtain weacons and ssids
         //TODO correct, is awful
@@ -153,15 +154,23 @@ public class MainActivity extends ActionBarActivity {
     }
 
     class WifiReceiver extends BroadcastReceiver {
-
         public void onReceive(Context c, Intent intent) {
-            sb = new StringBuilder();
-            wifiList = mainWifi.getScanResults();
-            for (int i = 0; i < wifiList.size(); i++) {
-                sb.append(new Integer(i + 1).toString() + ".");
-                sb.append((wifiList.get(i)).SSID);
-                sb.append("|");
-            }
+            AppendLog.appendLog("----One automatica scanned!");
+            Location loc;
+
+            loc=mPos.GetLastPosition();
+
+            List<ScanResult> sr = mainWifi.getScanResults();
+            SAPO.addSSIDS(sr, loc);
+            int found = Notifications.CheckScanResults(sr);
+
+            //Old code:
+//            sb = new StringBuilder();
+//            for (int i = 0; i < sr.size(); i++) {
+//                sb.append(new Integer(i + 1).toString() + ".");
+//                sb.append((sr.get(i)).SSID);
+//                sb.append("|");
+//            }
             oldTime = newTime;
             newTime = System.currentTimeMillis();
             long diff = Math.round((newTime - oldTime) / 1000);
@@ -170,52 +179,18 @@ public class MainActivity extends ActionBarActivity {
 //            String msg = Integer.toString(im) + ". " +
 //            Toast.makeText(getParent().getBaseContext(), Integer.toString(im) + sb, Toast.LENGTH_SHORT).show();
 //            mainText.setText(sb);
-            msg = Integer.toString(im) + ".(" + Long.toString(diff) + "s|n=" + Integer.toString(wifiList.size()) + ") ";
+
+//            msg = Integer.toString(im) + ".(" + Long.toString(diff) + "s|n=" + Integer.toString(sr.size()) + ") ";
+            msg = im + ".(" + diff + "s|found=" + found + "/" + sr.size() + ") ";
 //            tv.setText(msg);
             tv.append(msg);
         }
     }
 
-    /**
-     * Get the weacons from the city, and put in in a hash
-     */
-    private void DownloadWeacons() {
-
-        //  Two tables, one for SSIDS and other for weacons
-        // 1. Ask location to google:
-
-//        GPSCoordinates here = mPos.GetLastPosition();
-//
-//        // 2. Ask Parse all places in a radius around here, that have places associated
-//        ParseQuery<ParseObject> query = ParseQuery.getQuery("SSIDS");
-//        query.whereWithinKilometers("GPS",new ParseGeoPoint(here.getLatitude(),here.getLongitude()),5 );
-//        query.whereDoesNotExist("associated_place");
-//
-//
-//        query.findInBackground(new FindCallback<ParseObject>() {
-//            @Override
-//            public void done(List<ParseObject> objects, com.parse.ParseException e) {
-//                if (e == null) {
-//                    tv.setText("SSIDS downloaded");
-//                    for (ParseObject obj : objects) {
-////                        Weacon we = new Weacon(obj);
-////                        weaconsTable.put(we.getSSID(), we);
-//                        SSIDSTable.put(obj.getString("ssid"), obj.getString("associated_place"));
-//                    }
-////                    objectsWereRetrievedSuccessfully(objects);
-//                } else {
-////                    objectRetrievalFailed();
-//                }
-//            }
-//            //TODO download the corresponding weacons
-//
-//        });
-    }
-
     private void modeChange(boolean Demo) {
 
         t = new Timer();
-        wifiUpdater = new WifiUpdater((TextView) findViewById(R.id.tv_demoStatus), this, Demo);
+        wu = new WifiUpdater((TextView) findViewById(R.id.tv_demoStatus), this, Demo);
 
         if (Demo) {
             tv.setText("demo ON");
@@ -225,7 +200,7 @@ public class MainActivity extends ActionBarActivity {
         t.schedule(new TimerTask() {
             @Override
             public void run() {
-                runOnUiThread(wifiUpdater);
+                runOnUiThread(wu);
             }
         }, 4000, 3000);
 
@@ -296,11 +271,11 @@ public class MainActivity extends ActionBarActivity {
 
     public void clickStartSearching(View view) {
         t = new Timer();
-        wifiUpdater = new WifiUpdater((TextView) findViewById(R.id.tv_demoStatus), this, demoMode);
+        wu = new WifiUpdater((TextView) findViewById(R.id.tv_demoStatus), this, demoMode);
         t.schedule(new TimerTask() {
             @Override
             public void run() {
-                runOnUiThread(wifiUpdater);
+                runOnUiThread(wu);
             }
         }, 0, 500);
     }
@@ -321,116 +296,4 @@ public class MainActivity extends ActionBarActivity {
         startActivity(intentList);
     }
 
-    public void clickSendNotification(View view) {
-        //we wait 3 secs
-//        try {
-//            Thread.sleep(3000);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-
-        PendingIntent resultPendingIntent = null;
-        Intent resultIntent = new Intent(this, BrowserActivity.class);
-
-        // The stack builder object will contain an artificial back stack for the
-        // started Activity.
-        // This ensures that navigating backward from the Activity leads out of
-        // your application to the Home screen.
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
-        // Adds the back stack for the Intent (but not the Intent itself)
-        stackBuilder.addParentStack(BrowserActivity.class);
-        // Adds the Intent that starts the Activity to the top of the stack
-        stackBuilder.addNextIntent(resultIntent);
-        resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        Bitmap bm = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
-
-        NotificationCompat.Action myaction = new NotificationCompat.Action(R.drawable.ic_stat_name, "Call", resultPendingIntent);
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
-                .setSmallIcon(R.drawable.ic_stat_name)
-                .setLargeIcon(bm)
-                .setContentTitle("Weacons available")
-//                .setContentText(getString(R.string.cid))
-                .setAutoCancel(true)
-                .setDefaults(Notification.DEFAULT_VIBRATE | Notification.DEFAULT_SOUND | Notification.FLAG_SHOW_LIGHTS)
-//                .setLights(0xff00ff00, 300, 100)
-                .setLights(0xE6D820, 300, 100)
-                .setTicker("HearNow weacons detected")
-                .addAction(myaction);
-        NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
-        String[] events = {"H&M", "ZARA", "AIA", "USA Ambassay", "Starbucks", "Bus station"};
-
-        // Sets a title for the Inbox in expanded layout
-        inboxStyle.setBigContentTitle("Available weacons");
-
-        // Moves events into the expanded layout
-        for (String event : events) {
-            inboxStyle.addLine(event);
-        }
-        // Moves the expanded layout object into the notification object.
-        mBuilder.setStyle(inboxStyle);
-        // Issue the notification here.
-        ////////////////////////////
-
-// Creates an explicit intent for an Activity in your app
-
-        mBuilder.setContentIntent(resultPendingIntent);
-        mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        // mId allows you to update the notification later on.
-        int mId = 1;
-        mNotificationManager.notify(mId, mBuilder.build());
-    }
-
-    //////////////////////////////////
-    //Deprecated
-
-    public void clickStopNotification(View view) {
-        mNotificationManager.cancel(1);
-    }
-
-    /**
-     * Read the file from sd card (dropbox) and put them in cloud
-     */
-    private void UploadFileWeacons() {
-        //1. read file
-        File sdcard = new File(Environment.getExternalStorageDirectory(), "HNdata");
-        File file = new File(sdcard, "weacons.txt");
-
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(file));
-            String line;
-            line = br.readLine();//headers
-            while ((line = br.readLine()) != null) {
-                if (line.toCharArray()[0] == '/' && line.toCharArray()[1] == '/')
-                    continue; //skip comment lines (//)
-                String[] parts = line.split("; ");
-                Weacon we = new Weacon(parts, this);
-//                weaconsTable.put(parts[0], we); //TODO populate this table from internec
-                we.upload(this.getBaseContext());
-            }
-            br.close();
-        } catch (IOException e) {
-            //You'll need to add proper error handling here
-        }
-    }
-
-    public void clickStopSearch(View view) {
-        t.cancel();
-    }
-
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-    public static class PlaceholderFragment extends Fragment {
-
-        public PlaceholderFragment() {
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-            return rootView;
-        }
-    }
 }

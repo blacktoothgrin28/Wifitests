@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import util.AppendLog;
 import util.GPSCoordinates;
 import util.Weacon;
 
@@ -53,8 +54,21 @@ public class Position implements GoogleApiClient.ConnectionCallbacks, GoogleApiC
         }
     }
 
-    public GPSCoordinates GetLastPosition() {
-        return gps;
+    public Location GetLastPosition() {
+        try {
+            if (!mGoogleApiClient.isConnected()) {
+                mGoogleApiClient.connect();
+            }
+
+//            AppendLog.appendLog("*****solicitando GetLastPostition");
+            mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+//            AppendLog.appendLog("*****obtenido GetLastPostition:" + mLastLocation);
+        } catch (Exception e) {
+            e.printStackTrace();
+//            AppendLog.appendLog("***error at GetLastPostition" + e.getMessage());
+        }
+//        return new GPSCoordinates(mLastLocation);
+        return mLastLocation;
     }
 
     @Override
