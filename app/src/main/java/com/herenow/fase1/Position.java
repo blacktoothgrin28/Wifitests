@@ -3,7 +3,6 @@ package com.herenow.fase1;
 import android.content.Context;
 import android.location.Location;
 import android.os.Bundle;
-import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -18,7 +17,6 @@ import com.parse.SaveCallback;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 import util.AppendLog;
@@ -29,16 +27,22 @@ import util.Weacon;
  * Created by Milenko on 16/07/2015.
  */
 public class Position implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+    private final static boolean bFromLocalParse = false;
+    private String parseClass;
+    private Collection<String> obIds;
+    //    private ParseGeoPoint point;
+    private List scanResultSSIDS;
     private GoogleApiClient mGoogleApiClient;
     private Context context;
     private Location mLastLocation;
     private GPSCoordinates gps;
-    private final static boolean bFromLocalParse = true;
+    private REASON connectionReason;
 
-    //TODO for now receive location only onces. see http://blog.teamtreehouse.com/beginners-guide-location-android
+    //TODO. For now receive location only onces. see http://blog.teamtreehouse.com/beginners-guide-location-android
     public Position(Context context) {
         this.context = context.getApplicationContext();
         buildGoogleApiClient();
+
     }
 
     protected synchronized void buildGoogleApiClient() {
@@ -48,47 +52,78 @@ public class Position implements GoogleApiClient.ConnectionCallbacks, GoogleApiC
                     .addOnConnectionFailedListener(this)
                     .addApi(LocationServices.API)
                     .build();
-            mGoogleApiClient.connect();
+//            mGoogleApiClient.connect();
+
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public Location GetLastPosition() {
-        try {
-            if (!mGoogleApiClient.isConnected()) {
-                mGoogleApiClient.connect();
-            }
-
-//            AppendLog.appendLog("*****solicitando GetLastPostition");
-            mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-//            AppendLog.appendLog("*****obtenido GetLastPostition:" + mLastLocation);
-        } catch (Exception e) {
-            e.printStackTrace();
-//            AppendLog.appendLog("***error at GetLastPostition" + e.getMessage());
-        }
-//        return new GPSCoordinates(mLastLocation);
-        return mLastLocation;
+    public void connect(REASON reason) {
+        connectionReason = reason;
+        mGoogleApiClient.connect();
     }
 
     @Override
     public void onConnected(Bundle bundle) {
-        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        AppendLog.appendLog("Connected to google api. Reason:" + connectionReason);
 
-        //TODO decide when ask places to Cloud (change in position , etc)
-        if (mLastLocation != null) {
-            gps = new GPSCoordinates(mLastLocation);
-            retrieveSSIDSFromParse(bFromLocalParse);
+        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        MainActivity.lastLocation = mLastLocation;
+        this.mGoogleApiClient.disconnect();
+
+        if (mLastLocation == null) {
+            AppendLog.appendLog("Last location is null");
+            return;
         } else {
-            gps = new GPSCoordinates(0, 0);
-            Log.d("mhp", "Not possible to retrieve last place from Google");
-            retrieveSSIDSFromParse(true);
+//            SAPO.loc = new ParseGeoPoint(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+
+//            AppendLog.appendLog("GOT Last location = " + mLastLocation);
+
+        }
+
+        if (connectionReason == REASON.GetWeacons) {
+            gps = new GPSCoordinates(mLastLocation);
+            retrieveSPOTSFromParse(bFromLocalParse);
+//            SAPO.downloadSPOTSFromParse();
+//            SAPO.downloadHitsFromParse();
+        } else if (connectionReason == REASON.SaveSAPOssidswithLocation) {
+            //WARN: alguos de los nuevos ssids puede que ya estén. no puedo subir TODOS.
+            //MAla cuea, los subo y después resuelvo con script
+//            SAPO.saveSpotsAndHits(this.scanResultSSIDS, mLastLocation);//TODO fix this pingpong
+
+        } else if (connectionReason == REASON.SetLocationToParseObject) {
+            try {
+                //Needed: class and objectID(s)
+
+                ParseQuery query = ParseQuery.getQuery(parseClass);
+                query.whereContainedIn("objectId", obIds);
+
+                List<? extends ParseObject> parseObjects = null;
+                ParseObject.saveAllInBackground(parseObjects, new SaveCallback() {
+                    @Override
+                    public void done(ParseException e) {
+                        if (e == null) {
+                            AppendLog.appendLog("Parse object location has been updated");
+                        } else {
+                            AppendLog.appendLog("--- error:Parse object location has been NOT updated " + e.getMessage());
+                        }
+                    }
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+                AppendLog.appendLog("---error in Position|onConnected: " + e.getMessage());
+            }
+        } else if (connectionReason == REASON.JustUpdatLocation) {
+//            SAPO.setLoc(mLastLocation);
+        } else if (connectionReason == REASON.SaveSAPO2SPOTS) {
+            SAPO2.newLocation(mLastLocation);
         }
     }
 
-    public void retrieveSSIDSFromParse(final boolean bLocal) {
+    public void retrieveSPOTSFromParse(final boolean bLocal) {
         try {
-            Log.d("mhp", "retrieving SSIDS from local:" + bLocal + " user: " + ParseUser.getCurrentUser());
+            AppendLog.appendLog("retrieving SSIDS from local:" + bLocal + " user: " + ParseUser.getCurrentUser());
             ParseQuery<ParseObject> query = ParseQuery.getQuery("SSIDS");
             query.whereWithinKilometers("GPS", new ParseGeoPoint(gps.getLatitude(), gps.getLongitude()), 5);
             query.setLimit(700);
@@ -97,61 +132,60 @@ public class Position implements GoogleApiClient.ConnectionCallbacks, GoogleApiC
                 @Override
                 public void done(List<ParseObject> objects, ParseException e) {
                     if (e == null) {
-                        Log.d("mhp", "number of SSIDS:" + objects.size());
+                        AppendLog.appendLog("number of SSIDS for weacons:" + objects.size());
                         if (!bLocal) ParseObject.pinAllInBackground(objects);
                         ArrayList ids = new ArrayList();
                         for (ParseObject obj : objects) {
-                            SSID ssid = new SSID(obj);
-                            MainActivity.SSIDSTable.put(obj.getString("ssid"), ssid);
-                            ids.add(ssid.getPlaceId());
+                            SPOT spot = new SPOT(obj);
+                            MainActivity.BSSIDSTable.put(obj.getString("bssid"), spot);
+                            ids.add(spot.getPlaceId());
                         }
                         retrievePlacesFromParse(bLocal, ids);
                     } else {
-                        objectRetrievalFailed(e);
+                        AppendLog.appendLog("---ERROR from parse obtienning ssids" + e.getMessage());
                     }
                 }
             });
         } catch (Exception e) {
             e.printStackTrace();
-            Log.d("mhp", "failed retrieving ssids: " + e.getMessage());
+            AppendLog.appendLog("---Error: failed retrieving SPOTS: " + e.getMessage());
 
         }
     }
 
     private void retrievePlacesFromParse(final boolean bLocal, Collection weaconsIds) {
-        Log.d("mhp", "retrieving place from local:" + bLocal);
+//        Log.d("mhp", "retrieving place from local:" + bLocal);
+
         ParseQuery<ParseObject> query = ParseQuery.getQuery("Weacon");
         query.whereContainedIn("objectId", weaconsIds);
         query.setLimit(200);
+
         if (bLocal) query.fromLocalDatastore();
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
-            public void done(List<ParseObject> objects, com.parse.ParseException e) {
+            public void done(final List<ParseObject> objects, com.parse.ParseException e) {
                 if (e == null) {
-                    Log.d("mhp", "number of places:" + objects.size());
+                    AppendLog.appendLog("number of places:" + objects.size());
                     if (!bLocal) ParseObject.pinAllInBackground(objects, new SaveCallback() {
                         @Override
                         public void done(ParseException e) {
                             if (e == null) {
-                                Log.d("mhp", "Ive pinned the places:");
+                                AppendLog.appendLog("Ive pinned the places:" + objects.size());
                             }
                         }
                     });
                     for (ParseObject obj : objects) {
+//                        AppendLog.appendLog("converting the parse obj to weacon:"+obj.getString("Name"));
                         Weacon we = new Weacon(obj);
                         MainActivity.weaconsTable.put(obj.getObjectId(), we);
                     }
                     ParseObject.pinAllInBackground(objects);
                 } else {
-                    objectRetrievalFailed(e);
+                    AppendLog.appendLog("---Error: failed retrieving places: " + e.getMessage());
                 }
             }
         });
 
-    }
-
-    private void objectRetrievalFailed(ParseException e) {
-        Log.d("mhp", "Failed to retrieve objects " + e.getMessage());
     }
 
     @Override
@@ -163,4 +197,6 @@ public class Position implements GoogleApiClient.ConnectionCallbacks, GoogleApiC
     public void onConnectionFailed(ConnectionResult connectionResult) {
 
     }
+
+    public enum REASON {GetWeacons, SetLocationToParseObject, SaveSAPOssidswithLocation, SaveSAPO2SPOTS, JustUpdatLocation}
 }

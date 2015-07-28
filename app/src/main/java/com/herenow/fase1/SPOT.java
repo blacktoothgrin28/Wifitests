@@ -7,15 +7,16 @@ import util.GPSCoordinates;
 /**
  * Created by Milenko on 17/07/2015.
  */
-public class SSID {
+public class SPOT {
     private final String ssid;
     private final String bssid;
     private final GPSCoordinates gps;
     private final int level;
     private final ParseObject owner;
     private final boolean validated;
+    private final String placeId;
 
-    public SSID(ParseObject obj) {
+    public SPOT(ParseObject obj) {
         ssid = obj.getString("ssid");
         bssid = obj.getString("bssid");
         gps = new GPSCoordinates(obj.getParseGeoPoint("GPS").getLatitude(), obj.getParseGeoPoint("GPS").getLongitude());
@@ -30,8 +31,6 @@ public class SSID {
         return placeId;
     }
 
-    private final String placeId;
-
     public String getSsid() {
         return ssid;
     }
@@ -42,6 +41,16 @@ public class SSID {
 
     public GPSCoordinates getGps() {
         return gps;
+
+    }
+
+    /**
+     * A shorter description of coordinates
+     *
+     * @return
+     */
+    public String gpsString() {
+        return "(" + gps.getLatitude() + "," + gps.getLongitude() + ")";
     }
 
     public int getLevel() {

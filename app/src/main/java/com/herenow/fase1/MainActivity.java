@@ -1,31 +1,21 @@
 package com.herenow.fase1;
 
-import android.app.Activity;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.app.TaskStackBuilder;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.location.Location;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -35,9 +25,6 @@ import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -52,25 +39,23 @@ import util.Weacon;
 
 public class MainActivity extends ActionBarActivity {
     public static HashMap<String, Weacon> weaconsTable = new HashMap<String, Weacon>(); //Total list of weacons
-    public static HashMap<String, SSID> SSIDSTable = new HashMap<>(); //list {SSids , SSID
+    public static HashMap<String, SPOT> BSSIDSTable = new HashMap<>(); //list {SSids , SPOT}
 
-    //TODO Consider also the BSSID in the detection
     public static boolean demoMode; //in demo mode doesn't look for wifi's, it just lunch the events
+    public static Position mPos; //WARN. Lo he hecho static para poder usarlo en SAPO
+    public static Location lastLocation;
+    public GoogleApiClient mGoogleApiClient;
     Intent intentList;
+    WifiReceiver receiverWifi;
+    WifiManager mainWifi;
+    int im = 1;
     private WifiUpdater wu;
     private Timer t;
     private Switch mySwitch;
     private TextView tv;
-    StringBuilder sb = new StringBuilder();
-    WifiReceiver receiverWifi;
-    //    List<ScanResult> wifiList;
-    WifiManager mainWifi;
-    int im = 1;
     private long newTime, oldTime;
     private String msg = "";
-    public GoogleApiClient mGoogleApiClient;
-    public Position mPos;
-//    private int levelOld = -100;
+    private long oldTimeSapo = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,20 +63,21 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Notifications.Initialize(this);
-
-        mPos = new Position(this); //Automatically obtain weacons and ssids
-        //TODO correct, is awful
-
         //Write  unhandled exceptions in a log file in the phone
         AppendLog.initialize();
+        Notifications.Initialize(this);
+
+        mPos = new Position(this);
+        mPos.connect(Position.REASON.GetWeacons);
+
+        //Log unhandled exceptions
         Thread.currentThread().setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
             @Override
             public void uncaughtException(Thread thread, Throwable ex) {
                 PrintWriter pw;
                 try {
                     pw = new PrintWriter(
-                            new FileWriter(Environment.getExternalStorageDirectory() + "/rt.log", true));
+                            new FileWriter(Environment.getExternalStorageDirectory() + "/WCLOG//rt.txt", true));
                     ex.printStackTrace(pw);
                     pw.flush();
                     pw.close();
@@ -101,13 +87,10 @@ public class MainActivity extends ActionBarActivity {
             }
         });
 
-
-        tv = (TextView) findViewById(R.id.tv_demoStatus);
         mySwitch = (Switch) findViewById(R.id.sw_demo);
-        //set the switch to off
         mySwitch.setChecked(false);
+        tv = (TextView) findViewById(R.id.tv_demoStatus);
         tv.setText("demo OFF");
-        //attach a listener to check for changes in state
         mySwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView,
@@ -121,69 +104,59 @@ public class MainActivity extends ActionBarActivity {
         demoMode = mySwitch.isChecked();
 
         //PARSE
-        //TODO initilize Parse in Application class: http://stackoverflow.com/questions/30969612/android-parse-error-when-initializing-activity
-
         ParseUserLogIn();
+
 
         //Wifi
         mainWifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
         receiverWifi = new WifiReceiver();
-        registerReceiver(receiverWifi, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
+        intentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
+        registerReceiver(receiverWifi, intentFilter);
+    }
 
+    /**
+     * Upload the pinned info form SAP and from Weacons
+     */
+    private void syncAllPinned() {
+        SAPO2.uploadIfRequired();
+        uploadAllPinnedWeacon();
+    }
+
+
+    /**
+     * Upload all pinned data related to weacons: weacon definition , launched, openend, etc.
+     */
+    private void uploadAllPinnedWeacon() {
+        //TODO subir los weacons pinned
+    }
+
+
+    private boolean isConnectedViaWifi() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo mWifi = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+        return mWifi.isConnected();
     }
 
     private void ParseUserLogIn() {
 //        Parse.User.current()
         ParseUser curr = ParseUser.getCurrentUser();
         if (curr == null) {
-            Log.d("mhp", "sin usert, vamos a loggear");
+            AppendLog.appendLog("sin user, vamos a loggear");
 
             ParseUser.logInInBackground("sorrento", "spidey", new LogInCallback() {
                 public void done(ParseUser user, ParseException e) {
                     if (user != null) {
-                        Log.d("mhp", "Logged in");
+                        AppendLog.appendLog("Logged in");
                     } else {
-                        Log.d("mhp", "Not Logged in");
+                        AppendLog.appendLog("Not Logged in");
                     }
                 }
             });
 
         } else {
-            Log.d("mhp", "Ya tenia user,");
-        }
-    }
-
-    class WifiReceiver extends BroadcastReceiver {
-        public void onReceive(Context c, Intent intent) {
-            AppendLog.appendLog("----One automatica scanned!");
-            Location loc;
-
-            loc=mPos.GetLastPosition();
-
-            List<ScanResult> sr = mainWifi.getScanResults();
-            SAPO.addSSIDS(sr, loc);
-            int found = Notifications.CheckScanResults(sr);
-
-            //Old code:
-//            sb = new StringBuilder();
-//            for (int i = 0; i < sr.size(); i++) {
-//                sb.append(new Integer(i + 1).toString() + ".");
-//                sb.append((sr.get(i)).SSID);
-//                sb.append("|");
-//            }
-            oldTime = newTime;
-            newTime = System.currentTimeMillis();
-            long diff = Math.round((newTime - oldTime) / 1000);
-
-            im++;
-//            String msg = Integer.toString(im) + ". " +
-//            Toast.makeText(getParent().getBaseContext(), Integer.toString(im) + sb, Toast.LENGTH_SHORT).show();
-//            mainText.setText(sb);
-
-//            msg = Integer.toString(im) + ".(" + Long.toString(diff) + "s|n=" + Integer.toString(sr.size()) + ") ";
-            msg = im + ".(" + diff + "s|found=" + found + "/" + sr.size() + ") ";
-//            tv.setText(msg);
-            tv.append(msg);
+            AppendLog.appendLog("Ya tenia user,");
         }
     }
 
@@ -268,7 +241,6 @@ public class MainActivity extends ActionBarActivity {
 
     }
 
-
     public void clickStartSearching(View view) {
         t = new Timer();
         wu = new WifiUpdater((TextView) findViewById(R.id.tv_demoStatus), this, demoMode);
@@ -282,7 +254,7 @@ public class MainActivity extends ActionBarActivity {
 
     public void clickDownloadWeacons(View view) {
         try {
-            mPos.retrieveSSIDSFromParse(false);
+            mPos.retrieveSPOTSFromParse(false);
 //            intentList = new Intent(this, WeaconListActivity.class);
 //            startActivity(intentList);
 //            DownloadWeacons(); Deprecated,now load from mPos2
@@ -294,6 +266,61 @@ public class MainActivity extends ActionBarActivity {
     public void clickAddWeacon(View view) {
         intentList = new Intent(this, AddWeaconActivity.class);
         startActivity(intentList);
+    }
+
+    class WifiReceiver extends BroadcastReceiver {
+        public void onReceive(Context c, Intent intent) {
+            final String action = intent.getAction();
+//            Location loc; TODO put location battery friendly
+            AppendLog.appendLog("*BroadcastReceiver: " + action, "CON");
+
+            if (action.equals(WifiManager.NETWORK_STATE_CHANGED_ACTION)) {
+                NetworkInfo netInfo = intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
+                if ((netInfo.getDetailedState() == (NetworkInfo.DetailedState.CONNECTED))) {
+                    // your wifi is connected, do what you want to do
+                    AppendLog.appendLog("*** We just connected to wifi: " + netInfo.getExtraInfo(), "CON");
+                    syncAllPinned();
+                } else {
+//                    AppendLog.appendLog("***We are not connected to wifi:" + netInfo.toString(), "CON");
+                }
+
+            } else if (action.equals(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION)) { //Arrieved new scan
+//                AppendLog.appendLog("entramos en WifiManager.SCAN_RESULTS_AVAILABLE_ACTION","CON");
+                List<ScanResult> sr = mainWifi.getScanResults();
+                int found = Notifications.CheckScanResults(sr);
+//                loc = mPos.GetLastPosition(); //TODO no pedir localización? o cerrar conexión?
+
+                oldTime = newTime;
+                newTime = System.currentTimeMillis();
+                long diff = Math.round((newTime - oldTime) / 1000);
+                im++;
+                msg = im + ".(" + diff + "s|found=" + found + "/" + sr.size() + ") ";
+//            tv.setText(msg);
+                tv.append(msg);
+
+                SAPO2.addSPOTS(sr);//, loc);
+                AppendLog.appendLog("Automatic scanning: " + msg);
+            } else if (action.equals(WifiManager.SUPPLICANT_CONNECTION_CHANGE_ACTION)) { //Connection /disconnection from wifi
+                //DEPRECATED
+                AppendLog.appendLog("entramos en SUPPLICANT_CONNECTION_CHANGE_ACTION", "CON");
+
+            } else {
+                AppendLog.appendLog("entramos en otro: " + action, "CON");
+            }
+
+            //DOesn't work'
+//            if (action.equals(WifiManager.SUPPLICANT_CONNECTION_CHANGE_ACTION)) {
+//                AppendLog.appendLog("**************in SUPlicart");
+//                if (intent.getBooleanExtra(WifiManager.EXTRA_SUPPLICANT_CONNECTED, false)) {
+//                    //connected
+//                    AppendLog.appendLog("Connected to wifi");
+//                } else {
+//                    // wifi connection was lost
+//                }
+//            }
+
+
+        }
     }
 
 }

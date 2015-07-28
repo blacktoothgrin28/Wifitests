@@ -17,12 +17,17 @@ public class GPSCoordinates {
     }
 
     @Override
+//    public String toString() {
+//        return "GPSCoordinates{" +
+//                "latitude=" + latitude +
+//                ", longitude=" + longitude +
+//                '}';
+//}
+
     public String toString() {
-        return "GPSCoordinates{" +
-                "latitude=" + latitude +
-                ", longitude=" + longitude +
-                '}';
+        return "GPS{" + latitude + "," + longitude + '}';
     }
+
 
     public double getLongitude() {
         return longitude;

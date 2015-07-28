@@ -14,19 +14,22 @@ import java.util.Date;
  * Created by Milenko on 16/07/2015.
  */
 public class AppendLog {
+    private static String fileName;
+    private static String currentDateandTime;
 
     public static void initialize() {
-        //Delete files if too greater than 1M
-        File logFile = new File(Environment.getExternalStorageDirectory()+"/WCLOG/logWeacon.txt");
-        int file_size = Integer.parseInt(String.valueOf(logFile.length() / 1024));
-        if (file_size > 80) logFile.delete();
-        logFile = new File(Environment.getExternalStorageDirectory() + "/WCLOG/rt.log");
-        file_size = Integer.parseInt(String.valueOf(logFile.length() / 1024));
-        if (file_size > 10) logFile.delete();
-
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
-        String currentDateandTime = sdf.format(new Date());
-        appendLog("filesize = " + file_size + "************ Session: " + currentDateandTime);
+        currentDateandTime = sdf.format(new Date());
+
+        fileName = currentDateandTime + "_mhp.txt";
+        File logFile = new File(Environment.getExternalStorageDirectory() + "/WCLOG/" + fileName);
+        int file_size = Integer.parseInt(String.valueOf(logFile.length() / 1024));
+//        if (file_size > parameters.LogFileSize) logFile.delete();
+        logFile = new File(Environment.getExternalStorageDirectory() + "/WCLOG/rt.txt");
+        file_size = Integer.parseInt(String.valueOf(logFile.length() / 1024));
+        if (file_size > parameters.LogFileSize) logFile.delete();
+        appendLog("++++++++++++++++++++++++Session: " + currentDateandTime + "+++++++++++++++++++++++");
+
     }
 
     public static void appendLog(String text) {
@@ -36,7 +39,7 @@ public class AppendLog {
     public static void appendLog(String text, String TAG) {
         Log.d(TAG, text);
 
-        File logFile = new File(Environment.getExternalStorageDirectory(), "logWeacon.txt");
+        File logFile = new File(Environment.getExternalStorageDirectory(), "/WCLOG/" + currentDateandTime + "_" + TAG + ".txt");
         if (!logFile.exists()) {
             try {
                 logFile.createNewFile();

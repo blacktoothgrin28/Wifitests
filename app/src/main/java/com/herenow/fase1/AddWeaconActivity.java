@@ -2,6 +2,7 @@ package com.herenow.fase1;
 
 import android.app.Activity;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -18,6 +19,7 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -34,6 +36,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import util.AppendLog;
 import util.GPSCoordinates;
 import util.TYPE;
 import util.Weacon;
@@ -69,7 +72,14 @@ public class AddWeaconActivity extends ActionBarActivity implements GoogleApiCli
         tvMessage.setOnKeyListener(new View.OnKeyListener() {
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 if (keyCode == 66) {
-                    buttonSend.requestFocus();
+//                    buttonSend.requestFocus();
+                    InputMethodManager in = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    // NOTE: In the author's example, he uses an identifier
+                    // called searchBar. If setting this code on your EditText
+                    // then use v.getWindowToken() as a reference to your
+                    // EditText is passed into this callback as a TextView
+                    in.hideSoftInputFromWindow(v.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+//                    userValidateEntry();
                 }
                 return false;
             }
@@ -81,6 +91,21 @@ public class AddWeaconActivity extends ActionBarActivity implements GoogleApiCli
 //        mCropImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
 
         FillSpinner();
+//        GetLocation();
+    }
+
+    /**
+     * Dispatch onResume() to fragments.  Note that for better inter-operation
+     * with older versions of the platform, at the point of this call the
+     * fragments attached to the activity are <em>not</em> resumed.  This means
+     * that in some cases the previous state may still be saved, not allowing
+     * fragment transactions that modify the state.  To correctly interact
+     * with fragments in their proper state, you should instead override
+     * {@link #onResumeFragments()}.
+     */
+    @Override
+    protected void onResume() {
+        super.onResume();
         GetLocation();
     }
 
@@ -248,10 +273,11 @@ public class AddWeaconActivity extends ActionBarActivity implements GoogleApiCli
 
         try {
             Weacon weacon = new Weacon(selectedSSID, selectedBSSID, name, url, message, gps, validated, type, level, logo);
-            weacon.upload(this.getBaseContext());
+            weacon.upload(this.getApplicationContext());
         } catch (Exception e) {
             e.printStackTrace();
-            Toast.makeText(this.getBaseContext(), e.toString(), Toast.LENGTH_SHORT).show();
+            AppendLog.appendLog("---Error: Can't upload the new weacon");
+
         }
     }
 
@@ -279,18 +305,15 @@ public class AddWeaconActivity extends ActionBarActivity implements GoogleApiCli
 
     @Override
     public void onConnected(Bundle bundle) {
-        //TODO replace by Position.GetlastPosition
 
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
         if (mLastLocation != null) {
-//            mLatitudeText.setText(String.valueOf(mLastLocation.getLatitude()));
-//            mLongitudeText.setText(String.valueOf(mLastLocation.getLongitude()));
-//            cityText.setText(mLastLocation.toString());
+            AppendLog.appendLog("LOC: We got location in AddWeacon");
+        } else {
+            AppendLog.appendLog("We got null location in AddWeacon");
         }
         gps = new GPSCoordinates(mLastLocation);
-//        TextView textView = (TextView) this.findViewById(R.id.tv_Message);//testing
-//        textView.setText("Recibida localización: " + gps);
-//        textView.setText("Recibida localización: " + mLastLocation.toString());
+        mGoogleApiClient.disconnect();
     }
 
     @Override

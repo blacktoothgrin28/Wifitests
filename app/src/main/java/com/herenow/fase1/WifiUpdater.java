@@ -1,18 +1,11 @@
 package com.herenow.fase1;
 
 import android.app.Activity;
-import android.app.Notification;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.app.TaskStackBuilder;
 import android.content.Context;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -57,7 +50,7 @@ public class WifiUpdater implements Runnable {
 
     @Override
     public void run() {
-        Log.d("mhp", "Wifiuploader | run. demo =" + demo.toString());
+        AppendLog.appendLog("Wifiuploader | run. demo =" + demo.toString());
         if (demo) {
             if (demoCount == 1 || demoCount % ntimes == 0) {
                 findFakeWeacon();
@@ -84,11 +77,11 @@ public class WifiUpdater implements Runnable {
         do {
             int randomInt = generator.nextInt(values.length);
 
-            Log.d("mhp", "WifiUpdater |findFakeWeacon. i= " + randomInt);
+            AppendLog.appendLog("WifiUpdater |findFakeWeacon. i= " + randomInt);
             we = (Weacon) values[randomInt];
         } while (Notifications.weaconsLaunchedTable.containsKey(we.getObjectId()));
 
-        Log.d("mhp", "WifiUpdater |findFakeWeacon. lauchin= " + we.getName());
+        AppendLog.appendLog("WifiUpdater |findFakeWeacon. lauchin= " + we.getName());
         Notifications.sendNotification(we);
     }
 }
