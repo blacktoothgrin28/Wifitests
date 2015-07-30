@@ -73,6 +73,8 @@ public abstract class Notifications {
         for (ScanResult r : sr) {
             try {
                 if (MainActivity.BSSIDSTable.containsKey(r.BSSID)) {
+                    //TODO put in parse one hit
+
                     found++;
                     SPOT spot = MainActivity.BSSIDSTable.get(r.BSSID);
                     String obId = spot.getPlaceId();
@@ -95,12 +97,15 @@ public abstract class Notifications {
 
     public static void sendNotification(Weacon we) {
         try {
+
             Intent resultIntent;
             PendingIntent resultPendingIntent;
             TaskStackBuilder stackBuilder;
 
             Intent intent = new Intent(NOTIFICATION_DELETED_ACTION);
             pendingDeleteIntent = PendingIntent.getBroadcast(acti.getBaseContext(), 0, intent, 0);
+
+            //TODO put in parse that this weacon was notified
 
             if (showedNotifications.size() == 0 || justDeleted) { //New Notification
                 justDeleted = false;

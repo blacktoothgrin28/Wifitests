@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import util.AppendLog;
-import util.Hit;
+import parse.Hit;
 import util.parameters;
 
 /**
@@ -26,47 +26,57 @@ public abstract class SAPO2 {
 
     private static HashMap<String, Integer> oldSpots = new HashMap<>();
     private static HashMap<String, Integer> newSpots;
+    private static HashMap<String, Integer> blackList = new HashMap<>();//These should be ignored
+    //TODO fill the blacklist from an initial query
+
     //    private static HashMap<String, String> selectedSpots = new HashMap<>();
     private static List<ScanResult> toBeSaved;
-    private static HashMap<String, String> objIds = new HashMap<>();//bssid, objid
+    private static HashMap<String, String> parseHits = new HashMap<>();//bssid, parseHit
 
 
     public static void addSPOTS(List<ScanResult> sr) {
-        newSpots = new HashMap<>();
-        boolean bingo = false; //when one counter is grater than threshold
+        try {
+            newSpots = new HashMap<>();
+            boolean bingo = false; //when one counter is grater than threshold
 
-        //1. All results in the "new" hash, except those that are already selected
-        StringBuilder sb = new StringBuilder("\n**************\n");
+            //1. All results in the "new" hash, except those that are already selected
+            StringBuilder sb = new StringBuilder("\n**************\n");
 
-        for (ScanResult r : sr) {
-            String b = r.BSSID;
-            if (objIds.containsKey(b)) {
-                incrementHit(b);
-            } else {
-                if (oldSpots.containsKey(b)) {
-                    Integer newVal = oldSpots.get(b) + 1;
-                    newSpots.put(b, newVal); //bssid and counter
-                    sb.append("  - " + +newVal + " | " + r.SSID + newVal + "\n");
-                    if (newVal > parameters.hitRepetitions) { //set to 1 for testing
-                        app("*****BINGO*** we have repetitions: " + r.SSID);
-                        bingo = true;
-                        break;
+            for (ScanResult r : sr) {
+                String b = r.BSSID;
+
+                if (true){//TODO !blackList.containsKey(b)) {
+                    if (parseHits.containsKey(b)) {
+                        incrementHit(b);
+                    } else {
+                        if (oldSpots.containsKey(b)) {
+                            Integer newVal = oldSpots.get(b) + 1;
+                            newSpots.put(b, newVal); //bssid and counter
+                            sb.append("  - " + newVal + " | " + r.SSID + " | " + r.BSSID + "\n");
+                            if (newVal > parameters.hitRepetitions) { //set to 1 for testing
+                                app("*****BINGO*** we have repetitions: " + r.SSID);
+                                bingo = true;
+                                break;
+                            }
+                        } else {
+                            newSpots.put(b, 1); //bssid and counter
+                            sb.append("  - 1 | " + r.SSID + "\n");
+                        }
                     }
-                } else {
-                    newSpots.put(b, 1); //bssid and counter
-                    sb.append("  - 1 | " + r.SSID + "\n");
                 }
             }
-        }
-        sb.append("*********************");
-        app(sb.toString());
+            sb.append("*********************");
+            app(sb.toString());
 
 
-        if (bingo) {
-            toBeSaved = sr;
-            MainActivity.mPos.connect(Position.REASON.SaveSAPO2SPOTS);
-        } else {
-            oldSpots = newSpots;
+            if (bingo) {
+                toBeSaved = sr;
+                MainActivity.mPos.connect(Position.REASON.SaveSAPO2SPOTS);
+            } else {
+                oldSpots = newSpots;
+            }
+        } catch (Exception e) {
+            app("---error en sapo addspot:"+e.getMessage());
         }
     }
 
@@ -111,8 +121,9 @@ public abstract class SAPO2 {
                             if (e == null) {
                                 StringBuilder sb = new StringBuilder("****** adding to hash objects\n");
                                 for (Hit h : list) {
-                                    sb.append(h.getBSSID() + " | " + h.getObjectId() + " | created: " + h.getCreatedAt() + "\n");
-                                    objIds.put(h.getBSSID(), h.getObjectId());
+                                    sb.append("    " + h.getBSSID() + " | " + h.getObjectId() + " | created: " + h.getCreatedAt() + "\n");
+                                    parseHits.put(h.getBSSID(), h.getObjectId());
+                                    h.pinInBackground("SAPO2");
                                 }
                                 sb.append("*******");
                                 app(sb.toString());
@@ -142,9 +153,9 @@ public abstract class SAPO2 {
     }
 
     private static void incrementHit(final String bssid) {
-        if (objIds.containsKey(bssid)) {
-            String id = objIds.get(bssid);
-
+        if (parseHits.containsKey(bssid)) {
+//            Hit hitBuff = parseHits.get(bssid);
+            String id = parseHits.get(bssid);
             app("vamos a incrmentar en vacio, a ver: " + id);
             Hit hitBuff = ParseObject.createWithoutData(Hit.class, id);
             hitBuff.incrementMe();
@@ -166,7 +177,7 @@ public abstract class SAPO2 {
 //                        Hit hit = list.get(0);
                         app("este es el hit que recuperamos para " + bssid + "|" + hit + " obid=" + hit.getObjectId());
 //                        app("este es el hit que recuperamos para " + bssid + "|" + hit + " obid=" + hit.getObjectId());
-//                        objIds.put(bssid, hit.getObjectId());
+//                        parseHits.put(bssid, hit.getObjectId());
 //                        hit.incrementMe();
 
                     } else {
@@ -188,16 +199,16 @@ public abstract class SAPO2 {
             query.fromPin("SAPO2");
             query.findInBackground(new FindCallback<Hit>() {
                 @Override
-                public void done(final List<Hit> localhits, ParseException e) {
+                public void done( final List<Hit> localhits, ParseException e) {
                     if (e == null) {
                         if (localhits.size() == 0) {
                             app("Nothing to upload");
                         } else {
 
                             //just to log
-                            StringBuilder sb = new StringBuilder("+++hits locales que subiremos:\n");
+                            StringBuilder sb = new StringBuilder("+++hit subidos que actualizaremos:\n");
                             for (Hit h : localhits) {
-                                sb.append("->" + h + "\n");
+                                sb.append("  ->" + h + "\n");
                             }
                             sb.append("+++++++");
                             app(sb.toString());
@@ -216,8 +227,8 @@ public abstract class SAPO2 {
 
                                     int diff = Math.round((System.currentTimeMillis() - lastUpdate.getTime()) / (1000 * 60)); //in mins
 
-                                    app("apparrently have been passed mins:" + diff);
-                                    if (diff > parameters.minTimeForUpdates) { //Actually update if has passed enough time
+                                    app("Apparently have passed mins:" + diff + "/" + parameters.minTimeForUpdates);
+                                    if (diff > parameters.minTimeForUpdates || localhits.size() > 10) { //Actually update if has passed enough time
                                         app("uploading: " + localhits.size());
 
                                         ParseObject.saveAllInBackground(localhits, new SaveCallback() {
@@ -225,19 +236,20 @@ public abstract class SAPO2 {
                                             public void done(ParseException e) {
                                                 if (e == null) {
                                                     app("hits saved sucefully");
-                                                    ParseObject.unpinAllInBackground(localhits, new DeleteCallback() {
-                                                        @Override
-                                                        public void done(ParseException e) {
-                                                            if (e == null) {
-                                                                app("OK: hits unpinned");
-                                                            } else {
-                                                                app("--_ERROR, cannot unpin hits: " + e.getMessage());
-                                                            }
-                                                        }
-                                                    });
+
                                                 } else {
                                                     app("---ERROR uploadin hits" + e.getMessage());
                                                 }
+                                            }
+                                        });
+                                        ParseObject.unpinAllInBackground(new DeleteCallback() {
+                                            @Override
+                                            public void done(ParseException e) {
+                                               if(e==null){
+                                                   app("unpinned");
+                                               }else{
+                                                   app("ello"+e.getMessage());
+                                               }
                                             }
                                         });
                                     }

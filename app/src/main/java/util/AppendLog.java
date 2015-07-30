@@ -18,14 +18,13 @@ public class AppendLog {
     private static String currentDateandTime;
 
     public static void initialize() {
+        int file_size;
+
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
         currentDateandTime = sdf.format(new Date());
 
         fileName = currentDateandTime + "_mhp.txt";
-        File logFile = new File(Environment.getExternalStorageDirectory() + "/WCLOG/" + fileName);
-        int file_size = Integer.parseInt(String.valueOf(logFile.length() / 1024));
-//        if (file_size > parameters.LogFileSize) logFile.delete();
-        logFile = new File(Environment.getExternalStorageDirectory() + "/WCLOG/rt.txt");
+        File logFile = new File(Environment.getExternalStorageDirectory() + "/WCLOG/rt.txt");
         file_size = Integer.parseInt(String.valueOf(logFile.length() / 1024));
         if (file_size > parameters.LogFileSize) logFile.delete();
         appendLog("++++++++++++++++++++++++Session: " + currentDateandTime + "+++++++++++++++++++++++");
@@ -44,7 +43,6 @@ public class AppendLog {
             try {
                 logFile.createNewFile();
             } catch (IOException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }
@@ -59,7 +57,6 @@ public class AppendLog {
             buf.flush();
             buf.close();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }

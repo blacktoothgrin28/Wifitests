@@ -38,7 +38,6 @@ public class Position implements GoogleApiClient.ConnectionCallbacks, GoogleApiC
     private GPSCoordinates gps;
     private REASON connectionReason;
 
-    //TODO. For now receive location only onces. see http://blog.teamtreehouse.com/beginners-guide-location-android
     public Position(Context context) {
         this.context = context.getApplicationContext();
         buildGoogleApiClient();

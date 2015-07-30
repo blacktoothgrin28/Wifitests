@@ -257,7 +257,7 @@ public class AddWeaconActivity extends ActionBarActivity implements GoogleApiCli
         return isCamera ? getCaptureImageOutputUri() : data.getData();
     }
 
-    public void SendWeacon(View view) {
+    public void OnClickSendWeacon(View view) {
         int level = -76;
         boolean validated = false;
         TYPE type = OTHER;

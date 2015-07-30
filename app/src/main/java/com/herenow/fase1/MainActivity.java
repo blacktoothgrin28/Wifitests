@@ -121,19 +121,11 @@ public class MainActivity extends ActionBarActivity {
      */
     private void syncAllPinned() {
         SAPO2.uploadIfRequired();
-        uploadAllPinnedWeacon();
+//        uploadAllPinnedWeacon();
     }
 
 
-    /**
-     * Upload all pinned data related to weacons: weacon definition , launched, openend, etc.
-     */
-    private void uploadAllPinnedWeacon() {
-        //TODO subir los weacons pinned
-    }
-
-
-    private boolean isConnectedViaWifi() {
+     private boolean isConnectedViaWifi() {
         ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo mWifi = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
         return mWifi.isConnected();
@@ -271,7 +263,6 @@ public class MainActivity extends ActionBarActivity {
     class WifiReceiver extends BroadcastReceiver {
         public void onReceive(Context c, Intent intent) {
             final String action = intent.getAction();
-//            Location loc; TODO put location battery friendly
             AppendLog.appendLog("*BroadcastReceiver: " + action, "CON");
 
             if (action.equals(WifiManager.NETWORK_STATE_CHANGED_ACTION)) {
@@ -300,10 +291,6 @@ public class MainActivity extends ActionBarActivity {
 
                 SAPO2.addSPOTS(sr);//, loc);
                 AppendLog.appendLog("Automatic scanning: " + msg);
-            } else if (action.equals(WifiManager.SUPPLICANT_CONNECTION_CHANGE_ACTION)) { //Connection /disconnection from wifi
-                //DEPRECATED
-                AppendLog.appendLog("entramos en SUPPLICANT_CONNECTION_CHANGE_ACTION", "CON");
-
             } else {
                 AppendLog.appendLog("entramos en otro: " + action, "CON");
             }

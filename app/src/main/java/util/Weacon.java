@@ -177,7 +177,7 @@ public class Weacon {
                 parseWeacon.put("Description", this.getMessage());
                 parseWeacon.put("Type", this.getTypeString());
                 parseWeacon.put("Rating", -1);
-                parseWeacon.put("Owner", ParseUser.getCurrentUser()); //Todo check if this works
+                parseWeacon.put("Owner", ParseUser.getCurrentUser());
 
                 ParseObject parseSSID = new ParseObject("SSIDS");
                 parseSSID.put("ssid", this.getSSID());
@@ -189,16 +189,17 @@ public class Weacon {
                 parseSSID.put("validated", this.isValidated());
                 parseSSID.put("associated_place", parseWeacon);
 
-                Toast.makeText(context, "Uploading weacon", Toast.LENGTH_SHORT).show();//TODO give the right context
+                Toast.makeText(context, "Uploading weacon", Toast.LENGTH_SHORT).show();
 
                 parseSSID.saveInBackground(new SaveCallback() {
                     public void done(ParseException e) {
                         if (e == null) {
                             // Saved successfully.
-                            AppendLog.appendLog("Weacon uploaded. Toast shouls be shown");
-                            Toast.makeText(context, "Weacon Uploaded", Toast.LENGTH_SHORT).show();//TODO give the right context
+                            AppendLog.appendLog("Weacon uploaded. Toast should be shown");
+                            Toast.makeText(context, "Weacon Uploaded", Toast.LENGTH_SHORT).show();
                             //                    String id = po.getObjectId();
                             //                    Log.d(TAG, "The object id is: " + id);
+                            //Load it
                         } else {
                             // The save failed.
                             AppendLog.appendLog("Sorry, error: " + e);

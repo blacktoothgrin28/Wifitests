@@ -7,7 +7,7 @@ import util.GPSCoordinates;
 /**
  * Created by Milenko on 17/07/2015.
  */
-public class SPOT {
+public class SPOT { //TODO replace for a class that extends from  ParseObject
     private final String ssid;
     private final String bssid;
     private final GPSCoordinates gps;
