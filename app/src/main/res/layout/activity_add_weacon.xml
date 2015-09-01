@@ -45,9 +45,9 @@
         android:layout_below="@+id/bt_crop"
         android:layout_toEndOf="@+id/iv_logo"
         android:layout_toRightOf="@+id/iv_logo"
-        android:focusable="true"
         android:onClick="OnClickSendWeacon"
         android:text="Send" />
+    <!--android:focusable="false"-->
 
     <EditText
         android:id="@+id/tv_url"
@@ -74,7 +74,7 @@
         android:layout_alignParentStart="true"
         android:layout_below="@+id/iv_logo"
         android:hint="Name"
-        android:inputType="text"
+        android:inputType="textCapSentences|text"
         android:lines="1"
         android:maxLength="39"
         android:nextFocusDown="@+id/tv_url"
@@ -93,12 +93,12 @@
         android:layout_below="@+id/tv_url"
         android:gravity="top"
         android:hint="Description"
-        android:inputType="textLongMessage|text|textMultiLine"
+        android:inputType="textCapSentences|textLongMessage|text|textMultiLine"
         android:lines="6"
         android:maxLength="250"
-        android:nextFocusDown="@+id/send_weacon_button"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textStyle="italic" />
+    <!--android:nextFocusDown="@+id/send_weacon_button"-->
 
     <Button
         android:id="@+id/bt_crop"
@@ -121,5 +121,16 @@
         android:layout_toRightOf="@+id/iv_logo"
         android:onClick="OnClickLoadImage"
         android:text="Load" />
+
+    <Button
+        android:id="@+id/validation"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/bt_crop"
+        android:layout_toEndOf="@+id/send_weacon_button"
+        android:layout_toRightOf="@+id/send_weacon_button"
+        android:onClick="OnClickValidate"
+        android:text="Val" />
 
 </RelativeLayout>

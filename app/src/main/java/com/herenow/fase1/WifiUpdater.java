@@ -3,19 +3,20 @@ package com.herenow.fase1;
 import android.app.Activity;
 import android.app.NotificationManager;
 import android.content.Context;
-import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.support.v4.app.NotificationCompat;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Random;
+import com.parse.GetCallback;
+import com.parse.ParseException;
+import com.parse.ParseQuery;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import parse.WeaconParse;
 import util.AppendLog;
-import util.Weacon;
+import util.parameters;
 
 /**
  * Created by Milenko on 27/05/2015.
@@ -56,32 +57,33 @@ public class WifiUpdater implements Runnable {
                 findFakeWeacon();
             }
             demoCount++;
-        } else {
-//            wifi.startScan();
-////            AppendLog.appendLog("Realizando scanner");
-            List<ScanResult> sr = wifi.getScanResults();
-            Notifications.CheckScanResults(sr);
-//            cont++;
         }
     }
 
     /**
-     * Launch a fake weacon, randomly from the file
+     * Launch a fake weacon, randomly from LOCAL PARSE
      */
     private void findFakeWeacon() {
-        Random generator = new Random();
-        Weacon we;
-        Collection<Weacon> intermediate = MainActivity.weaconsTable.values();
-        Object[] values = intermediate.toArray();
 
-        do {
-            int randomInt = generator.nextInt(values.length);
+        try {
+            ParseQuery<WeaconParse> query = ParseQuery.getQuery(WeaconParse.class);
+            query.whereNotContainedIn("ObjectId", Notifications.weaconsLaunchedTable.keySet());
+            query.fromPin(parameters.pinWeacons);
+            query.getFirstInBackground(new GetCallback<WeaconParse>() {
+                @Override
+                public void done(WeaconParse we, ParseException e) {
+                    if (e == null) {
+                        AppendLog.appendLog("WifiUpdater | findFakeWeacon. lauching = " + we);
+                        Notifications.sendNotification(we);
+                    } else {
+                        AppendLog.appendLog("---Error in fakeweacon: " + e.getMessage());
+                    }
+                }
+            });
+        } catch (Exception e) {
+            AppendLog.appendLog("---Error en fake weacon2: " + e.getMessage());
+        }
 
-            AppendLog.appendLog("WifiUpdater |findFakeWeacon. i= " + randomInt);
-            we = (Weacon) values[randomInt];
-        } while (Notifications.weaconsLaunchedTable.containsKey(we.getObjectId()));
 
-        AppendLog.appendLog("WifiUpdater |findFakeWeacon. lauchin= " + we.getName());
-        Notifications.sendNotification(we);
     }
 }

@@ -9,4 +9,5 @@
     <string name="title_activity_add_weacon">New Weacon</string>
 
     <string name="hello_world">Hello world!</string>
+    <string name="title_activity_test_cards">TestCardsActivity</string>
 </resources>

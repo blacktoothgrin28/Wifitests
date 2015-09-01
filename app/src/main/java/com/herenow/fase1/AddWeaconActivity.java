@@ -30,16 +30,25 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
+import com.parse.FindCallback;
+import com.parse.GetCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
+import com.parse.ParseUser;
+import com.parse.SaveCallback;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import parse.WeaconParse;
+import parse.WifiSpot;
 import util.AppendLog;
 import util.GPSCoordinates;
 import util.TYPE;
-import util.Weacon;
+import util.parameters;
 
 import static util.TYPE.OTHER;
 
@@ -59,39 +68,46 @@ public class AddWeaconActivity extends ActionBarActivity implements GoogleApiCli
     private TextView tvMessage;
     private Bitmap croppedImage;
     private Button buttonSend;
+//    private Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_weacon);
 
-        mCropImageView = (CropImageView) findViewById(R.id.iv_logo);
-        tvMessage = (TextView) this.findViewById(R.id.tv_Message);
-        buttonSend = (Button) this.findViewById(R.id.send_weacon_button);
-        buttonSend.setFocusableInTouchMode(true);
-        tvMessage.setOnKeyListener(new View.OnKeyListener() {
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if (keyCode == 66) {
-//                    buttonSend.requestFocus();
-                    InputMethodManager in = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                    // NOTE: In the author's example, he uses an identifier
-                    // called searchBar. If setting this code on your EditText
-                    // then use v.getWindowToken() as a reference to your
-                    // EditText is passed into this callback as a TextView
-                    in.hideSoftInputFromWindow(v.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-//                    userValidateEntry();
+        try {
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.activity_add_weacon);
+//    context=this.getApplicationContext();
+
+            mCropImageView = (CropImageView) findViewById(R.id.iv_logo);
+            tvMessage = (TextView) this.findViewById(R.id.tv_Message);
+            buttonSend = (Button) this.findViewById(R.id.send_weacon_button);
+//        buttonSend.setFocusableInTouchMode(true);
+            tvMessage.setOnKeyListener(new View.OnKeyListener() {
+                public boolean onKey(View v, int keyCode, KeyEvent event) {
+                    if (keyCode == 66) {
+                        //                    buttonSend.requestFocus();
+                        InputMethodManager in = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                        // NOTE: In the author's example, he uses an identifier
+                        // called searchBar. If setting this code on your EditText
+                        // then use v.getWindowToken() as a reference to your
+                        // EditText is passed into this callback as a TextView
+                        in.hideSoftInputFromWindow(v.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+                        //                    userValidateEntry();
+                    }
+                    return false;
                 }
-                return false;
-            }
-        });
+            });
 
 
-        mCropImageView.setImageResource(R.mipmap.ic_launcher);
+            mCropImageView.setImageResource(R.mipmap.ic_launcher);
 
 //        mCropImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
 
-        FillSpinner();
+            FillSpinner();
 //        GetLocation();
+        } catch (Exception e) {
+            AppendLog.appendLog("petadoal crear add weacon: " + e.getMessage());
+        }
     }
 
     /**
@@ -105,8 +121,12 @@ public class AddWeaconActivity extends ActionBarActivity implements GoogleApiCli
      */
     @Override
     protected void onResume() {
-        super.onResume();
-        GetLocation();
+        try {
+            super.onResume();
+//            GetLocation();
+        } catch (Exception e) {
+            AppendLog.appendLog("ha petado en onresume addweacon: " + e.getMessage());
+        }
     }
 
     protected synchronized void buildGoogleApiClient() {
@@ -130,10 +150,13 @@ public class AddWeaconActivity extends ActionBarActivity implements GoogleApiCli
         lista = new ArrayList<String>();
 
         spinner = (Spinner) this.findViewById(R.id.spinner);
-//        spinner = (Spinner) findViewById(R.id.spinner);
+
         for (ScanResult r : sr) {
-            lista.add(r.SSID);
+            if (!lista.contains(r.SSID) && !r.SSID.equals("")) {  //we omit repeated ssids or =""
+                lista.add(r.SSID);
+            }
         }
+
         ArrayAdapter<String> adaptador = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, lista);
         adaptador.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adaptador);
@@ -158,14 +181,6 @@ public class AddWeaconActivity extends ActionBarActivity implements GoogleApiCli
 //        imageView.setImageBitmap(logo);
     }
 
-    /**
-     * Crop the image and set it back to the cropping view.
-     */
-//    public void onCropImageClick(View view) {
-//        Bitmap cropped = mCropImageView.getCroppedImage(500, 500);
-//        if (cropped != null)
-//            mCropImageView.setImageBitmap(cropped);
-//    }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == Activity.RESULT_OK) {
@@ -261,22 +276,117 @@ public class AddWeaconActivity extends ActionBarActivity implements GoogleApiCli
         int level = -76;
         boolean validated = false;
         TYPE type = OTHER;
+        final Context context = this.getApplicationContext();
+
         //TODO validation of fields
         TextView tvName = (TextView) this.findViewById(R.id.tv_name);
         TextView tvUrl = (TextView) this.findViewById(R.id.tv_url);
-
 
         String name = tvName.getText().toString();
         String url = tvUrl.getText().toString();
         String message = tvMessage.getText().toString();
         logo = Bitmap.createScaledBitmap(croppedImage, 120, 120, true);
 
+        final WeaconParse we = new WeaconParse(name, url, "", "None", "None", message, "OTHER",
+                gps.getLatitude(), gps.getLongitude(), -1, false, ParseUser.getCurrentUser(), logo);
+
+        final WifiSpot spot = new WifiSpot(selectedSSID, selectedBSSID, we, gps.getLatitude(), gps.getLongitude());
+
         try {
-            Weacon weacon = new Weacon(selectedSSID, selectedBSSID, name, url, message, gps, validated, type, level, logo);
-            weacon.upload(this.getApplicationContext());
+            //Verify if spot is already used
+            //TODO option of validation of ownership
+            ParseQuery<WifiSpot> query = ParseQuery.getQuery(WifiSpot.class);
+            query.whereEqualTo("bssid", selectedBSSID);
+            query.findInBackground(new FindCallback<WifiSpot>() {
+                @Override
+                public void done(List<WifiSpot> list, ParseException e) {
+                    int i = list.size();
+                    if (i == 1) {
+                        WifiSpot sp = list.get(0);
+                        if (sp.isValidated()) {
+                            String msg = selectedSSID + " was already used and validated. \nSelect another";
+                            Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
+                            AppendLog.appendLog(msg);
+                            //TODo validation of several spots (like Creapolis)
+                        } else {
+                            String msg = selectedSSID + " was already used but not validated. \nwant to validate=";
+                            Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
+                            AppendLog.appendLog(msg);
+                            //TODO put a button to validate
+                            //todo put a chekbox for validation in creation
+                        }
+
+
+                        return;
+                    } else if (i > 1) {
+                        AppendLog.appendLog("spot already present more than one time");
+                    } else {
+                        spot.saveInBackground(new SaveCallback() {
+                            @Override
+                            public void done(ParseException e) {
+                                if (e == null) {
+                                    Toast.makeText(context, "Saved", Toast.LENGTH_SHORT).show();
+                                    AppendLog.appendLog("se ha salvado el spot ");
+
+                                    try {
+                                        spot.fetchInBackground(new GetCallback<ParseObject>() {
+                                            @Override
+                                            public void done(ParseObject parseObject, ParseException e) {
+                                                Toast.makeText(context, "retrieved: " + spot.getObjectId(), Toast.LENGTH_SHORT).show();
+                                                spot.pinInBackground(parameters.pinWeacons);
+
+                                            }
+                                        });
+
+                                    } catch (Exception e1) {
+                                        e1.printStackTrace();
+                                    }
+                                } else {
+                                    Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show();
+                                    AppendLog.appendLog("-Eeeoe uploafdin spot: " + e.getMessage());
+                                }
+                            }
+                        });
+                    }
+
+                }
+            });
+
+
+//            Weacon weacon = new Weacon(selectedSSID, selectedBSSID, name, url, message, gps, validated, type, level, logo);
+
+
+//            we.saveInBackground(new SaveCallback() {
+//                @Override
+//                public void done(ParseException e) {
+//                    if (e == null) {
+//                        AppendLog.appendLog("subidoel we. verifique es está tambien subido el weacon: " + spot);
+////                        we.fetchIfNeeded()
+//                        spot.saveInBackground(new SaveCallback() {
+//                            @Override
+//                            public void done(ParseException e) {
+//                                if (e == null) {
+//                                    Toast.makeText(context, "Uploading spot...", Toast.LENGTH_SHORT).show();
+//                                    AppendLog.appendLog("se ha salvado el spot ");
+//                                    we.pinInBackground(parameters.pinWeacons);
+//                                    spot.pinInBackground(parameters.pinWeacons);
+//                                } else {
+//                                    AppendLog.appendLog("-Eeeoe uploafdin spot: " + e.getMessage());
+//
+//                                }
+//                            }
+//                        });
+//                    } else {
+//                        AppendLog.appendLog("-Eeeoe uploafdin weacon : " + e.getMessage());
+//                    }
+//                }
+//            });
+
+
+//            weacon.upload(this.getApplicationContext());
         } catch (Exception e) {
             e.printStackTrace();
-            AppendLog.appendLog("---Error: Can't upload the new weacon");
+            AppendLog.appendLog("---Error: Can't upload the new weacon" + e.getLocalizedMessage());
 
         }
     }
@@ -284,7 +394,11 @@ public class AddWeaconActivity extends ActionBarActivity implements GoogleApiCli
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_add_weacon, menu);
+        try {
+            getMenuInflater().inflate(R.menu.menu_add_weacon, menu);
+        } catch (Exception e) {
+            AppendLog.appendLog("--- petado oncreaterOptionMenu ");
+        }
         return true;
     }
 
@@ -311,6 +425,8 @@ public class AddWeaconActivity extends ActionBarActivity implements GoogleApiCli
             AppendLog.appendLog("LOC: We got location in AddWeacon");
         } else {
             AppendLog.appendLog("We got null location in AddWeacon");
+            mLastLocation = MainActivity.mPos.mLastLocation;
+            mGoogleApiClient.reconnect();
         }
         gps = new GPSCoordinates(mLastLocation);
         mGoogleApiClient.disconnect();
@@ -336,9 +452,22 @@ public class AddWeaconActivity extends ActionBarActivity implements GoogleApiCli
 
     public void OnClickLoadImage(View view) {
         startActivityForResult(getPickImageChooserIntent(), 200);
+        croppedImage = mCropImageView.getCroppedImage();
 
         mCropImageView.setAspectRatio(200, 200);
         mCropImageView.setFixedAspectRatio(true);
         mCropImageView.setGuidelines(2);
+    }
+
+    /***
+     * Takes the selected wifi to try to validate as owner
+     *
+     * @param view
+     */
+    public void OnClickValidate(View view) {
+
+        SpotValidationTask task = new SpotValidationTask(this);
+
+        task.execute(selectedBSSID);
     }
 }

@@ -15,13 +15,15 @@ import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
+import parse.WeaconParse;
+
 public class WeaconAdapter extends RecyclerView.Adapter<WeaconHolder> implements View.OnClickListener {
 
-    private List<Weacon> weaconItemList;
+    private List<WeaconParse> weaconItemList;
     private Context mContext;
     private View.OnClickListener listener;
 
-    public WeaconAdapter(Context context, List<Weacon> weaconItemList) {
+    public WeaconAdapter(Context context, List<WeaconParse> weaconItemList) {
         this.weaconItemList = weaconItemList;
         this.mContext = context;
     }
@@ -37,7 +39,7 @@ public class WeaconAdapter extends RecyclerView.Adapter<WeaconHolder> implements
 
     @Override
     public void onBindViewHolder(WeaconHolder weaconHolder, int i) {
-        Weacon weaconItem = weaconItemList.get(i);
+        WeaconParse weaconItem = weaconItemList.get(i);
 //        String imageUrl = "file:" + weaconItem.getImagePath(); //Necessary for local files
         String imageUrl = weaconItem.getImageParseUrl();
         Picasso.with(mContext).load(imageUrl)

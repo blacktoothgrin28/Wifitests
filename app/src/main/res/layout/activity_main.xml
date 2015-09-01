@@ -29,7 +29,7 @@
             android:layout_gravity="right|center_vertical"
             android:gravity="top"
             android:onClick="clickAddWeacon"
-            android:text="add weacon"
+            android:text="Add Weacon"
             android:visibility="visible" />
 
         <Button
@@ -38,9 +38,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="top|right"
-            android:onClick="clickStartSearching"
-            android:text="Start Search"
-            android:visibility="invisible" />
+            android:onClick="clickAddWeacon"
+            android:text="Blank"
+            android:visibility="visible" />
     </FrameLayout>
 
     <TextView
@@ -56,8 +56,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal|bottom"
-        android:onClick="clickDownloadWeacons"
-        android:text="Download" />
+        android:onClick="clickCards"
+        android:text="CARDS" />
 
     <Switch
         android:id="@+id/sw_demo"

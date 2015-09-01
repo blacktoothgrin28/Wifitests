@@ -10,12 +10,13 @@ import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 import util.AppendLog;
+import util.parameters;
 
 /**
  * Created by Milenko on 27/07/2015.
  */
 @ParseClassName("SAPO_hits_users")
-public class Hit extends ParseObject {
+public class HitSapo extends ParseObject {
     String bssid, ssid;
     ParseGeoPoint location;
 
@@ -36,7 +37,7 @@ public class Hit extends ParseObject {
     public String toString() {
         String st;
         try {
-            st = "Hit{" +
+            st = "HitSapo{" +
                     " objId=" + getObjectId() +
                     ", b='" + getBSSID() + '\'' +
                     ", s='" + getSSID() + '\'' +
@@ -70,7 +71,7 @@ public class Hit extends ParseObject {
     public void incrementMe() {
         AppendLog.appendLog("incrementado el hit " + this, "SAPOA"); //Not possible since is empty;
         this.increment("nhits");
-        this.pinInBackground("SAPO2", new SaveCallback() {
+        this.pinInBackground(parameters.pinSapo, new SaveCallback() {
             @Override
             public void done(ParseException e) {
                 AppendLog.appendLog("pin con el incremento ", "SAPOA");

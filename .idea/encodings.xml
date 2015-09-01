@@ -2,8 +2,24 @@
 <project version="4">
   <component name="Encoding" useUTFGuessing="true" native2AsciiForPropertiesFiles="false">
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/herenow/fase1/AddWeaconActivity.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/herenow/fase1/Cards/AirportCard.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/herenow/fase1/Cards/MaterialLargeImageCard.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/herenow/fase1/Cards/MaterialLargeImageCardThumbnail.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/herenow/fase1/MainActivity.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/herenow/fase1/Position.java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/app/src/main/java/com/herenow/fase1/SAPO.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/drawable-mdpi-v11/im_beach.png" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/drawable-mdpi-v11/l_mail.png" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/drawable-mdpi-v11/l_search.png" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/drawable-mdpi-v11/l_trash.png" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/drawable-xxhdpi-v9/activated_background_item_card.xml" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/drawable-xxhdpi-v9/card_item_background.xml" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/drawable-xxhdpi-v9/demo_item_selector.xml" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/drawable-xxhdpi-v9/ic_action_sun.png" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/drawable-xxhdpi-v9/pressed_background_item_card.xml" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/layout/carddemo_googlenowweather_inner_header.xml" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/layout/carddemo_googlenowweather_inner_main.xml" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/layout/carddemo_native_material_supplemental_actions_large_icon.xml" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/layout/demo_fragment_cardwithlist_card.xml" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/values-w820dp/colors.xml" charset="UTF-8" />
   </component>
 </project>

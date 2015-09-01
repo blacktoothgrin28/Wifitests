@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import util.Weacon;
+import parse.WeaconParse;
 import util.WeaconAdapter;
 
 
@@ -28,7 +28,7 @@ public class WeaconListActivity extends ActionBarActivity {
     private RecyclerView mRecyclerView;
     private WeaconAdapter adapter;
     //    private List<WeaconItem> weaconItemList = new ArrayList<WeaconItem>();
-    private List<Weacon> weaconItemList = new ArrayList<Weacon>();
+    private List<WeaconParse> weaconItemList = new ArrayList<>();
     private Intent intentWeb;
 
     @Override
@@ -52,18 +52,17 @@ public class WeaconListActivity extends ActionBarActivity {
 //            weaconItemList.add(wec);
 //        }
         //Fill the list with launched
-        Collection<Weacon> intermediate = Notifications.weaconsLaunchedTable.values();
+        Collection<WeaconParse> intermediate = Notifications.weaconsLaunchedTable.values();
         for (Object obj : intermediate.toArray()) {
-            Weacon wec = (Weacon) obj;
-            weaconItemList.add(wec); //To the shohwed list.
-
+            WeaconParse wec = (WeaconParse) obj;
+            weaconItemList.add(wec); //To the showed list.
         }
 
         adapter = new WeaconAdapter(this, weaconItemList);
         adapter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Weacon we = (Weacon) v.getTag();
+                WeaconParse we = (WeaconParse) v.getTag();
 
                 intentWeb = new Intent(WeaconListActivity.this, BrowserActivity.class);
                 intentWeb.putExtra("wName", we.getName());
