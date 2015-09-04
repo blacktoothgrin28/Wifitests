@@ -121,7 +121,7 @@ public class MainActivity extends ActionBarActivity {
         demoMode = mySwitch.isChecked();
 
         //PARSE
-        ParseUser.logOut();// TODO remove logout
+//        ParseUser.logOut();// TODO remove logout
         ParseUserLogIn();
 
         //Wifi
