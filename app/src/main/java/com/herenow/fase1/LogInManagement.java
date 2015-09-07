@@ -9,6 +9,7 @@ import java.util.List;
 
 import parse.WifiSpot;
 import util.AppendLog;
+import util.parameters;
 
 /**
  * Created by Milenko on 10/08/2015.
@@ -36,7 +37,7 @@ public abstract class LogInManagement {
                 n = oldSpots.get(b);
             }
             newSpots.put(b, n + 1);
-            if (n + 1 == 3) LogIn(spot);
+            if (n + 1 == parameters.nHitsForLogIn) LogIn(spot);
         }
         oldSpots = newSpots;
 
@@ -64,17 +65,15 @@ public abstract class LogInManagement {
         //TODO inform parse
         loggedWeacons.remove(bssid);
         AppendLog.appendLog("Logged out:" + bssid);
-
-        ParsePush.unsubscribeInBackground("Z_" + bssid.replace(":", "_"));
+        ParsePush.unsubscribeInBackground(ChannelName(bssid));
     }
-
 
     private static void LogIn(WifiSpot spot) {
         //TODO Register in parse or is automatic to kwnow how many subscribers?
         AppendLog.appendLog("Logged in:" + spot);
         loggedWeacons.put(spot.getBSSID(), 0);
 
-        final String channelName = "Z_" + spot.getBSSID().replace(":", "_");
+        final String channelName = ChannelName(spot.getBSSID());
         AppendLog.appendLog("channel name=" + channelName);
 
         //TODo ver si puedo hacer canales nuevos
@@ -84,13 +83,20 @@ public abstract class LogInManagement {
                 if (e == null) {
                     AppendLog.appendLog("successfully subscribed to the broadcast channel." + channelName);
                 } else {
-                    AppendLog.appendLog("failed to subscribe for push: " + e.getMessage());
+                    AppendLog.appendLog("failed to subscribe for push: " + e.getMessage() + " \n" + e);
                 }
             }
         });
-
     }
 
+    /**
+     * Convert the bssid to a string appropiate for channel name
+     * @param bs
+     * @return
+     */
+    private static String ChannelName(String bs) {
+        return "Z_" + bs.replace(":", "_");
+    }
 
     public HashMap getCurrentlyLogged() {
         return loggedWeacons;

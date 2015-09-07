@@ -27,6 +27,14 @@
     android:paddingLeft="@dimen/actions_padding_left"
     android:paddingRight="@dimen/actions_padding_left">
 
+    <TextView
+        android:id="@+id/text1"
+        android:text="MORE"
+        android:background="?android:selectableItemBackground"
+        android:layout_width="wrap_content"
+        style="@style/card.native.actions"
+        android:layout_height="wrap_content"/>
+
     <ImageButton
         android:id="@+id/ic1"
         style="@style/card.native.actions.button"
@@ -44,12 +52,5 @@
         android:scaleType="fitCenter"
         android:src="@drawable/l_mail" />
 
-    <ImageButton
-        android:id="@+id/ic3"
-        style="@style/card.native.actions.button"
-        android:layout_marginRight="8dp"
-        android:background="?android:selectableItemBackground"
-        android:scaleType="fitCenter"
-        android:src="@drawable/l_trash" />
 
 </LinearLayout>

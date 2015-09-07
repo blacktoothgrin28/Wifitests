@@ -4,12 +4,10 @@
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/herenow/fase1/AddWeaconActivity.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/herenow/fase1/Cards/AirportCard.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/herenow/fase1/Cards/CompanyCard.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/herenow/fase1/Cards/CompanyCard.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/herenow/fase1/MainActivity.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/herenow/fase1/Position.java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/app/src/main/java/com/herenow/fase1/test/CardThumbnailIcon.java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/app/src/main/java/com/herenow/fase1/test/MaterialLargeImageCard.java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/app/src/main/java/com/herenow/fase1/test/MaterialLargeImageCardThumbnail.java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/app/src/main/java/com/herenow/fase1/test/mMaterialLargeImageCard.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/herenow/fase1/test/CustomExpandCard.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/herenow/fase1/test/mMaterialLargeImageCardThumbnail.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/res/drawable-mdpi-v11/im_beach.png" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/res/drawable-mdpi-v11/l_mail.png" charset="UTF-8" />
@@ -20,10 +18,16 @@
     <file url="file://$PROJECT_DIR$/app/src/main/res/drawable-xxhdpi-v9/demo_item_selector.xml" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/res/drawable-xxhdpi-v9/ic_action_sun.png" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/res/drawable-xxhdpi-v9/pressed_background_item_card.xml" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/drawable/card_menu_button_other.xml" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/drawable/ic_menu_other_action_more_normal.png" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/drawable/ic_menu_other_action_more_pressed.png" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/layout/carddemo_example_native_inner_expand.xml" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/res/layout/carddemo_googlenowweather_inner_header.xml" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/res/layout/carddemo_googlenowweather_inner_main.xml" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/res/layout/carddemo_native_material_supplemental_actions_large_icon.xml" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/res/layout/demo_fragment_cardwithlist_card.xml" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/layout/native_inner_base_expand.xml" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/res/values-w820dp/colors.xml" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/values/styles_card.xml" charset="UTF-8" />
   </component>
 </project>

@@ -10,6 +10,7 @@ public class parameters {
     final static int LogFileSize = 100; //in kilobytes, after that, new is started
     public static Integer hitRepetitions = 20; //number of HitSapo in SAPO for considering a SSID important
     public static int minTimeForUpdates = 60 * 1; //in mins
+    public static int nHitsForLogIn = 3; //recommend 3. Number of hits for declaring the login in a spot
 
     public enum typeOfWeacon {
         accounting, airport, amusement_park, aquarium, art_gallery, atm, bakery,

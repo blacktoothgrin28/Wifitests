@@ -20,7 +20,10 @@ import android.widget.TextView;
 
 import com.parse.LogInCallback;
 import com.parse.ParseException;
+import com.parse.ParseInstallation;
+import com.parse.ParsePush;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -84,8 +87,8 @@ public class MainActivity extends ActionBarActivity {
         AppendLog.initialize();
         Notifications.Initialize(this);
 
-        mPos = new Position(this);
-        mPos.connect(Position.REASON.GetWeacons);
+//        mPos = new Position(this);
+//        mPos.connect(Position.REASON.GetWeacons);
 
         //Write  unhandled exceptions in a log file in the phone
         Thread.currentThread().setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
@@ -121,7 +124,6 @@ public class MainActivity extends ActionBarActivity {
         demoMode = mySwitch.isChecked();
 
         //PARSE
-//        ParseUser.logOut();// TODO remove logout
         ParseUserLogIn();
 
         //Wifi
@@ -130,9 +132,8 @@ public class MainActivity extends ActionBarActivity {
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
         intentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
-        registerReceiver(receiverWifi, intentFilter);
-
-
+//        registerReceiver(receiverWifi, intentFilter);
+    clickCards(null);
     }
 
     public void clickCards(View view) {
@@ -154,7 +155,7 @@ public class MainActivity extends ActionBarActivity {
         if (curr == null) {
             AppendLog.appendLog("sin user, vamos a loggear");
 
-            ParseUser.logInInBackground("sorrento", "spidey", new LogInCallback() {
+            ParseUser.logInInBackground("sorrento2", "spidey", new LogInCallback() {
                 public void done(ParseUser user, ParseException e) {
                     if (user != null) {
                         AppendLog.appendLog("Logged in");
