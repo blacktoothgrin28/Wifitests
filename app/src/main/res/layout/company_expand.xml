@@ -8,23 +8,24 @@
     <TextView
         android:id="@+id/company_expand_lemma"
         style="@style/Now.card_expand_inner_layout.light_gray.bold"
-        android:layout_height="wrap_content"
-        android:text="Lemma"
-        android:textStyle="bold|italic"
         android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:gravity="center_horizontal"
-        android:paddingBottom="8dp" />
+        android:paddingBottom="8dp"
+        android:text="Lemma"
+        android:textStyle="bold|italic" />
 
     <TextView
         android:id="@+id/company_expand_bullets"
-        android:layout_height="wrap_content"
         style="@style/Now.card_expand_inner_layout.dark"
+        android:layout_height="wrap_content"
         android:text="Data" />
 
     <TextView
         android:id="@+id/company_expand_description"
         style="@style/Now.card_expand_inner_layout.dark"
         android:layout_height="wrap_content"
+        android:paddingBottom="8dp"
         android:text="Description"
         android:textStyle="italic" />
 

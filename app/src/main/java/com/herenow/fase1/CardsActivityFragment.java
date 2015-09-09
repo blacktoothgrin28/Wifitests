@@ -2,7 +2,6 @@ package com.herenow.fase1;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,7 +48,8 @@ public class CardsActivityFragment extends Fragment {
 
         try {
             //Company Card
-            CompanyData companyData = new CompanyData("Aplicaciones en Informática Avanzadam", R.drawable.im_aia_fondo, R.drawable.im_aia_logo);
+
+            CompanyData companyData = new CompanyData("Aplicaciones en Informática Avanzada", R.drawable.im_aia_fondo_claro, R.drawable.im_aia_logo);
             companyData.setEmployeesNumber(55);
             companyData.setDescription("");
             companyData.setLemma("Algoritmos para un mundo mejor");
@@ -61,7 +61,8 @@ public class CardsActivityFragment extends Fragment {
             companyData.setEmail("secretaria@aia.es");
 
             CompanyCard companyCardtest = CompanyCard.with(getActivity())
-                    .setData(companyData)//
+                    .setTitle("paropo")
+                    .setData(companyData)
                     .build();
 
             CardViewNative cardViewCompany = (CardViewNative) getActivity().findViewById(R.id.carddemo_largeimage_test);

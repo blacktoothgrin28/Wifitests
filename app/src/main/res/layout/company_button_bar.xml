@@ -22,8 +22,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="horizontal"
-    android:paddingStart="8dp"
-    android:paddingEnd="8dp">
+    android:paddingEnd="8dp"
+    android:paddingStart="8dp">
 
     <TextView
         android:id="@+id/text1"
@@ -42,8 +42,8 @@
         android:layout_toLeftOf="@+id/ic2"
         android:background="?android:selectableItemBackground"
         android:scaleType="fitCenter"
-        android:src="@drawable/l_search" />
-        <!--android:src="@drawable/ic_phone" />-->
+        android:src="@drawable/ic_phone" />
+    <!--android:src="@drawable/l_search" />-->
 
 
     <ImageButton

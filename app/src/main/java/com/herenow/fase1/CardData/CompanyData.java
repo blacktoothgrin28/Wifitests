@@ -11,7 +11,7 @@ import java.util.HashMap;
  */
 public class CompanyData {
     Bitmap mainImage, logo;
-    String mName, description, phone, email, website, typeOfBusiness,
+    String name, description, phone, email, website, typeOfBusiness,
             foundationPlace, director, headQuarters, lemma;
     String[] founders, subsidiaries;
     String foundationYear;
@@ -23,14 +23,14 @@ public class CompanyData {
     int imageResId, logoResId;
     HashMap<String, String> dataTable = new HashMap();
 
-    public CompanyData(String mName, int imageResId, int logoResId) {
-        this.mName = mName;
+    public CompanyData(String name, int imageResId, int logoResId) {
+        this.name = name;
         this.imageResId = imageResId;
         this.logoResId = logoResId;
     }
 
-    public CompanyData(String mName, Bitmap mainImage, Bitmap logo) {
-        this.mName = mName;
+    public CompanyData(String name, Bitmap mainImage, Bitmap logo) {
+        this.name = name;
         this.mainImage = mainImage;
         this.logo = logo;
     }
@@ -47,12 +47,20 @@ public class CompanyData {
         return lemma;
     }
 
+    public void setLemma(String lemma) {
+        this.lemma = lemma;
+    }
+
     public String getDescription() {
         return description;
     }
 
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     public String getName() {
-        return mName;
+        return name;
     }
 
     public int getLogoResId() {
@@ -61,20 +69,6 @@ public class CompanyData {
 
     public int getImageResId() {
         return imageResId;
-    }
-
-    public static final class SetupWizard {
-        private final Context mContext;
-        private String mName;
-
-        private SetupWizard(Context context) {
-            mContext = context;
-        }
-
-        public SetupWizard setName(String name) {
-            mName = name;
-            return this;
-        }
     }
 
     public String getExtraInfo() {
@@ -88,14 +82,12 @@ public class CompanyData {
             for (int i = 0; i < founders.length - 1; i++) {
                 sbFoundation.append(founders[i]).append(", ");
             }
-//            sbFoundation.deleteCharAt(sb.length()-1);
+            sbFoundation.deleteCharAt(sbFoundation.length() - 2);
             sbFoundation.append("and " + founders[founders.length - 1]);
         }
-        AddPair(sb, "<b>Foundation</b>", sbFoundation.toString());
-
-        AddPair(sb, "*Employees*", Integer.toString(nEmployees));
+        AddPair(sb, "Foundation", sbFoundation.toString());
+        AddPair(sb, "Employees", Integer.toString(nEmployees));
         AddPair(sb, "Director", director);
-//        AddPair(sb, "Description", description);
 
         return sb.toString();
     }
@@ -105,17 +97,12 @@ public class CompanyData {
         return sb;
     }
 
-
     public void setPhone(String phone) {
         this.phone = phone;
     }
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public void setLemma(String lemma) {
-        this.lemma = lemma;
     }
 
     public void setFounders(String[] founders) {
@@ -134,7 +121,17 @@ public class CompanyData {
         this.director = director;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public static final class SetupWizard {
+        private final Context mContext;
+        private String mName;
+
+        private SetupWizard(Context context) {
+            mContext = context;
+        }
+
+        public SetupWizard setName(String name) {
+            mName = name;
+            return this;
+        }
     }
 }
