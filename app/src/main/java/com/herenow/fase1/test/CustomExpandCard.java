@@ -31,13 +31,16 @@ import it.gmariotti.cardslib.library.internal.CardExpand;
 public class CustomExpandCard extends CardExpand {
 
     int count;
+    private String lemma;
+    private String bullets;
+    private String description;
 
     public CustomExpandCard(Context context) {
-        super(context, R.layout.carddemo_example_native_inner_expand);
+        super(context, R.layout.company_expand);
     }
 
     public CustomExpandCard(Context context, int i) {
-        super(context, R.layout.carddemo_example_native_inner_expand);
+        super(context, R.layout.company_expand);
         count = i;
     }
 
@@ -49,27 +52,33 @@ public class CustomExpandCard extends CardExpand {
         if (view == null) return;
 
         //Retrieve TextView elements
-        TextView tx1 = (TextView) view.findViewById(R.id.carddemo_expand_text1);
-        TextView tx2 = (TextView) view.findViewById(R.id.carddemo_expand_text2);
-        TextView tx3 = (TextView) view.findViewById(R.id.carddemo_expand_text3);
-        TextView tx4 = (TextView) view.findViewById(R.id.carddemo_expand_text4);
+        TextView txLemma = (TextView) view.findViewById(R.id.company_expand_lemma);
+        TextView txBullets = (TextView) view.findViewById(R.id.company_expand_bullets);
+        TextView txDescription = (TextView) view.findViewById(R.id.company_expand_description);
+//        TextView tx4 = (TextView) view.findViewById(R.id.carddemo_expand_text4);
 
         //Set value in text views
-        if (tx1 != null) {
-//            if (count % 2 ==0)
-//                tx1.setText(getContext().getString(R.string.demo_expand_customtitle1));
-//            else
-                tx1.setText("Fundador: Fustero y Luma");
+        if (txLemma != null) {
+                txLemma.setText(lemma);
         }
 
-        if (tx2 != null) {
-            tx2.setText("Nro empleado: 45 +/- 3");
+        if (txBullets != null) {
+            txBullets.setText(bullets);
         }
-        if (tx3 != null) {
-            tx3.setText("Headquarters: Al lado del decampa'o ese ");
+        if (txDescription != null) {
+            txDescription.setText(description);
         }
-        if (tx4 != null) {
-            tx4.setText("Sector: software y tontás");
-        }
+    }
+
+    public void setLemma(String lemma) {
+        this.lemma = lemma;
+    }
+
+    public void setBullets(String bullets) {
+        this.bullets = bullets;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

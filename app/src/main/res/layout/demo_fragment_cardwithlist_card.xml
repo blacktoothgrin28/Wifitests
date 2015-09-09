@@ -25,8 +25,7 @@
                 android:layout_marginLeft="12dp"
                 android:layout_marginRight="12dp"
                 android:layout_marginTop="12dp"
-                card:card_layout_resourceID="@layout/native_material_largeimage_card_icon" />
-                <!--card:card_layout_resourceID="@layout/native_material_largeimage_card_icon" />-->
+                card:card_layout_resourceID="@layout/company_card" />
 
             <!-- Empty view-->
             <View

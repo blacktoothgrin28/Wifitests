@@ -84,7 +84,7 @@
         <!-- <meta-data android:name="com.parse.push.notification_icon" android:resource="@drawable/push_icon"/> -->
 
         <activity
-            android:name=".TestCardsActivity"
+            android:name=".CardsActivity"
             android:label="@string/title_activity_test_cards"></activity>
 
         <!--PArse push staff-->

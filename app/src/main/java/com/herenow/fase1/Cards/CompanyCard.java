@@ -22,18 +22,26 @@ package com.herenow.fase1.Cards;
 import android.content.Context;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.LayoutRes;
+import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.herenow.fase1.CardData.CompanyData;
 import com.herenow.fase1.R;
+import com.herenow.fase1.test.CustomExpandCard;
 import com.herenow.fase1.test.mMaterialLargeImageCardThumbnail;
 
 import java.util.ArrayList;
 
 import it.gmariotti.cardslib.library.cards.actions.BaseSupplementalAction;
+import it.gmariotti.cardslib.library.cards.actions.IconSupplementalAction;
+import it.gmariotti.cardslib.library.cards.actions.TextSupplementalAction;
 import it.gmariotti.cardslib.library.cards.base.BaseMaterialCard;
+import it.gmariotti.cardslib.library.internal.Card;
+import it.gmariotti.cardslib.library.internal.ViewToClickToExpand;
 
 /**
  * @author Gabriele Mariotti (gabri.mariotti@gmail.com)
@@ -104,6 +112,8 @@ public class CompanyCard extends BaseMaterialCard {
     }
 
     public static final class SetupWizard {
+        private CompanyData mCompanyData;
+
         private final Context mContext;
         private
         @DrawableRes
@@ -121,8 +131,17 @@ public class CompanyCard extends BaseMaterialCard {
         private ArrayList<BaseSupplementalAction> mActions;
         private int mSupplementalActionLayoutId;
 
+
         private SetupWizard(Context context) {
             mContext = context;
+        }
+
+        public SetupWizard setData(CompanyData companyData) {
+            mCompanyData = companyData;
+            mTitle = mCompanyData.getName();
+            mDrawableCardIcon = mCompanyData.getLogoResId();
+            mDrawableCardThumbnail = mCompanyData.getImageResId();
+            return this;
         }
 
         public SetupWizard useDrawableId(@DrawableRes int drawableIdCardThumbnail) {
@@ -166,11 +185,11 @@ public class CompanyCard extends BaseMaterialCard {
             return this;
         }
 
-        public SetupWizard setupSupplementalActions(@LayoutRes int layoutId, ArrayList<BaseSupplementalAction> actions) {
-            mSupplementalActionLayoutId = layoutId;
-            mActions = actions;
-            return this;
-        }
+//        public SetupWizard setupSupplementalActions(@LayoutRes int layoutId, ArrayList<BaseSupplementalAction> actions) {
+//            mSupplementalActionLayoutId = layoutId;
+//            mActions = actions;
+//            return this;
+//        }
 
         public CompanyCard build() {
             return build(new CompanyCard(mContext));
@@ -192,14 +211,66 @@ public class CompanyCard extends BaseMaterialCard {
                 card.setTitle(mTitle.toString());
             card.setSubTitle(mSubTitle);
 
+            //Barra de botones mhp
+            mSupplementalActionLayoutId = R.layout.company_button_bar;
+            mActions = setActions();
+
             if (mActions != null) {
                 for (BaseSupplementalAction ac : mActions)
                     card.addSupplementalAction(ac);
             }
             card.setLayout_supplemental_actions_id(mSupplementalActionLayoutId);
             card.build();
+
+            ViewToClickToExpand viewToClickToExpand2 = ViewToClickToExpand.builder().enableForExpandAction();
+            card.setViewToClickToExpand(viewToClickToExpand2);
+
+            CustomExpandCard expand = new CustomExpandCard(mContext);
+            expand.setLemma(mCompanyData.getLemma());
+            expand.setBullets(mCompanyData.getExtraInfo());
+            expand.setDescription(mCompanyData.getDescription());
+            card.addCardExpand(expand);
+
             return card;
         }
+
+        @NonNull
+        private ArrayList<BaseSupplementalAction> setActions() {
+            // Set supplemental actions as icon
+            ArrayList<BaseSupplementalAction> actions = new ArrayList<BaseSupplementalAction>();
+
+            TextSupplementalAction moreAction = new TextSupplementalAction(mContext, R.id.text1);
+            moreAction.setOnActionClickListener(new BaseSupplementalAction.OnActionClickListener() {
+                @Override
+                public void onClick(Card card, View view) {
+                    Toast.makeText(mContext, "Clicked on Text MORE", Toast.LENGTH_SHORT).show();
+                    card.doToogleExpand();
+                }
+            });
+            actions.add(moreAction);
+
+            IconSupplementalAction actionPhone = new IconSupplementalAction(mContext, R.id.ic1);
+            actionPhone.setOnActionClickListener(new BaseSupplementalAction.OnActionClickListener() {
+                @Override
+                public void onClick(Card card, View view) {
+                    Toast.makeText(mContext, " Clicked on Phone", Toast.LENGTH_SHORT).show();
+                    //TODO open phone add contact or call
+                }
+            });
+            actions.add(actionPhone);
+
+            IconSupplementalAction mailAction = new IconSupplementalAction(mContext, R.id.ic2);
+            mailAction.setOnActionClickListener(new BaseSupplementalAction.OnActionClickListener() {
+                @Override
+                public void onClick(Card card, View view) {
+                    Toast.makeText(mContext, " Clicked on Mailing", Toast.LENGTH_SHORT).show();
+                    //TODO open phone add address or email
+                }
+            });
+            actions.add(mailAction);
+            return actions;
+        }
+
     }
 
     // -------------------------------------------------------------
@@ -254,7 +325,6 @@ public class CompanyCard extends BaseMaterialCard {
 
 
         }
-
 
 
         if (view != null) {
@@ -384,7 +454,7 @@ public class CompanyCard extends BaseMaterialCard {
      * to setup all values.
      *
      * @param context context
-     * @param parent Inner Frame
+     * @param parent  Inner Frame
      * @return
      */
     @Override
@@ -395,17 +465,17 @@ public class CompanyCard extends BaseMaterialCard {
             mInnerLayout = R.layout.native_inner_base_expand;
 
         //Inflate the inner layout
-        View view= super.getInnerView(context, parent);
+        View view = super.getInnerView(context, parent);
 
         //This provides a simple implementation with a single title
-        if (view!=null){
+        if (view != null) {
 
             //Add inner view to parent
             parent.addView(view);
 
             //Setup values
-            if (mInnerLayout>-1 ){
-                setupInnerViewElements(parent,view);
+            if (mInnerLayout > -1) {
+                setupInnerViewElements(parent, view);
             }
         }
         return view;

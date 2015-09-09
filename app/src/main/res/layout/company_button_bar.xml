@@ -18,39 +18,42 @@
   ~  *****************************************************************************
   -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="right"
     android:orientation="horizontal"
-    android:padding="@dimen/actions_padding"
-    android:paddingLeft="@dimen/actions_padding_left"
-    android:paddingRight="@dimen/actions_padding_left">
+    android:paddingStart="8dp"
+    android:paddingEnd="8dp">
 
     <TextView
         android:id="@+id/text1"
-        android:text="MORE"
-        android:background="?android:selectableItemBackground"
-        android:layout_width="wrap_content"
         style="@style/card.native.actions"
-        android:layout_height="wrap_content"/>
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_gravity="left"
+        android:background="?android:selectableItemBackground"
+        android:text="MORE" />
 
     <ImageButton
         android:id="@+id/ic1"
         style="@style/card.native.actions.button"
-        android:layout_marginRight="8dp"
+        android:layout_toLeftOf="@+id/ic2"
         android:background="?android:selectableItemBackground"
         android:scaleType="fitCenter"
         android:src="@drawable/l_search" />
+        <!--android:src="@drawable/ic_phone" />-->
 
 
     <ImageButton
         android:id="@+id/ic2"
         style="@style/card.native.actions.button"
-        android:layout_marginRight="8dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
         android:background="?android:selectableItemBackground"
         android:scaleType="fitCenter"
         android:src="@drawable/l_mail" />
 
 
-</LinearLayout>
+</RelativeLayout>

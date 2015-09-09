@@ -20,10 +20,7 @@ import android.widget.TextView;
 
 import com.parse.LogInCallback;
 import com.parse.ParseException;
-import com.parse.ParseInstallation;
-import com.parse.ParsePush;
 import com.parse.ParseUser;
-import com.parse.SaveCallback;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -138,7 +135,7 @@ public class MainActivity extends ActionBarActivity {
 
     public void clickCards(View view) {
         //open the card activity
-        intentCards = new Intent(this, TestCardsActivity.class);
+        intentCards = new Intent(this, CardsActivity.class);
         startActivity(intentCards);
     }
 
