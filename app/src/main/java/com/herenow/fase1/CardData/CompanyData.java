@@ -11,10 +11,28 @@ import java.util.HashMap;
  */
 public class CompanyData {
     Bitmap mainImage, logo;
-    String name, description, phone, email, website, typeOfBusiness,
-            foundationPlace, director, headQuarters, lemma;
+    String name;
+    String description;
+    String phone;
+    String email;
+
+    public String getWebsite() {
+        return website;
+    }
+
+    public void setWebsite(String website) {
+        this.website = website;
+    }
+
+    String website;
+    String typeOfBusiness;
+    String foundationPlace;
+    String director;
+    String headQuarters;
+    String lemma;
     String[] founders, subsidiaries;
     String foundationYear;
+    //    String skype;
     //Product[] products;
     //Client[] clients
     int nEmployees;
@@ -119,6 +137,14 @@ public class CompanyData {
 
     public void setDirector(String director) {
         this.director = director;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public String getEmail() {
+        return email;
     }
 
     public static final class SetupWizard {

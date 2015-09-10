@@ -51,7 +51,6 @@ public class CardsActivityFragment extends Fragment {
 
             CompanyData companyData = new CompanyData("Aplicaciones en Informática Avanzada", R.drawable.im_aia_fondo_claro, R.drawable.im_aia_logo);
             companyData.setEmployeesNumber(55);
-            companyData.setDescription("");
             companyData.setLemma("Algoritmos para un mundo mejor");
             companyData.setDirector("Regina Llopis");
             companyData.setFoundationYear("1990");
@@ -59,9 +58,10 @@ public class CardsActivityFragment extends Fragment {
             companyData.setFounders(new String[]{"Regina Llopis", "Toni Trias", "Xavier Fustero"});
             companyData.setTypeOfBusiness("Software");
             companyData.setEmail("secretaria@aia.es");
+            companyData.setPhone("+34935044900");
+            companyData.setWebsite("www.aia.es");
 
             CompanyCard companyCardtest = CompanyCard.with(getActivity())
-                    .setTitle("paropo")
                     .setData(companyData)
                     .build();
 
@@ -76,15 +76,20 @@ public class CardsActivityFragment extends Fragment {
             cardViewAirport.setCard(airportCard);
 
         } catch (Exception e) {
-            AppendLog.appendLog("---error init airportCard: " + e);
+            AppendLog.appendLog("---error init cards: " + e);
         }
 
     }
 
     @Override
     public void onPause() {
-        super.onPause();
-        if (airportCard != null)
-            airportCard.unregisterDataSetObserver();//TODO, VER CoMO VA ESTE ROLLO DEL REGISTRO DE OBSERVER
+
+        try {
+            super.onPause();
+            if (airportCard != null)
+                airportCard.unregisterDataSetObserver();//TODO, VER CoMO VA ESTE ROLLO DEL REGISTRO DE OBSERVER
+        } catch (Exception e) {
+            AppendLog.appendLog("--error on Pause cards" + e.getMessage());
+        }
     }
 }
