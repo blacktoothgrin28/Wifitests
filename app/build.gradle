@@ -29,6 +29,8 @@ dependencies {
     compile fileTree(dir: 'libs', include: 'Parse-*.jar')
     compile 'com.google.android.gms:play-services:7.5.0'
     compile 'com.theartofdev.edmodo:android-image-cropper:1.0.+'
+    // parse html
+    compile 'org.jsoup:jsoup:1.7.3'
 
     //Core
     compile 'com.github.gabrielemariotti.cards:cardslib-core:2.1.0'

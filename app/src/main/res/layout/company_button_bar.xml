@@ -42,7 +42,7 @@
         android:layout_toLeftOf="@+id/ic0"
         android:background="?android:selectableItemBackground"
         android:scaleType="fitCenter"
-        android:src="@drawable/ic_http" />
+        android:src="@drawable/ic_world" />
 
     <ImageButton
         android:id="@+id/ic0"
