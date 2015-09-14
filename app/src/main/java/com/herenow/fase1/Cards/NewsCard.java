@@ -1,14 +1,21 @@
 package com.herenow.fase1.Cards;
 
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.util.Base64;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.herenow.fase1.Noticia;
 import com.herenow.fase1.R;
+import com.squareup.picasso.Picasso;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -19,7 +26,10 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import it.gmariotti.cardslib.library.internal.Card;
 import it.gmariotti.cardslib.library.internal.CardHeader;
@@ -44,6 +54,33 @@ public class NewsCard extends CardWithList implements OnTaskCompleted {
     public NewsCard(Context context, String companyName) {
         super(context);
         mCompanyName = companyName;
+    }
+
+    public static Noticia ProcessHtmlNews(Element oneNew, HashMap<String, Bitmap> tableImages) {
+        Noticia noticia = null;
+        String imageId;
+        try {
+            noticia = new Noticia();
+            noticia.title = oneNew.select("a[class=l _HId]").text();
+            noticia.link = oneNew.select("a[class=l _HId]").attr("href");
+            noticia.content = oneNew.select("div.st").text();
+            noticia.isExact = oneNew.select("div.st").html().contains("<em>");
+            noticia.date = oneNew.select("div.slp").first().child(2).text();
+            noticia.source = oneNew.select("div.slp").first().child(0).text();
+            //Image
+            String imgPath = oneNew.select("img[class=th _lub]").attr("src");
+            if (imgPath.startsWith("http")) {
+                noticia.imageUrl = imgPath;
+            } else if (imgPath.startsWith("data")) {
+                imageId = oneNew.select("img[class=th _lub]").attr("id");
+                noticia.image = tableImages.get(imageId);
+            }
+
+
+        } catch (Exception e) {
+            AppendLog.appendLog("fallo en crear una noticia" + e.getMessage());
+        }
+        return noticia;
     }
 
     @Override
@@ -105,7 +142,7 @@ public class NewsCard extends CardWithList implements OnTaskCompleted {
         AppendLog.appendLog("w1 es " + w1.title + " | " + w1.content);
 //        w1.title="la cagá";
 //        w1.content="ha quedado la tremenda cagá en el lugar de los hechos";
-        w1.setObjectId(w1.title); //It can be important to set ad id
+        w1.setObjectId(w1.link); //It can be important to set ad id
         mObjects.add(w1);
 
         NewsObject w2 = new NewsObject(this);
@@ -114,7 +151,7 @@ public class NewsCard extends CardWithList implements OnTaskCompleted {
 //        w2.content = "ha quedado la tremenda cagá en el lugar de los hechos";
         AppendLog.appendLog("w2 es " + w2.title + " | " + w2.content);
 
-        w2.setObjectId(w2.title); //It can be important to set ad id
+        w2.setObjectId(w2.link); //It can be important to set ad id
         mObjects.add(w2);
 
         NewsObject w3 = new NewsObject(this);
@@ -123,7 +160,7 @@ public class NewsCard extends CardWithList implements OnTaskCompleted {
 //        w3.content = "ha quedado la tremenda cagá en el lugar de los hechos";
         AppendLog.appendLog("w3 es " + w3.title + " | " + w3.content);
 
-        w3.setObjectId(w3.title); //It can be important to set ad id
+        w3.setObjectId(w3.link); //It can be important to set ad id
         mObjects.add(w3);
 
 
@@ -152,7 +189,7 @@ public class NewsCard extends CardWithList implements OnTaskCompleted {
             AppendLog.appendLog(" We ve got news: " + news.size());
 
             for (Element oneNew : news) {
-                noticias.add(ProcessHtmlNews(oneNew));
+//                noticias.add(ProcessHtmlNews(oneNew, tableImages));
             }
         } catch (IOException e) {
             AppendLog.appendLog("--errorn en getnews symc:" + e.getMessage());
@@ -161,36 +198,38 @@ public class NewsCard extends CardWithList implements OnTaskCompleted {
         return noticias;
     }
 
-    public static Noticia ProcessHtmlNews(Element oneNew) {
-        Noticia noticia = null;
-        try {
-            noticia = new Noticia();
-            noticia.title = oneNew.select("a[class=l _HId]").text();
-            noticia.link = oneNew.select("a[class=l _HId]").attr("href");
-            noticia.content = oneNew.select("div.st").text();
-            noticia.isExact = oneNew.select("div.st").html().contains("<em>");
-            noticia.image = oneNew.select("img[class=th _lub]").attr("src");
-            noticia.source = oneNew.select("div.slp").first().child(0).text();
-            noticia.date = oneNew.select("div.slp").first().child(2).text();
-        } catch (Exception e) {
-            AppendLog.appendLog("fallo en crear una noticia" + e.getMessage());
-        }
-        return noticia;
-    }
-
     @Override
     public View setupChildView(int childPosition, ListObject object, View convertView, ViewGroup parent) {
 
-        //TODO complete
-        //Setup the ui elements inside the item
-        TextView title = (TextView) convertView.findViewById(R.id.news_title);
-//        ImageView icon = (ImageView) convertView.findViewById(R.id.carddemo_weather_icon);
-        TextView content = (TextView) convertView.findViewById(R.id.news_content);
+        try {
+            //Setup the ui elements inside the item
 
-        //Retrieve the values from the object
-        NewsObject newsObject = (NewsObject) object;
-        title.setText(newsObject.title);
-        content.setText(newsObject.content);
+            TextView title = (TextView) convertView.findViewById(R.id.news_title);
+            TextView content = (TextView) convertView.findViewById(R.id.news_content);
+
+            TextView source = (TextView) convertView.findViewById(R.id.news_source);
+            TextView date = (TextView) convertView.findViewById(R.id.news_date);
+
+            ImageView ivImage = (ImageView) convertView.findViewById(R.id.news_image);
+
+            //Retrieve the values from the object
+            NewsObject newsObject = (NewsObject) object;
+            title.setText(newsObject.title);
+            content.setText(newsObject.content);
+            source.setText(newsObject.source);
+            date.setText(newsObject.date);
+
+            if (newsObject.imageUrl != null) {
+                Picasso.with(mContext).load(newsObject.imageUrl)//Todo si es que tiene url
+                        .error(R.drawable.abc_ic_ab_back_mtrl_am_alpha)
+                        .placeholder(R.mipmap.ic_launcher)
+                        .into(ivImage);
+            } else if (newsObject.image != null) {
+                ivImage.setImageBitmap(newsObject.image);
+            }
+        } catch (Exception e) {
+            AppendLog.appendLog("errror item news : " + e.getMessage());
+        }
 
         return convertView;
     }
@@ -223,6 +262,10 @@ public class NewsCard extends CardWithList implements OnTaskCompleted {
         mCardViewNews = cardViewNews;
     }
 
+    public void updateNews(ArrayList<String> news) {
+
+
+    }
 
     // -------------------------------------------------------------
     // News Object
@@ -230,8 +273,9 @@ public class NewsCard extends CardWithList implements OnTaskCompleted {
 
     public class NewsObject extends DefaultListObject {
 
-        public String title, source, content, image, link;
+        public String title, source, content, imageUrl, link;
         public String date;
+        private Bitmap image;
 //        public boolean isExact;
 //        public String city;
         //        public int weatherIcon;
@@ -240,18 +284,19 @@ public class NewsCard extends CardWithList implements OnTaskCompleted {
 //        public String time;
 
 
+        public NewsObject(Card parentCard) {
+            super(parentCard);
+            init();
+        }
+
         public void setData(Noticia noti) {
             title = noti.title;
             source = noti.source;
             content = noti.content;
-            image = noti.image;
+            imageUrl = noti.imageUrl;
             link = noti.link;
             date = noti.date;
-        }
-
-        public NewsObject(Card parentCard) {
-            super(parentCard);
-            init();
+            image = noti.image;
         }
 
         private void init() {
@@ -260,6 +305,9 @@ public class NewsCard extends CardWithList implements OnTaskCompleted {
                 @Override
                 public void onItemClick(LinearListView parent, View view, int position, ListObject object) {
                     Toast.makeText(getContext(), "Click on " + getObjectId(), Toast.LENGTH_SHORT).show();
+
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(getObjectId()));
+                    mContext.startActivity(browserIntent);
                 }
             });
 
@@ -294,13 +342,19 @@ class ParseURL extends AsyncTask<String, Void, ArrayList<Noticia>> {
 
             Document doc = Jsoup.connect(strings[0]).get();
             AppendLog.appendLog("Connected to [" + strings[0] + "]");
+//            String code = doc.select("script").get(9).html();//todo assure that is 9
+
+//            String mydata = "some string with 'the data i want' inside";
+
+            HashMap<String, Bitmap> tableImages = ObtainCodedImages(doc.select("script").get(9).html());
+
 
             ///mhp
             Elements news = doc.select("li.g");
             AppendLog.appendLog(" We ve got news: " + news.size());
 
             for (Element oneNew : news) {
-                noticias.add(ProcessHtmlNews(oneNew));
+                noticias.add(ProcessHtmlNews(oneNew, tableImages));
             }
 
 
@@ -308,6 +362,33 @@ class ParseURL extends AsyncTask<String, Void, ArrayList<Noticia>> {
             t.printStackTrace();
         }
         return noticias;
+    }
+
+    private HashMap<String, Bitmap> ObtainCodedImages(String script) {
+        HashMap<String, Bitmap> res = new HashMap<>();
+        try {
+            Bitmap buffData = null;
+            Pattern pattern = Pattern.compile("'(.*?)'");
+            Matcher matcher = pattern.matcher(script);
+            int i = 0;
+
+            while (matcher.find()) {
+                i++;
+                //            System.out.println(matcher.group(1));
+                String str = matcher.group(1);
+                if (i % 2 == 0) {//Impares son datos, pares son los nombres. Primero datos
+                    res.put(str, buffData);
+                } else {
+                    int commaIndex = str.indexOf(",");
+                    String coded = str.substring(commaIndex + 1);//todo quitarle hasta la coma
+                    byte[] decodedString = Base64.decode(coded, Base64.DEFAULT);
+                    buffData = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+                }
+            }
+        } catch (Exception e) {
+            AppendLog.appendLog("eerro " + e.getMessage());
+        }
+        return res;
     }
 
 
