@@ -41,7 +41,7 @@
                 android:layout_marginLeft="12dp"
                 android:layout_marginRight="12dp"
                 android:layout_marginTop="12dp"
-                card:card_layout_resourceID="@layout/news_card" />
+                card:card_layout_resourceID="@layout/native_cardwithlist_layout" />
 
             <!-- Empty view-->
             <View

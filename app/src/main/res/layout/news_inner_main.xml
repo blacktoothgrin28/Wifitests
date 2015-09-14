@@ -4,7 +4,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="200dp"
     android:layout_marginLeft="8dp"
     android:layout_marginRight="8dp"
     android:background="@drawable/demo_item_selector"
@@ -13,32 +13,35 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_gravity="center_vertical"
         android:layout_marginLeft="12dp"
         android:layout_marginRight="12dp"
         android:minHeight="55dp">
 
         <TextView
-            android:id="@+id/carddemo_weather_city"
+            android:id="@+id/news_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_centerInParent="true"
             android:textColor="@color/demo_card_weather_city_color"
             android:textSize="17sp"
-            tools:text="London" />
+            tools:text="Se ha caido in avión en el cementerio"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
 
 
         <TextView
-            android:id="@+id/carddemo_weather_temperature"
+            android:id="@+id/news_content"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_centerInParent="true"
             android:textColor="@color/demo_card_weather_temperature_color"
-            android:textSize="28sp"
-            tools:text="16°C" />
+            android:textSize="14sp"
+            tools:text="...son más de 500 los muertos que se han encontrado esta mañana en el luga"
+            android:layout_alignParentTop="false"
+            android:layout_alignParentLeft="false"
+            android:layout_alignParentStart="false"
+            android:layout_alignParentBottom="true" />
 
 
     </RelativeLayout>

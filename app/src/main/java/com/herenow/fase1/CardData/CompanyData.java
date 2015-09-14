@@ -4,7 +4,13 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.annotation.DrawableRes;
 
+import com.parse.codec.binary.StringUtils;
+
+import org.jsoup.helper.StringUtil;
+
 import java.util.HashMap;
+
+import util.AppendLog;
 
 /**
  * Created by Milenko on 25/08/2015.
@@ -25,17 +31,19 @@ public class CompanyData {
     }
 
     String website;
+    boolean isWebResponsive; //TODO
     String typeOfBusiness;
-    String foundationPlace;
     String director;
-    String headQuarters;
+    int nEmployees;
     String lemma;
     String[] founders, subsidiaries;
     String foundationYear;
+    String headQuarters;
+    String memberOfGroup;
+    String foundationPlace;
     //    String skype;
     //Product[] products;
     //Client[] clients
-    int nEmployees;
     //    int logoResId;
     @DrawableRes
     int imageResId, logoResId;
@@ -79,6 +87,23 @@ public class CompanyData {
 
     public String getName() {
         return name;
+    }
+
+    /**
+     * Remove {"S.L.","S.A",etc},  at the end of name
+     */
+    public String getNameClean() {
+        final String[] abrev = {" SL", " S.L.", " S.A.", " SA", " INC.", " INC", " CO", " CO."};//TODO see other company names abrev
+        String upper = name.toUpperCase();
+        String nameClean = name;
+        for (String ab : abrev) {
+            if (upper.endsWith(ab)) {
+                AppendLog.appendLog("company name ends with:" + ab);
+                nameClean = name.substring(0, name.length() - ab.length());
+                break;
+            }
+        }
+        return nameClean;
     }
 
     public int getLogoResId() {

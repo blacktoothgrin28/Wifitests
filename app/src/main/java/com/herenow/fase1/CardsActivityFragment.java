@@ -57,14 +57,7 @@ public class CardsActivityFragment extends Fragment {
     private void initCards() {
 
         try {
-            //News card , esto lanza la busqueda en google y se abre el navegador
-//            Intent searchIntent = new Intent(Intent.ACTION_WEB_SEARCH);
-//            String keyword= "\"aplicaciones en Informática avanzada\"";
-//            searchIntent.putExtra(SearchManager.QUERY, keyword);
-////            searchIntent.putExtra(SearchManager. keyword);
-//            startActivity(searchIntent);
-
-//            String siteUrl = "https://www.google.es/webhp?ie=UTF-8#q=%22aplicaciones+en+informatica+avanzada%22&tbm=nws";
+            //Just un exaple of retrieving news
             String siteUrl = "https://www.google.es/search?q=aviones&tbm=nws ";
             (new ParseURL()).execute(new String[]{siteUrl});
 //////
@@ -72,7 +65,7 @@ public class CardsActivityFragment extends Fragment {
 
             //Company Card
 
-            CompanyData companyData = new CompanyData("Aplicaciones en Informática Avanzada", R.drawable.im_aia_fondo_claro, R.drawable.im_aia_logo);
+            CompanyData companyData = new CompanyData("Aplicaciones en Informática Avanzada S.L.", R.drawable.im_aia_fondo_claro, R.drawable.im_aia_logo);
             companyData.setEmployeesNumber(55);
             companyData.setLemma("Algoritmos para un mundo mejor");
             companyData.setDirector("Regina Llopis");
@@ -92,10 +85,12 @@ public class CardsActivityFragment extends Fragment {
             cardViewCompany.setCard(companyCardtest);
 
             // News Card
-            NewsCard newsCard = new NewsCard(getActivity(), companyData.getName());
-            newsCard.init();
+            NewsCard newsCard = new NewsCard(getActivity(), companyData.getNameClean());
             CardViewNative cardViewNews = (CardViewNative) getActivity().findViewById(R.id.card_view_news);
-//cardViewNews.setCard(cardViewNews);
+            newsCard.setView(cardViewNews);
+            newsCard.init();
+//            newsCard.Pon(cardViewNews);
+//            cardViewNews.setCard(newsCard);
 
             // Airport card
             airportCard = new AirportCard(getActivity());
@@ -201,7 +196,6 @@ class ParseURL extends AsyncTask<String, Void, String> {
             noticia.link = oneNew.select("a[class=l _HId]").attr("href");
             noticia.content = oneNew.select("div.st").text();
             noticia.isExact = oneNew.select("div.st").html().contains("<em>");
-
             noticia.image = oneNew.select("img[class=th _lub]").attr("src");
             noticia.source = oneNew.select("div.slp").first().child(0).text();
             noticia.date = oneNew.select("div.slp").first().child(2).text();

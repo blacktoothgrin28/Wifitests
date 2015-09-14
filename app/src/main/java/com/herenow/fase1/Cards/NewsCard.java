@@ -2,7 +2,6 @@ package com.herenow.fase1.Cards;
 
 import android.content.Context;
 import android.os.AsyncTask;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -16,47 +15,44 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import it.gmariotti.cardslib.library.internal.Card;
 import it.gmariotti.cardslib.library.internal.CardHeader;
 import it.gmariotti.cardslib.library.prototypes.CardWithList;
 import it.gmariotti.cardslib.library.prototypes.LinearListView;
+import it.gmariotti.cardslib.library.view.CardViewNative;
 import util.AppendLog;
+
+import static com.herenow.fase1.Cards.NewsCard.ProcessHtmlNews;
 
 /**
  * Created by Milenko on 12/08/2015.
  */
-public class NewsCard extends CardWithList {
+public class NewsCard extends CardWithList implements OnTaskCompleted {
 
-    private ArrayList<Noticia> mNews;
+    private String mCompanyName;
+    //    private ArrayList<Noticia> mNews;
+    private ArrayList<Noticia> mNewsToShow;
+    private String siteUrl;
+    private CardViewNative mCardViewNews;
 
     public NewsCard(Context context, String companyName) {
         super(context);
+        mCompanyName = companyName;
     }
-
-    public NewsCard(Context context) {
-        super(context);
-    }
-
-    public NewsCard(Context context, int innerLayout) {
-        super(context, innerLayout);
-    }
-
-    public void setData(HashMap flightsData) {//TODO
-
-    }
-
 
     @Override
     protected CardHeader initCardHeader() {
 
         //Add Header
         CardHeader header = new CardHeader(getContext(), R.layout.carddemo_googlenowweather_inner_header);
-
-        header.setTitle("News"); //should use R.string.
+        //Todo change the news header style
+        header.setTitle("News"); //todo should use R.string.
         return header;
     }
 
@@ -72,42 +68,64 @@ public class NewsCard extends CardWithList {
             }
         });
 
+        setEmptyViewViewStubLayoutId(R.layout.carddemo_extras_base_withlist_empty);
+
+        setUseProgressBar(true);
+
     }
 
     @Override
     public void init() {
 
         //perform the search
-        String siteUrl = "https://www.google.es/search?q=aviones&tbm=nws ";
-        (new ParseURL()).execute(new String[]{siteUrl});
 
-        mNews = null;//todo Rellenar
+        try {
 
-        super.init();
+            siteUrl = "https://www.google.es/search?q=%22" + URLEncoder.encode(mCompanyName, "UTF-8") + "%22&tbm=nws ";
+            AppendLog.appendLog("The query for news is " + siteUrl);
+
+            (new ParseURL(this)).execute(new String[]{siteUrl});//async
+        } catch (UnsupportedEncodingException e) {
+            AppendLog.appendLog("Encoding error : " + e.getMessage());
+        }
+//        super.init();//Sync
     }
 
     @Override
     protected List<ListObject> initChildren() {
 
+//        mNewsToShow = GetNewsSync();
         //Init the list
         List<ListObject> mObjects = new ArrayList<ListObject>();
 
+        //TODO repleacebla by FOR
         //Add an object to the list
         NewsObject w1 = new NewsObject(this);
-        w1.city = "London";
-        w1.time = "11:30";
-//        w1.temperature = 16;
-//        w1.weatherIcon = R.drawable.ic_action_cloud;
-        w1.setObjectId(w1.city); //It can be important to set ad id
+        w1.setData(mNewsToShow.get(0));
+        AppendLog.appendLog("w1 es " + w1.title + " | " + w1.content);
+//        w1.title="la cagá";
+//        w1.content="ha quedado la tremenda cagá en el lugar de los hechos";
+        w1.setObjectId(w1.title); //It can be important to set ad id
         mObjects.add(w1);
 
         NewsObject w2 = new NewsObject(this);
-        w2.city = "Rome";
-        w2.time = "11:33";
-//        w2.temperature = 25;
-//        w2.weatherIcon = R.drawable.ic_action_sun;
-        w2.setObjectId(w2.city);
-        w2.setSwipeable(true);
+        w2.setData(mNewsToShow.get(1));
+//        w2.title = "la cagá";
+//        w2.content = "ha quedado la tremenda cagá en el lugar de los hechos";
+        AppendLog.appendLog("w2 es " + w2.title + " | " + w2.content);
+
+        w2.setObjectId(w2.title); //It can be important to set ad id
+        mObjects.add(w2);
+
+        NewsObject w3 = new NewsObject(this);
+        w3.setData(mNewsToShow.get(2));
+//        w3.title = "la cagá";
+//        w3.content = "ha quedado la tremenda cagá en el lugar de los hechos";
+        AppendLog.appendLog("w3 es " + w3.title + " | " + w3.content);
+
+        w3.setObjectId(w3.title); //It can be important to set ad id
+        mObjects.add(w3);
+
 
         //Example onSwipe
         /*w2.setOnItemSwipeListener(new OnItemSwipeListener() {
@@ -116,57 +134,120 @@ public class NewsCard extends CardWithList {
                 Toast.makeText(getContext(), "Swipe on " + object.getObjectId(), Toast.LENGTH_SHORT).show();
             }
         });*/
-        mObjects.add(w2);
-
-        NewsObject w3 = new NewsObject(this);
-        w3.city = "Paris";
-        w1.time = "11:39";
-//        w3.temperature = 19;
-//        w3.weatherIcon = R.drawable.ic_action_cloudy;
-        w3.setObjectId(w3.city);
-        mObjects.add(w3);
 
         return mObjects;
+    }
+
+    private ArrayList<Noticia> GetNewsSync() {
+        ArrayList noticias = new ArrayList();
+        //Todo tomar sólo las literales
+        try {
+            AppendLog.appendLog("Connecting to [" + siteUrl + "]");
+
+            Document doc = Jsoup.connect(siteUrl).get();
+            AppendLog.appendLog("Connected to [" + siteUrl + "]");
+
+            ///mhp
+            Elements news = doc.select("li.g");
+            AppendLog.appendLog(" We ve got news: " + news.size());
+
+            for (Element oneNew : news) {
+                noticias.add(ProcessHtmlNews(oneNew));
+            }
+        } catch (IOException e) {
+            AppendLog.appendLog("--errorn en getnews symc:" + e.getMessage());
+        }
+
+        return noticias;
+    }
+
+    public static Noticia ProcessHtmlNews(Element oneNew) {
+        Noticia noticia = null;
+        try {
+            noticia = new Noticia();
+            noticia.title = oneNew.select("a[class=l _HId]").text();
+            noticia.link = oneNew.select("a[class=l _HId]").attr("href");
+            noticia.content = oneNew.select("div.st").text();
+            noticia.isExact = oneNew.select("div.st").html().contains("<em>");
+            noticia.image = oneNew.select("img[class=th _lub]").attr("src");
+            noticia.source = oneNew.select("div.slp").first().child(0).text();
+            noticia.date = oneNew.select("div.slp").first().child(2).text();
+        } catch (Exception e) {
+            AppendLog.appendLog("fallo en crear una noticia" + e.getMessage());
+        }
+        return noticia;
     }
 
     @Override
     public View setupChildView(int childPosition, ListObject object, View convertView, ViewGroup parent) {
 
+        //TODO complete
         //Setup the ui elements inside the item
-        TextView city = (TextView) convertView.findViewById(R.id.carddemo_weather_city);
+        TextView title = (TextView) convertView.findViewById(R.id.news_title);
 //        ImageView icon = (ImageView) convertView.findViewById(R.id.carddemo_weather_icon);
-        TextView time = (TextView) convertView.findViewById(R.id.carddemo_weather_temperature);
+        TextView content = (TextView) convertView.findViewById(R.id.news_content);
 
         //Retrieve the values from the object
         NewsObject newsObject = (NewsObject) object;
-//        icon.setImageResource(flightObject.weatherIcon);
-        city.setText(newsObject.city);
-        time.setText(newsObject.time);
+        title.setText(newsObject.title);
+        content.setText(newsObject.content);
 
         return convertView;
     }
 
     @Override
     public int getChildLayoutId() {
-        return R.layout.carddemo_googlenowweather_inner_main;
+        return R.layout.news_inner_main;
+    }
+
+    @Override
+    public void OnTaskCompleted(ArrayList<Noticia> news) {
+        // TODO what if there is only one or none?
+        AppendLog.appendLog("ontaskcompleted:" + news.size() + " neews");
+        //Select three news with exact name
+        mNewsToShow = new ArrayList<>();
+        for (Noticia not : news) {
+            if (not.isExact) {
+                mNewsToShow.add(not);
+                if (mNewsToShow.size() == 3) break;
+            }
+        }
+        AppendLog.appendLog("ontaskcompleted: tenemos :" + mNewsToShow.size() + " noticias para mostrar");
+        super.init();
+
+
+        mCardViewNews.setCard(this);
+    }
+
+    public void setView(CardViewNative cardViewNews) {
+        mCardViewNews = cardViewNews;
     }
 
 
     // -------------------------------------------------------------
-    // Weather Object
+    // News Object
     // -------------------------------------------------------------
 
     public class NewsObject extends DefaultListObject {
 
         public String title, source, content, image, link;
         public String date;
-        public boolean isExact;
-
-        public String city;
+//        public boolean isExact;
+//        public String city;
         //        public int weatherIcon;
 //        public int temperature;
-        public String temperatureUnit = "°C";
-        public String time;
+//        public String temperatureUnit = "°C";
+//        public String time;
+
+
+        public void setData(Noticia noti) {
+            title = noti.title;
+            source = noti.source;
+            content = noti.content;
+            image = noti.image;
+            link = noti.link;
+            date = noti.date;
+        }
 
         public NewsObject(Card parentCard) {
             super(parentCard);
@@ -196,98 +277,47 @@ public class NewsCard extends CardWithList {
 
 }
 
-class ParseURL extends AsyncTask<String, Void, String> {
+class ParseURL extends AsyncTask<String, Void, ArrayList<Noticia>> {
+    private OnTaskCompleted listener;
+
+    ParseURL(OnTaskCompleted listener) {
+        AppendLog.appendLog("asignando listener en parseURL");
+        this.listener = listener;
+    }
 
     @Override
-    protected String doInBackground(String... strings) {
-        StringBuffer buffer = new StringBuffer();
+    protected ArrayList<Noticia> doInBackground(String... strings) {
+        ArrayList noticias = new ArrayList();
         try {
-//            HttpClient client = new DefaultHttpClient();
-//            HttpGet request = new HttpGet(strings[0]);
-//            HttpResponse response = client.execute(request);
-//
-//            String html = "";
-//            InputStream in = response.getEntity().getContent();
-//            BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-//            StringBuilder str = new StringBuilder();
-//            String line = null;
-//            while((line = reader.readLine()) != null)
-//            {
-//                str.append(line);
-//            }
-//            in.close();
-//            html = str.toString();
-//
 
-//            Document doc = Jsoup.parse(html);
+            AppendLog.appendLog("Connecting to [" + strings[0] + "]");
 
-            Log.d("JSwa", "Connecting to [" + strings[0] + "]");
-//            String url2 = "http://www.google.es/search?ie=UTF-8#q=aviones&tbm=nws";
-
-            Document doc = Jsoup.connect(strings[0]).get(); //https y nees
-//            Document doc2 = Jsoup.connect(url2).get(); //codification
-//            Document doc3 = Jsoup.connect(strings[0]).get(); //
-//            Document doc4 = Jsoup.connect(strings[0]).get(); //
-            Log.d("JSwa", "Connected to [" + strings[0] + "]");
-            // Get document (HTML page) title
-            String title = doc.title();
-            Log.d("JSwA", "Title [" + title + "]");
-            buffer.append("Title: " + title + "\r\n");
+            Document doc = Jsoup.connect(strings[0]).get();
+            AppendLog.appendLog("Connected to [" + strings[0] + "]");
 
             ///mhp
             Elements news = doc.select("li.g");
-            ArrayList noticias = new ArrayList();
+            AppendLog.appendLog(" We ve got news: " + news.size());
+
             for (Element oneNew : news) {
                 noticias.add(ProcessHtmlNews(oneNew));
             }
 
 
-            // Get meta info
-            Elements metaElems = doc.select("meta");
-            buffer.append("META DATA\r\n");
-            for (Element metaElem : metaElems) {
-                String name = metaElem.attr("name");
-                String content = metaElem.attr("content");
-                buffer.append("name [" + name + "] - content [" + content + "] \r\n");
-            }
-
-            Elements topicList = doc.select("h2.topic");
-            buffer.append("Topic list\r\n");
-            for (Element topic : topicList) {
-                String data = topic.text();
-
-                buffer.append("Data [" + data + "] \r\n");
-            }
-
         } catch (Throwable t) {
             t.printStackTrace();
         }
-
-        return buffer.toString();
-    }
-
-    private Noticia ProcessHtmlNews(Element oneNew) {
-        Noticia noticia = null;
-        try {
-            noticia = new Noticia();
-            noticia.title = oneNew.select("a[class=l _HId]").text();
-            noticia.link = oneNew.select("a[class=l _HId]").attr("href");
-            noticia.content = oneNew.select("div.st").text();
-            noticia.isExact = oneNew.select("div.st").contains("<b>");
-
-            noticia.image = oneNew.select("img[class=th _lub]").attr("src");
-            noticia.source = oneNew.select("div.slp").first().child(0).text();
-            noticia.date = oneNew.select("div.slp").first().child(2).text();
-        } catch (Exception e) {
-            AppendLog.appendLog("fallo en crear una noticia" + e.getMessage());
-        }
-        return noticia;
+        return noticias;
     }
 
 
     @Override
-    protected void onPostExecute(String s) {
-        super.onPostExecute(s);
-//        respText.setText(s);
+    protected void onPostExecute(ArrayList<Noticia> news) {
+        super.onPostExecute(news);
+//        respText.setText(s) TODO here populate the cards
+//        this.inflateCard(news);
+        listener.OnTaskCompleted(news);
     }
+
+
 }
