@@ -12,10 +12,13 @@ import android.view.ViewGroup;
 import com.herenow.fase1.CardData.CompanyData;
 import com.herenow.fase1.Cards.AirportCard;
 import com.herenow.fase1.Cards.CompanyCard;
+import com.herenow.fase1.Cards.LinkedinCard;
 import com.herenow.fase1.Cards.NewsCard;
+import com.herenow.fase1.Cards.ScheduleCard;
 
 import it.gmariotti.cardslib.library.view.CardViewNative;
 import util.AppendLog;
+import util.parameters;
 
 //import com.herenow.fase1.Cards.MaterialLargeImageCard;
 
@@ -24,6 +27,7 @@ import util.AppendLog;
  */
 public class CardsActivityFragment extends Fragment {
     AirportCard airportCard;
+    ScheduleCard scheduleCard;
 //    CompanyCard card2;
 
     public CardsActivityFragment() {
@@ -68,19 +72,7 @@ public class CardsActivityFragment extends Fragment {
 
 
             //Company Card
-
-            CompanyData companyData = new CompanyData("Aplicaciones en Informática Avanzada S.L.", R.drawable.im_aia_fondo_claro, R.drawable.im_aia_logo);
-            companyData.setEmployeesNumber(55);
-            companyData.setLemma("Algoritmos para un mundo mejor");
-            companyData.setDirector("Regina Llopis");
-            companyData.setFoundationYear("1990");
-            companyData.setDescription("El objetivo principal de Grupo AIA es producir un beneficio económico real y cuantificable para nuestros clientes a través de la actividad innovadora usando la tecnología punta como una propuesta de negocio de alto valor.");
-            companyData.setFounders(new String[]{"Regina Llopis", "Toni Trias", "Xavier Fustero"});
-            companyData.setTypeOfBusiness("Software");
-            companyData.setEmail("secretaria@aia.es");
-            companyData.setPhone("+34935044900");
-            companyData.setWebsite("www.aia.es");
-
+            CompanyData companyData = parameters.getExampleCompanyCard();
             CompanyCard companyCardtest = CompanyCard.with(getActivity())
                     .setData(companyData)
                     .build();
@@ -93,8 +85,24 @@ public class CardsActivityFragment extends Fragment {
             CardViewNative cardViewNews = (CardViewNative) getActivity().findViewById(R.id.card_view_news);
             newsCard.setView(cardViewNews);
             newsCard.init();
-//            newsCard.Pon(cardViewNews);
-//            cardViewNews.setCard(newsCard);
+
+
+            //Linkedin card
+            // todo change format of linkedin card
+            LinkedinCard linkedinCard = new LinkedinCard(getActivity(), companyData.getLinkedinUrl());
+            CardViewNative cvLinkedin = (CardViewNative) getActivity().findViewById(R.id.card_view_linkedin);
+            linkedinCard.setView(cvLinkedin);
+            linkedinCard.init();
+
+
+            //Schedule card
+            //TOdo schedule card
+            scheduleCard = new ScheduleCard(getActivity());
+            scheduleCard.init();
+
+            CardViewNative cardViewSchedule = (CardViewNative) getActivity().findViewById(R.id.card_view_schedule);
+            cardViewSchedule.setCard(airportCard);
+
 
             // Airport card
             airportCard = new AirportCard(getActivity());

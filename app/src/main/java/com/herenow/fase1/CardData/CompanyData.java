@@ -4,10 +4,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.annotation.DrawableRes;
 
-import com.parse.codec.binary.StringUtils;
-
-import org.jsoup.helper.StringUtil;
-
 import java.util.HashMap;
 
 import util.AppendLog;
@@ -21,15 +17,6 @@ public class CompanyData {
     String description;
     String phone;
     String email;
-
-    public String getWebsite() {
-        return website;
-    }
-
-    public void setWebsite(String website) {
-        this.website = website;
-    }
-
     String website;
     boolean isWebResponsive; //TODO
     String typeOfBusiness;
@@ -41,6 +28,7 @@ public class CompanyData {
     String headQuarters;
     String memberOfGroup;
     String foundationPlace;
+    String linkedinUrl;
     //    String skype;
     //Product[] products;
     //Client[] clients
@@ -63,6 +51,22 @@ public class CompanyData {
 
     public static SetupWizard with(Context context) {
         return new SetupWizard(context);
+    }
+
+    public String getWebsite() {
+        return website;
+    }
+
+    public void setWebsite(String website) {
+        this.website = website;
+    }
+
+    public String getLinkedinUrl() {
+        return linkedinUrl;
+    }
+
+    public void setLinkedinUrl(String linkedinUrl) {
+        this.linkedinUrl = linkedinUrl;
     }
 
     public void setEmployeesNumber(int workers) {
@@ -140,14 +144,6 @@ public class CompanyData {
         return sb;
     }
 
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
     public void setFounders(String[] founders) {
         this.founders = founders;
     }
@@ -168,8 +164,16 @@ public class CompanyData {
         return phone;
     }
 
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
     public String getEmail() {
         return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public static final class SetupWizard {

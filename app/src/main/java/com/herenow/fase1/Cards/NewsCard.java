@@ -136,32 +136,28 @@ public class NewsCard extends CardWithList implements OnTaskCompleted {
         List<ListObject> mObjects = new ArrayList<ListObject>();
 
         //TODO repleacebla by FOR
-        //Add an object to the list
-        NewsObject w1 = new NewsObject(this);
-        w1.setData(mNewsToShow.get(0));
-        AppendLog.appendLog("w1 es " + w1.title + " | " + w1.content);
-//        w1.title="la cagá";
-//        w1.content="ha quedado la tremenda cagá en el lugar de los hechos";
-        w1.setObjectId(w1.link); //It can be important to set ad id
-        mObjects.add(w1);
+        //Todo Handle if there is no or less than three new
+        try {
+            NewsObject w1 = new NewsObject(this);
+            w1.setData(mNewsToShow.get(0));
+//            AppendLog.appendLog("w1 es " + w1.title + " | " + w1.content);
+            w1.setObjectId(w1.link);
+            mObjects.add(w1);
 
-        NewsObject w2 = new NewsObject(this);
-        w2.setData(mNewsToShow.get(1));
-//        w2.title = "la cagá";
-//        w2.content = "ha quedado la tremenda cagá en el lugar de los hechos";
-        AppendLog.appendLog("w2 es " + w2.title + " | " + w2.content);
+            NewsObject w2 = new NewsObject(this);
+            w2.setData(mNewsToShow.get(1));
+//            AppendLog.appendLog("w2 es " + w2.title + " | " + w2.content);
+            w2.setObjectId(w2.link);
+            mObjects.add(w2);
 
-        w2.setObjectId(w2.link); //It can be important to set ad id
-        mObjects.add(w2);
-
-        NewsObject w3 = new NewsObject(this);
-        w3.setData(mNewsToShow.get(2));
-//        w3.title = "la cagá";
-//        w3.content = "ha quedado la tremenda cagá en el lugar de los hechos";
-        AppendLog.appendLog("w3 es " + w3.title + " | " + w3.content);
-
-        w3.setObjectId(w3.link); //It can be important to set ad id
-        mObjects.add(w3);
+            NewsObject w3 = new NewsObject(this);
+            w3.setData(mNewsToShow.get(2));
+//            AppendLog.appendLog("w3 es " + w3.title + " | " + w3.content);
+            w3.setObjectId(w3.link);
+            mObjects.add(w3);
+        } catch (Exception e) {
+            AppendLog.appendLog("eerron in init chile caards: " + e.getMessage());
+        }
 
 
         //Example onSwipe
@@ -240,12 +236,12 @@ public class NewsCard extends CardWithList implements OnTaskCompleted {
     }
 
     @Override
-    public void OnTaskCompleted(ArrayList<Noticia> news) {
-        // TODO what if there is only one or none?
+    public void OnTaskCompleted(ArrayList news) {
         AppendLog.appendLog("ontaskcompleted:" + news.size() + " neews");
         //Select three news with exact name
         mNewsToShow = new ArrayList<>();
-        for (Noticia not : news) {
+        for (Object ob : news) {
+            Noticia not = (Noticia) ob;
             if (not.isExact) {
                 mNewsToShow.add(not);
                 if (mNewsToShow.size() == 3) break;
@@ -348,8 +344,6 @@ class ParseURL extends AsyncTask<String, Void, ArrayList<Noticia>> {
 
             HashMap<String, Bitmap> tableImages = ObtainCodedImages(doc.select("script").get(9).html());
 
-
-            ///mhp
             Elements news = doc.select("li.g");
             AppendLog.appendLog(" We ve got news: " + news.size());
 

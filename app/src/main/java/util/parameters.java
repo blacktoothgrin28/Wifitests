@@ -1,5 +1,8 @@
 package util;
 
+import com.herenow.fase1.CardData.CompanyData;
+import com.herenow.fase1.R;
+
 /**
  * Created by Milenko on 20/07/2015.
  */
@@ -11,6 +14,24 @@ public class parameters {
     public static Integer hitRepetitions = 20; //number of HitSapo in SAPO for considering a SSID important
     public static int minTimeForUpdates = 60 * 1; //in mins
     public static int nHitsForLogIn = 3; //recommend 3. Number of hits for declaring the login in a spot
+
+    public static CompanyData getExampleCompanyCard() {
+        CompanyData companyData = new CompanyData("Aplicaciones en Informática Avanzada S.L.", R.drawable.im_aia_fondo_claro, R.drawable.im_aia_logo);
+        companyData.setEmployeesNumber(55);
+        companyData.setLemma("Algoritmos para un mundo mejor");
+        companyData.setDirector("Regina Llopis");
+        companyData.setFoundationYear("1990");
+        companyData.setDescription("El objetivo principal de Grupo AIA es producir un beneficio económico real y cuantificable para nuestros clientes a través de la actividad innovadora usando la tecnología punta como una propuesta de negocio de alto valor.");
+        companyData.setFounders(new String[]{"Regina Llopis", "Toni Trias", "Xavier Fustero"});
+        companyData.setTypeOfBusiness("Software");
+        companyData.setEmail("secretaria@aia.es");
+        companyData.setPhone("+34935044900");
+        companyData.setWebsite("www.aia.es");
+        companyData.setLinkedinUrl("https://es.linkedin.com/company/aplicaciones-en-inform-tica-avanzada");
+
+        return companyData;
+    }
+
 
     public enum typeOfWeacon {
         accounting, airport, amusement_park, aquarium, art_gallery, atm, bakery,
@@ -26,7 +47,5 @@ public class parameters {
         roofing_contractor, rv_park, school, shoe_store, shopping_mall, spa, stadium, storage, store, subway_station,
         synagogue, taxi_stand, train_station, travel_agency, university, veterinary_care, zoo
     }
-
-
 }
 
