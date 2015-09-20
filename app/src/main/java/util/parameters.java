@@ -1,6 +1,7 @@
 package util;
 
 import com.herenow.fase1.CardData.CompanyData;
+import com.herenow.fase1.CardData.Schedule;
 import com.herenow.fase1.R;
 
 /**
@@ -14,6 +15,7 @@ public class parameters {
     public static Integer hitRepetitions = 20; //number of HitSapo in SAPO for considering a SSID important
     public static int minTimeForUpdates = 60 * 1; //in mins
     public static int nHitsForLogIn = 3; //recommend 3. Number of hits for declaring the login in a spot
+
 
     public static CompanyData getExampleCompanyCard() {
         CompanyData companyData = new CompanyData("Aplicaciones en Informática Avanzada S.L.", R.drawable.im_aia_fondo_claro, R.drawable.im_aia_logo);
@@ -30,6 +32,23 @@ public class parameters {
         companyData.setLinkedinUrl("https://es.linkedin.com/company/aplicaciones-en-inform-tica-avanzada");
 
         return companyData;
+    }
+
+    public static Schedule getExampleScheduleData() {
+        Schedule ex = new Schedule("Conference Sample");
+        ex.addItem("Welcome", "", 9, 15, "Reception", "http://www.aia.es");
+        ex.addItem("Challenges in near horizon", "Moe Szyslak", 9, 30, "Room A", "http://www.aia.es");
+        ex.addItem("Beyond the Musgo", "José Mota", 10, 30, "Room A", "http://www.aia.es");
+        ex.addItem("Power of Imagination", "Sponge Bob", 11, 30, "Creativity room", "http://www.aia.es");
+        ex.addItem("Coffee break dance", "", 12, 15, "Reception", "http://www.aia.es");
+        ex.addItem("Riding over your problems", "Little Pony", 12, 45, "Room B", "http://www.aia.es");
+        ex.addItem("LUNCH", "", 12, 45, "Reception", "http://www.aia.es");
+        ex.addItem("When Elsa met the Starks", "Princess Anna", 14, 0, "Refrigerator room", "http://www.aia.es");
+        ex.addItem("Kill your problems gently", "Dexter", 15, 0, "Basement", "http://www.aia.es");
+        ex.addItem("Aaarrggh Eaarmmm", "Zombie B", 16, 0, "Kitchen", "http://www.aia.es");
+        ex.addItem("Next stupid events", "The Master", 17, 0, "Plenaty Room", "http://www.aia.es");
+
+        return ex;
     }
 
 

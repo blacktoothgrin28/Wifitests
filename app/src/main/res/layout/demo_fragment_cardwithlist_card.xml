@@ -48,6 +48,38 @@
                 android:layout_width="match_parent"
                 android:layout_height="15dp" />
 
+            <!--Linkedin-->
+            <it.gmariotti.cardslib.library.view.CardViewNative
+                android:id="@+id/card_view_linkedin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="12dp"
+                android:layout_marginRight="12dp"
+                android:layout_marginTop="12dp"
+                card:card_layout_resourceID="@layout/native_cardwithlist_layout" />
+
+            <!-- Empty view-->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="15dp" />
+
+
+            <!--Schedule-->
+            <it.gmariotti.cardslib.library.view.CardViewNative
+                android:id="@+id/card_view_schedule"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="12dp"
+                android:layout_marginRight="12dp"
+                android:layout_marginTop="12dp"
+                card:card_layout_resourceID="@layout/native_cardwithlist_layout" />
+
+            <!-- Empty view-->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="15dp" />
+
+
             <!--AIRPORT-->
             <it.gmariotti.cardslib.library.view.CardViewNative
                 android:id="@+id/card_view_airport"

@@ -156,7 +156,7 @@ public class NewsCard extends CardWithList implements OnTaskCompleted {
             w3.setObjectId(w3.link);
             mObjects.add(w3);
         } catch (Exception e) {
-            AppendLog.appendLog("eerron in init chile caards: " + e.getMessage());
+            AppendLog.appendLog("--eerron in news caard: " + e.getMessage());
         }
 
 
@@ -345,7 +345,7 @@ class ParseURL extends AsyncTask<String, Void, ArrayList<Noticia>> {
             HashMap<String, Bitmap> tableImages = ObtainCodedImages(doc.select("script").get(9).html());
 
             Elements news = doc.select("li.g");
-            AppendLog.appendLog(" We ve got news: " + news.size());
+            AppendLog.appendLog(" We ve got persons (linkedin): " + news.size());
 
             for (Element oneNew : news) {
                 noticias.add(ProcessHtmlNews(oneNew, tableImages));

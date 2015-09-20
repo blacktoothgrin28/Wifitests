@@ -1,15 +1,18 @@
 package com.herenow.fase1.Cards;
 
 import android.content.Context;
+import android.content.Intent;
+import android.provider.CalendarContract;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.herenow.fase1.CardData.Schedule;
 import com.herenow.fase1.R;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Calendar;
 import java.util.List;
 
 import it.gmariotti.cardslib.library.internal.Card;
@@ -24,6 +27,8 @@ import it.gmariotti.cardslib.library.prototypes.LinearListView;
 
 public class ScheduleCard extends CardWithList {
 
+    private Schedule mScheduleData;
+
     public ScheduleCard(Context context) {
         super(context);
     }
@@ -32,8 +37,8 @@ public class ScheduleCard extends CardWithList {
         super(context, innerLayout);
     }
 
-    public void setData(HashMap scheduleData) {//TODO
-
+    public void setData(Schedule scheduleData) {
+        mScheduleData = scheduleData;
     }
 
     @Override
@@ -51,6 +56,7 @@ public class ScheduleCard extends CardWithList {
 
         //Set the whole card as swipeable
         setSwipeable(true);
+
         setOnSwipeListener(new OnSwipeListener() {
             @Override
             public void onSwipe(Card card) {
@@ -64,20 +70,14 @@ public class ScheduleCard extends CardWithList {
     @Override
     protected List<ListObject> initChildren() {
 
-        //TODO asignar datos
         //Init the list
-        List<CardWithList.ListObject> mObjects = new ArrayList<ListObject>();
+        List<CardWithList.ListObject> mObjects = new ArrayList<>();
 
         //Add an object to the list
-//        FlightObject w1 = new FlightObject(this);
-//        w1.city = "London";
-//        w1.time = "11:30";
-////        w1.temperature = 16;
-////        w1.weatherIcon = R.drawable.ic_action_cloud;
-//        w1.setObjectId(w1.city); //It can be important to set ad id
-//        mObjects.add(w1);
-//
-
+        for (Schedule.ScheduleItem it : mScheduleData.getData()) {
+            ScheduleObject so = new ScheduleObject(mParentCard, it);
+            mObjects.add(so);
+        }
 
         //Example onSwipe
         /*w2.setOnItemSwipeListener(new OnItemSwipeListener() {
@@ -87,32 +87,32 @@ public class ScheduleCard extends CardWithList {
             }
         });*/
 
-
         return mObjects;
     }
+
 
     @Override
     public View setupChildView(int childPosition, CardWithList.ListObject object, View convertView, ViewGroup parent) {
 
         //Setup the ui elements inside the item
-        TextView title = (TextView) convertView.findViewById(R.id.carddemo_weather_city);
-//        ImageView icon = (ImageView) convertView.findViewById(R.id.carddemo_weather_icon);
-        TextView time = (TextView) convertView.findViewById(R.id.carddemo_weather_temperature);
-//TextView place=(TextView) convertView.findViewById(R.id.carddemo_weather_temperature);
-//Todo agregar el place
+        TextView title = (TextView) convertView.findViewById(R.id.title);
+        TextView time = (TextView) convertView.findViewById(R.id.time);
+        TextView place = (TextView) convertView.findViewById(R.id.place);
+        TextView speaker = (TextView) convertView.findViewById(R.id.speaker);
 
         //Retrieve the values from the object
-        ScheduleItem scheduleItem = (ScheduleItem) object;
-//        icon.setImageResource(flightObject.weatherIcon);
-        title.setText(scheduleItem.title);
-        time.setText(scheduleItem.hour);
+        ScheduleObject scheduleObject = (ScheduleObject) object;
+        title.setText(scheduleObject.title);
+        time.setText(scheduleObject.getTime());
+        place.setText(scheduleObject.location);
+        speaker.setText(scheduleObject.speaker);
 
         return convertView;
     }
 
     @Override
     public int getChildLayoutId() {
-        return R.layout.carddemo_googlenowweather_inner_main;
+        return R.layout.schedule_card_inner_main;
     }
 
 
@@ -120,14 +120,28 @@ public class ScheduleCard extends CardWithList {
     // event Object
     // -------------------------------------------------------------
 
-    class ScheduleItem extends CardWithList.DefaultListObject {
+    class ScheduleObject extends CardWithList.DefaultListObject {
         public String url;
         String title, hour, urlImage, location;
         int h, min;
+        private String speaker;
 
-        public ScheduleItem(Card parentCard) {
+        public ScheduleObject(Card parentCard) {
             super(parentCard);
             init();
+        }
+
+        public ScheduleObject(Card parentcard, Schedule.ScheduleItem it) {
+            super(parentcard);
+            title = it.getTitle();
+            hour = it.getHour();
+            min = it.getMin();
+            h = it.getH();
+            location = it.getPlace();
+            speaker = it.getSpeaker();
+            url = it.getUrl();
+            init();
+
         }
 
         private void init() {
@@ -139,9 +153,31 @@ public class ScheduleCard extends CardWithList {
 
 //                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(getObjectId()));
 //                    mContext.startActivity(browserIntent);
+                    Add2Agenda((ScheduleObject) object);
                     //TODO hacer que se agregue a la agneda o la alerma
-                    //TODO ver si poner un botón para una url
-                    //TODO ver si se puede descargar algún archivo
+                    //TODO ver si poner un botÃ³n para una url
+                    //TODO ver si se puede descargar algÃºn archivo
+
+                }
+
+                private void Add2Agenda(ScheduleObject scItem) {
+                    Calendar cal = Calendar.getInstance();
+                    Intent intent = new Intent(Intent.ACTION_EDIT);
+                    intent.setType("vnd.android.cursor.item/event");
+
+
+                    intent.putExtra(CalendarContract.Events.TITLE, scItem.title);
+//                    intent.putExtra(CalendarContract.Events.ALL_DAY, false);
+                    intent.putExtra(CalendarContract.Events.DESCRIPTION, "Presentation by " + scItem.speaker);
+//                    intent.putExtra(CalendarContract.Events.DTSTART, scItem.getStartInMilli());//Complete
+//                    intent.putExtra(CalendarContract.Events.DURATION, scItem.duration);//Complete
+                    intent.putExtra(CalendarContract.Events.EVENT_LOCATION, scItem.location);
+
+                    intent.putExtra("beginTime", cal.getTimeInMillis() + 60 * 60 * 1000);
+                    intent.putExtra("allDay", false);
+//                    intent.putExtra("rrule", "FREQ=YEARLY");
+                    intent.putExtra("endTime", cal.getTimeInMillis() + 2 * 60 * 60 * 1000);
+                    mContext.startActivity(intent);
 
                 }
             });
@@ -155,6 +191,10 @@ public class ScheduleCard extends CardWithList {
             });
         }
 
+        public String getTime() {
+            return Integer.toString(h) + ":" + String.format("%02d", min);
+//            return Integer.toString(h) + ":" +  Integer.toString(min); //Todo agregar cero a la iz. lo de a
+        }
     }
 
 
