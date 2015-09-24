@@ -1,53 +1,61 @@
 package com.herenow.fase1.Cards;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.herenow.fase1.CardData.GoogleFlight;
+import com.herenow.fase1.CardData.flight;
 import com.herenow.fase1.R;
 
+import org.jsoup.Connection;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import it.gmariotti.cardslib.library.internal.Card;
 import it.gmariotti.cardslib.library.internal.CardHeader;
 import it.gmariotti.cardslib.library.prototypes.CardWithList;
 import it.gmariotti.cardslib.library.prototypes.LinearListView;
+import it.gmariotti.cardslib.library.view.CardViewNative;
+import util.AppendLog;
 
 /**
  * Created by Milenko on 12/08/2015.
  */
-public class AirportCard extends CardWithList {
+public class AirportCard extends CardWithList implements OnTaskCompleted {
+
+    private List<ListObject> mObjects;
+    private CardViewNative mCardViewAir;
+    private GoogleFlight mGoogleFlight;
+    private GoogleFlight mCurrentGoogle, mOldGoogle;
 
     public AirportCard(Context context) {
         super(context);
     }
 
-    public AirportCard(Context context, int innerLayout) {
-        super(context, innerLayout);
-    }
-
-    public void setData(HashMap flightsData) {//TODO
-
-    }
-
 
     @Override
     protected CardHeader initCardHeader() {
-
         //Add Header
         CardHeader header = new CardHeader(getContext(), R.layout.carddemo_googlenowweather_inner_header);
 
-        header.setTitle("Fligths"); //should use R.string.
+        header.setTitle("Departures " + "BCN");
         return header;
     }
 
     @Override
     protected void initCard() {
-
         //Set the whole card as swipeable
         setSwipeable(true);
         setOnSwipeListener(new OnSwipeListener() {
@@ -59,86 +67,143 @@ public class AirportCard extends CardWithList {
 
     }
 
-
     @Override
-    protected List<CardWithList.ListObject> initChildren() {
-
-        //Init the list
-        List<CardWithList.ListObject> mObjects = new ArrayList<CardWithList.ListObject>();
-
-        //Add an object to the list
-        FlightObject w1 = new FlightObject(this);
-        w1.city = "London";
-        w1.time = "11:30";
-//        w1.temperature = 16;
-//        w1.weatherIcon = R.drawable.ic_action_cloud;
-        w1.setObjectId(w1.city); //It can be important to set ad id
-        mObjects.add(w1);
-
-        FlightObject w2 = new FlightObject(this);
-        w2.city = "Rome";
-        w2.time = "11:33";
-//        w2.temperature = 25;
-//        w2.weatherIcon = R.drawable.ic_action_sun;
-        w2.setObjectId(w2.city);
-        w2.setSwipeable(true);
-
-        //Example onSwipe
-        /*w2.setOnItemSwipeListener(new OnItemSwipeListener() {
-            @Override
-            public void onItemSwipe(ListObject object,boolean dismissRight) {
-                Toast.makeText(getContext(), "Swipe on " + object.getObjectId(), Toast.LENGTH_SHORT).show();
-            }
-        });*/
-        mObjects.add(w2);
-
-        FlightObject w3 = new FlightObject(this);
-        w3.city = "Paris";
-        w1.time = "11:39";
-//        w3.temperature = 19;
-//        w3.weatherIcon = R.drawable.ic_action_cloudy;
-        w3.setObjectId(w3.city);
-        mObjects.add(w3);
-
+    protected List<ListObject> initChildren() {
         return mObjects;
     }
 
     @Override
     public View setupChildView(int childPosition, CardWithList.ListObject object, View convertView, ViewGroup parent) {
+        try {
+            //Setup the ui elements inside the item
+            TextView time = (TextView) convertView.findViewById(R.id.time);
+            TextView destination = (TextView) convertView.findViewById(R.id.destination);
+            TextView companyAndFlight = (TextView) convertView.findViewById(R.id.company_and_flight);
+            TextView estimated = (TextView) convertView.findViewById(R.id.estimated);
 
-        //Setup the ui elements inside the item
-        TextView city = (TextView) convertView.findViewById(R.id.carddemo_weather_city);
-//        ImageView icon = (ImageView) convertView.findViewById(R.id.carddemo_weather_icon);
-        TextView time = (TextView) convertView.findViewById(R.id.carddemo_weather_temperature);
+            //Retrieve the values from the object
+            flightObject flightObject = (flightObject) object;
 
-        //Retrieve the values from the object
-        FlightObject flightObject = (FlightObject) object;
-//        icon.setImageResource(flightObject.weatherIcon);
-        city.setText(flightObject.city);
-        time.setText(flightObject.time);
+            time.setText(flightObject.scheduledAt);
+            destination.setText(flightObject.destination);
+            companyAndFlight.setText(flightObject.airline + " " + flightObject.code);
 
+            String est = flightObject.estimated;
+            if (est.startsWith("Schedu")) {
+                est = "";
+            } else if (est.startsWith("Estimat")) {
+                est = est.substring(est.length() - 5);
+//                estimated.setTextColor();
+            } else if (est.startsWith("Dela")) {
+                est = est.substring(est.length() - 5);
+                AppendLog.appendLog("hay uno con retraso grande, programado para las: " + flightObject.scheduledAt);
+                estimated.setTextColor(getContext().getResources().getColor(R.color.red));
+            }
+
+            estimated.setText(est);
+
+        } catch (Exception e) {
+            AppendLog.appendLog("eyyo " + e.getMessage());
+        }
         return convertView;
     }
 
     @Override
+    public void init() {
+        super.init();
+        mCardViewAir.setCard(this);
+    }
+
+    public void setView(CardViewNative cardViewAir) {
+        mCardViewAir = cardViewAir;
+    }
+
+    @Override
     public int getChildLayoutId() {
-        return R.layout.carddemo_googlenowweather_inner_main;
+        return R.layout.flight_card_inner_main;
     }
 
 
-    // -------------------------------------------------------------
-    // Weather Object
-    // -------------------------------------------------------------
+    public void setData(ArrayList<flight> departures) {
+        mObjects = new ArrayList<>();
 
-    public class FlightObject extends CardWithList.DefaultListObject {
+        for (flight fl : departures) {
+            flightObject fo = new flightObject(mParentCard);
+            fo.code = fl.code;
+            fo.scheduledAt = fl.scheduledAt;
+            fo.airline = fl.airline;
+            fo.destination = fl.destination;
+            fo.status = fl.status;
+            fo.title = fl.title;
+            fo.estimated = fl.estimated;
 
-        public String city;
-        //        public int weatherIcon;
-//        public int temperature;
-        public String temperatureUnit = "°C";
-        public String time;
+            fo.setObjectId(fo.code);
 
-        public FlightObject(Card parentCard) {
+            mObjects.add(fo);
+        }
+    }
+
+    @Override
+    public void OnTaskCompleted(ArrayList googleFlights) {
+        mCurrentGoogle = (GoogleFlight) googleFlights.get(0);
+
+        //Start asking google flight each 20 secs:
+        Timer t = new Timer();
+        t.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                AppendLog.appendLog("timer execution");
+                GetInfoFlightFromGoogleSync(mCurrentGoogle.code); //repeated
+            }
+        }, 10000, 20000);
+
+    }
+
+    private void GetInfoFlightFromGoogleSync(String code) {
+
+        try {
+            AppendLog.appendLog("getoin from google sync (timer)");
+            Connection.Response response = Jsoup.connect("https://www.google.es/search?q=" + code)
+                    .ignoreContentType(true)
+                            //                        .userAgent("Mozilla/5.0 (Windows NT 6.3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.85 Safari/537.36")
+                    .referrer("http://www.google.com")
+                    .timeout(5000)
+                    .followRedirects(true)
+                    .execute();
+
+            Document doc = response.parse();
+            Element googleFlightCard = doc.select("div[class=card-section vk_c]").first();
+            Elements datos = googleFlightCard.select("tr[class=_FJg").first().children();
+            mOldGoogle = mCurrentGoogle;
+            mCurrentGoogle = new GoogleFlight(datos);
+            mCurrentGoogle.code = code;
+
+            AppendLog.appendLog("..primera info de timer: " + mCurrentGoogle.toString());
+            //TOdo Compare on e state with the previous and rise notification if disctinnt
+        } catch (IOException e) {
+            AppendLog.appendLog("---error en sync:" + e.getMessage());
+        }
+
+    }
+
+    private void GetInfoFlightFromGoogle(String flightCode) {
+        (new readGoogleFlight(this)).execute(new String[]{flightCode});
+    }
+
+    class flightObject extends CardWithList.DefaultListObject {
+
+        public String code;
+        public String scheduledAt;
+        public String destination;
+        public String airline;
+        public String plane;
+        public String ignoro;
+        public String estimated;
+        public String ignoro2;
+        public String status;
+        public String title;
+
+        public flightObject(Card parentCard) {
             super(parentCard);
             init();
         }
@@ -148,20 +213,63 @@ public class AirportCard extends CardWithList {
             setOnItemClickListener(new CardWithList.OnItemClickListener() {
                 @Override
                 public void onItemClick(LinearListView parent, View view, int position, CardWithList.ListObject object) {
-                    Toast.makeText(getContext(), "Click on " + getObjectId(), Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(getContext(), "Click on " + getObjectId(), Toast.LENGTH_SHORT).show();
+                    AppendLog.appendLog("asgink google for flight for first time: " + getObjectId());
+                    GetInfoFlightFromGoogle(getObjectId()); //First retrieving
                 }
             });
 
-            //OnItemSwipeListener
-            setOnItemSwipeListener(new CardWithList.OnItemSwipeListener() {
-                @Override
-                public void onItemSwipe(CardWithList.ListObject object, boolean dismissRight) {
-                    Toast.makeText(getContext(), "Swipe on " + object.getObjectId(), Toast.LENGTH_SHORT).show();
-                }
-            });
+//            //OnItemSwipeListener
+//            setOnItemSwipeListener(new OnItemSwipeListener() {
+//                @Override
+//                public void onItemSwipe(ListObject object, boolean dismissRight) {
+//                    Toast.makeText(getContext(), "Swipe on " + object.getObjectId(), Toast.LENGTH_SHORT).show();
+//                }
+//            });
+        }
+    }
+
+    class readGoogleFlight extends AsyncTask<String, Void, GoogleFlight> {
+        private OnTaskCompleted listener;
+
+        readGoogleFlight(OnTaskCompleted listener) {
+            AppendLog.appendLog("asignando listener en parseGoogleflight");
+            this.listener = listener;
+        }
+
+        @Override
+        protected GoogleFlight doInBackground(String... strings) {
+            GoogleFlight googleFlight = null;
+
+            try {
+                Connection.Response response = Jsoup.connect("https://www.google.es/search?q=" + strings[0])
+                        .ignoreContentType(true)
+//                        .userAgent("Mozilla/5.0 (Windows NT 6.3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.85 Safari/537.36")
+                        .referrer("http://www.google.com")
+                        .timeout(12000)
+                        .followRedirects(true)
+                        .execute();
+
+                Document doc = response.parse();
+                Element googleFlightCard = doc.select("div[class=card-section vk_c]").first();
+                Elements datos = googleFlightCard.select("tr[class=_FJg").first().children();
+                googleFlight = new GoogleFlight(datos);
+                googleFlight.code = strings[0];
+//                Toast.makeText(mContext, googleFlight.toString(), Toast.LENGTH_SHORT).show();
+                AppendLog.appendLog("primera vista de google:" + googleFlight);
+            } catch (Throwable t) {
+                AppendLog.appendLog("-eeeoo frist query a google flifht" + t.getMessage());
+            }
+            return googleFlight;
+        }
+
+        @Override
+        protected void onPostExecute(GoogleFlight googleFlight) {
+            super.onPostExecute(googleFlight);
+            ArrayList buff = new ArrayList<>();
+            buff.add(googleFlight);
+            listener.OnTaskCompleted(buff);
         }
 
     }
-
-
 }

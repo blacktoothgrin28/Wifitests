@@ -18,6 +18,15 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
+            <!--Test loading airport-->
+            <WebView
+                android:id="@+id/wbChanta"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginRight="8dp" />
+
+
             <!--COMPANY-->
             <it.gmariotti.cardslib.library.view.CardViewNative
                 android:id="@+id/card_view_company"
@@ -29,6 +38,8 @@
                 card:card_layout_resourceID="@layout/company_card" />
 
             <!-- Empty view-->
+
+
             <View
                 android:layout_width="match_parent"
                 android:layout_height="15dp" />

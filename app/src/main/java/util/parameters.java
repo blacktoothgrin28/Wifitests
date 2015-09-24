@@ -4,6 +4,9 @@ import com.herenow.fase1.CardData.CompanyData;
 import com.herenow.fase1.CardData.Schedule;
 import com.herenow.fase1.R;
 
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+
 /**
  * Created by Milenko on 20/07/2015.
  */
@@ -35,7 +38,14 @@ public class parameters {
     }
 
     public static Schedule getExampleScheduleData() {
-        Schedule ex = new Schedule("Conference Sample");
+        Schedule ex = new Schedule("Interesting Conference");
+        ex.subtitle = "Once a year, the most wise people met";
+        Calendar cal = new GregorianCalendar();
+        cal.set(2015, 11, 3);
+        ex.setDate(cal);
+//        ex.setEndOfMeeting(date in milli);
+        //todo posibilidad de ver de días siguiente
+        //todo add all schedule to calendar
         ex.addItem("Welcome", "", 9, 15, "Reception", "http://www.aia.es");
         ex.addItem("Challenges in near horizon", "Moe Szyslak", 9, 30, "Room A", "http://www.aia.es");
         ex.addItem("Beyond the Musgo", "José Mota", 10, 30, "Room A", "http://www.aia.es");

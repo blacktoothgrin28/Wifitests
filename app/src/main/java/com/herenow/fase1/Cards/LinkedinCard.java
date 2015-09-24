@@ -152,9 +152,9 @@ public class LinkedinCard extends CardWithList implements OnTaskCompleted {
         mCardViewNews.setCard(this);
     }
 
-    public void setView(CardViewNative cardViewNews) {
-        mCardViewNews = cardViewNews;
-    }
+//    public void setView(CardViewNative cardViewNews) {
+//        mCardViewNews = cardViewNews;
+//    }
 
     public void updateNews(ArrayList<String> news) {
 

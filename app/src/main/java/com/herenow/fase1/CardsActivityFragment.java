@@ -5,17 +5,25 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.JavascriptInterface;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 
-import com.herenow.fase1.CardData.CompanyData;
+import com.herenow.fase1.CardData.flight;
 import com.herenow.fase1.Cards.AirportCard;
-import com.herenow.fase1.Cards.CompanyCard;
-import com.herenow.fase1.Cards.LinkedinCard;
-import com.herenow.fase1.Cards.NewsCard;
 import com.herenow.fase1.Cards.ScheduleCard;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
+import java.util.ArrayList;
 
 import it.gmariotti.cardslib.library.view.CardViewNative;
 import util.AppendLog;
-import util.parameters;
+
+import static com.google.android.gms.internal.zzhl.runOnUiThread;
 
 //import com.herenow.fase1.Cards.MaterialLargeImageCard;
 
@@ -52,45 +60,65 @@ public class CardsActivityFragment extends Fragment {
     private void initCards() {
 
         try {
+
+
             //Company Card
-            CompanyData companyData = parameters.getExampleCompanyCard();
-            CompanyCard companyCardtest = CompanyCard.with(getActivity())
-                    .setData(companyData)
-                    .build();
+//            CompanyData companyData = parameters.getExampleCompanyCard();
+//            CompanyCard companyCardtest = CompanyCard.with(getActivity())
+//                    .setData(companyData)
+//                    .build();
+//
+//            CardViewNative cardViewCompany = (CardViewNative) getActivity().findViewById(R.id.card_view_company);
+//            cardViewCompany.setCard(companyCardtest);
 
-            CardViewNative cardViewCompany = (CardViewNative) getActivity().findViewById(R.id.card_view_company);
-            cardViewCompany.setCard(companyCardtest);
-
-            // News Card
-            NewsCard newsCard = new NewsCard(getActivity(), companyData.getNameClean());
-            CardViewNative cardViewNews = (CardViewNative) getActivity().findViewById(R.id.card_view_news);
-            newsCard.setView(cardViewNews);
-            newsCard.init();
-
-
-            //Linkedin card
-            // todo change format of linkedin card
-            LinkedinCard linkedinCard = new LinkedinCard(getActivity(), companyData.getLinkedinUrl());
-            CardViewNative cvLinkedin = (CardViewNative) getActivity().findViewById(R.id.card_view_linkedin);
-            linkedinCard.setView(cvLinkedin);
-            linkedinCard.init();
-
+//            // News Card
+//            NewsCard newsCard = new NewsCard(getActivity(), companyData.getNameClean());
+//            CardViewNative cardViewNews = (CardViewNative) getActivity().findViewById(R.id.card_view_news);
+//            newsCard.setView(cardViewNews);
+//            newsCard.init();
+//
+//
+//            //Linkedin card
+//            // todo change format of linkedin card
+//            LinkedinCard linkedinCard = new LinkedinCard(getActivity(), companyData.getLinkedinUrl());
+//            CardViewNative cvLinkedin = (CardViewNative) getActivity().findViewById(R.id.card_view_linkedin);
+//            linkedinCard.setView(cvLinkedin);
+//            linkedinCard.init();
+//
 
             //Schedule card
-            scheduleCard = new ScheduleCard(getActivity());
-            scheduleCard.setData(parameters.getExampleScheduleData());//it has 11 items
-            scheduleCard.init();
-
-            CardViewNative cardViewSchedule = (CardViewNative) getActivity().findViewById(R.id.card_view_schedule);
-            cardViewSchedule.setCard(scheduleCard);
-
-
+//            scheduleCard = new ScheduleCard(getActivity());
+//            scheduleCard.setData(parameters.getExampleScheduleData());//it has 11 items
+//            scheduleCard.init();
+//
+//            CardViewNative cardViewSchedule = (CardViewNative) getActivity().findViewById(R.id.card_view_schedule);
+//            cardViewSchedule.setCard(scheduleCard);
+//
+//
             // Airport card
             airportCard = new AirportCard(getActivity());
-            airportCard.init();
-
             CardViewNative cardViewAirport = (CardViewNative) getActivity().findViewById(R.id.card_view_airport);
-            cardViewAirport.setCard(airportCard);
+            airportCard.setView(cardViewAirport);
+// cardViewAirport.setCard(airportCard);
+
+
+            final WebView browser = (WebView) getActivity().findViewById(R.id.wbChanta);
+            //TODO quita la carga de imagenes:
+//            browser.getSettings().setLoadsImagesAutomatically(false);
+//            browser.getSettings().setBlockNetworkLoads (true);
+            browser.getSettings().setJavaScriptEnabled(true);
+            browser.addJavascriptInterface(new MyJavaScriptInterface(), "HTMLOUT");
+            browser.setWebViewClient(new WebViewClient() {
+                @Override
+                public void onPageFinished(WebView view, String url) {
+            /* This call inject JavaScript into the page which just finished loading. */
+                    browser.loadUrl("javascript:window.HTMLOUT.extractHtml('<head>'+document.getElementsByTagName('html')[0].innerHTML+'</head>');");
+
+                }
+            });
+                /* load a web page */
+            browser.loadUrl("http://flightradar24.com/airport/bcn/departures");
+
 
         } catch (Exception e) {
             AppendLog.appendLog("---error init cards: " + e.getMessage());
@@ -109,4 +137,59 @@ public class CardsActivityFragment extends Fragment {
             AppendLog.appendLog("--error on Pause cards" + e.getMessage());
         }
     }
+
+
+    class MyJavaScriptInterface {
+
+        @JavascriptInterface
+        public void extractHtml(String html) {
+            ArrayList<flight> departures = new ArrayList<>();
+
+            try {
+                Document doc = Jsoup.parse(html);
+                Elements dep = doc.select("table[class=flightList mainFlightList]").get(1).children().get(1).children();//el segundo tiene la chicha
+
+                for (Element item : dep) {
+                    if (item.className().equals("codeshareFlights")) continue;
+                    departures.add(ProcessHtmlFlights(item)); //todo agregar los codigos compartidos
+                }
+
+                AppendLog.appendLog("tenemos ya procesasdo aviones partiendo: " + departures.size());
+
+                airportCard.setData(departures);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        airportCard.init();       //stuff that updates ui
+                    }
+                });
+            } catch (Exception e) {
+                AppendLog.appendLog("error en parsing la web aviones:" + e.getMessage());
+            }
+
+        }
+
+        private flight ProcessHtmlFlights(Element flight) {
+            flight fo = new flight();
+            Elements children = flight.children();
+
+            try {
+                fo.scheduledAt = children.get(0).text(); //scheduled
+                fo.code = children.get(1).text(); //code
+                fo.destination = children.get(2).text();
+                fo.airline = children.get(3).text(); //airline
+                fo.plane = children.get(4).text(); //codigo del modelo de avion
+                fo.ignoro = children.get(5).text(); //no se que
+                fo.estimated = children.get(6).text(); //en hora,
+                fo.status = children.get(6).child(0).attr("class");
+                fo.title = children.get(6).child(0).attr("title");
+                fo.ignoro2 = children.get(7).text();
+            } catch (Exception e) {
+                AppendLog.appendLog("errror capturanfo flight " + e.getMessage());
+            }
+            return fo;
+        }
+
+    }
 }
+

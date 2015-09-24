@@ -1,0 +1,52 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/card.native"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/material_blue_grey_800"
+    android:gravity="center_vertical"
+    android:orientation="vertical">
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/card_header_inner_simple_title"
+            style="@style/card.native.header_simple_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="4dp"
+            android:textColor="@android:color/white"
+            tools:text="Schedule" />
+
+        <TextView
+            android:id="@+id/card_header_inner_simple_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/card_header_inner_simple_title"
+            android:layout_alignBottom="@+id/card_header_inner_simple_title"
+            android:layout_marginLeft="6dp"
+            android:layout_marginStart="6dp"
+            android:layout_toEndOf="@+id/card_header_inner_simple_title"
+            android:layout_toRightOf="@+id/card_header_inner_simple_title"
+            android:text="Thu 3/12/2015"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="#dcdddc"
+            android:textSize="10dp" />
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/card_header_inner_simple_subtitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="7dp"
+        android:paddingBottom="2dp"
+        android:text="A very interesting meeting "
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="@color/bright_foreground_disabled_material_dark"
+        android:textStyle="italic" />
+
+</LinearLayout>
+

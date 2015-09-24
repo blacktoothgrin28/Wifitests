@@ -6,6 +6,7 @@
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/herenow/fase1/Cards/CompanyCard.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/herenow/fase1/Cards/NewsCard.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/herenow/fase1/Cards/ScheduleCard.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/herenow/fase1/CardsActivityFragment.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/herenow/fase1/MainActivity.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/herenow/fase1/Position.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/herenow/fase1/test/CustomExpandCard.java" charset="UTF-8" />
@@ -33,9 +34,11 @@
     <file url="file://$PROJECT_DIR$/app/src/main/res/layout/company_button_bar.xml" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/res/layout/company_expand.xml" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/res/layout/demo_fragment_cardwithlist_card.xml" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/layout/flight_card_inner_main.xml" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/res/layout/native_inner_base_expand.xml" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/res/layout/news_inner_main.xml" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/res/layout/schedule_card_inner_main.xml" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/layout/schedule_inner_header.xml" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/res/values-w820dp/colors.xml" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/res/values/styles_card.xml" charset="UTF-8" />
   </component>
