@@ -28,7 +28,8 @@ import it.gmariotti.cardslib.library.internal.CardHeader;
 import it.gmariotti.cardslib.library.prototypes.CardWithList;
 import it.gmariotti.cardslib.library.prototypes.LinearListView;
 import it.gmariotti.cardslib.library.view.CardViewNative;
-import util.AppendLog;
+import util.OnTaskCompleted;
+import util.myLog;
 
 /**
  * Created by Milenko on 19/09/2015.
@@ -130,7 +131,7 @@ public class LinkedinCard extends CardWithList implements OnTaskCompleted {
             }
 
         } catch (Exception e) {
-            AppendLog.appendLog("errror item news : " + e.getMessage());
+            myLog.add("errror item news : " + e.getMessage());
         }
 
         return convertView;
@@ -143,7 +144,7 @@ public class LinkedinCard extends CardWithList implements OnTaskCompleted {
 
     @Override
     public void OnTaskCompleted(ArrayList elements) {
-        AppendLog.appendLog("ontaskcompleted:" + elements.size() + " neews");
+        myLog.add("ontaskcompleted:" + elements.size() + " neews");
         //Select three news with exact name
         mEmployeesToShow = elements;
         super.init();
@@ -152,9 +153,9 @@ public class LinkedinCard extends CardWithList implements OnTaskCompleted {
         mCardViewNews.setCard(this);
     }
 
-//    public void setView(CardViewNative cardViewNews) {
-//        mCardViewNews = cardViewNews;
-//    }
+    public void setView(CardViewNative cardViewNews) {
+        mCardViewNews = cardViewNews;
+    }
 
     public void updateNews(ArrayList<String> news) {
 
@@ -204,7 +205,7 @@ public class LinkedinCard extends CardWithList implements OnTaskCompleted {
         private OnTaskCompleted listener;
 
         ParseURLLinkedin(OnTaskCompleted listener) {
-            AppendLog.appendLog("asignando listener en parseURLLinkeedin");
+            myLog.add("asignando listener en parseURLLinkeedin");
             this.listener = listener;
         }
 
@@ -251,7 +252,7 @@ public class LinkedinCard extends CardWithList implements OnTaskCompleted {
                 emp.urlImage = element.select("img").attr("data-li-lazy-load-src");
 
             } catch (Exception e) {
-                AppendLog.appendLog("errror capturanfo employee " + e.getMessage());
+                myLog.add("errror capturanfo employee " + e.getMessage());
             }
 
             return emp;

@@ -1,4 +1,4 @@
-package com.herenow.fase1;
+package util;
 
 import android.content.Context;
 import android.content.res.TypedArray;

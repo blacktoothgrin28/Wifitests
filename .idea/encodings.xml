@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="Encoding" useUTFGuessing="true" native2AsciiForPropertiesFiles="false">
-    <file url="file://$PROJECT_DIR$/app/src/main/java/com/herenow/fase1/AddWeaconActivity.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/herenow/fase1/Activities/AddWeaconActivity.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/herenow/fase1/Activities/CardsActivityFragment.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/herenow/fase1/Activities/MainActivity.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/herenow/fase1/Cards/AirportCard.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/herenow/fase1/Cards/CompanyCard.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/herenow/fase1/Cards/NewsCard.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/herenow/fase1/Cards/ScheduleCard.java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/app/src/main/java/com/herenow/fase1/CardsActivityFragment.java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/app/src/main/java/com/herenow/fase1/MainActivity.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/herenow/fase1/Position.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/herenow/fase1/test/CustomExpandCard.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/herenow/fase1/test/mMaterialLargeImageCardThumbnail.java" charset="UTF-8" />

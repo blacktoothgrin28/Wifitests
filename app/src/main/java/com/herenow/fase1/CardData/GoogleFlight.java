@@ -6,36 +6,13 @@ import org.jsoup.select.Elements;
  * Created by Milenko on 23/09/2015.
  */
 public class GoogleFlight {
-    public String hourEstimated, terminal, gate, arrivalExpected, arrivalTerminal, arrivalGate;
-    public String hourEstimatedOld, terminalOld, gateOld, arrivalExpectedOld, arrivalTerminalOld, arrivalGateOld;
-    public String code;
-//    GoogleFlight oldState;
+    private final FlightData mFlight;
+    public String hourEstimated, terminal, gate, arrivalExpected, arrivalTerminal, arrivalGate, code;
+    public String changesText, changeSummarized;
 
-    public GoogleFlight(Elements datos) {
-        extractData(datos);
+    public GoogleFlight(Elements datos, FlightData flight) {
+        mFlight = flight;
 
-//        oldState = this;
-    }
-
-    @Override
-    public String toString() {
-        return "GoogleFlight{" +
-                "hourEstimated='" + hourEstimated + '\'' +
-                ", terminal='" + terminal + '\'' +
-                ", gate='" + gate + '\'' +
-                ", arrivalExpected='" + arrivalExpected + '\'' +
-                ", arrivalTerminal='" + arrivalTerminal + '\'' +
-                ", arrivalGate='" + arrivalGate + '\'' +
-                ", hourEstimatedOld='" + hourEstimatedOld + '\'' +
-                ", terminalOld='" + terminalOld + '\'' +
-                ", gateOld='" + gateOld + '\'' +
-                ", arrivalExpectedOld='" + arrivalExpectedOld + '\'' +
-                ", arrivalTerminalOld='" + arrivalTerminalOld + '\'' +
-                ", arrivalGateOld='" + arrivalGateOld + '\'' +
-                '}';
-    }
-
-    private void extractData(Elements datos) {
         hourEstimated = datos.first().text();
         terminal = datos.get(1).text();
         gate = datos.get(2).text();
@@ -44,55 +21,59 @@ public class GoogleFlight {
         arrivalGate = datos.get(5).text();
     }
 
-    public void update(Elements datos) {
-        toBuffer();
-        extractData(datos);
-        compare();
+    @Override
+    public String toString() {
+        return "GoogleFlight{" +
+                "hEst='" + hourEstimated + '\'' +
+                ", T='" + terminal + '\'' +
+                ", Gate='" + gate + '\'' +
+                ", ahExp='" + arrivalExpected + '\'' +
+                ", aT='" + arrivalTerminal + '\'' +
+                ", aGate='" + arrivalGate + '\'' +
+                '}';
     }
 
-    private boolean compare() {
-        boolean changed = false;
-        String changedField = "";
+    public boolean hasChanged(GoogleFlight OldGoogle) {
+        StringBuilder sb = new StringBuilder();
 
-        if (!hourEstimatedOld.equals(hourEstimated)) {
-            changed = true;
-            changedField = "hour";
+        boolean bEstimated = hourEstimated.equals(OldGoogle.hourEstimated);
+        boolean bGate = gate.equals(OldGoogle.gate);
+        boolean bTerminal = terminal.equals(OldGoogle.gate);
+
+        if (bGate) {
+            sb.append(mFlight.toString() + "\n");
+            sb.append("Gate: " + OldGoogle.gate + " -> " + gate + " | ");
+            if (OldGoogle.equals("-")) {//Check
+                changeSummarized = "The gate for the flight " + mFlight.code + "  has been assigned: " + gate;
+            } else {
+                changeSummarized = "The gate for the flight " + mFlight.code + " has been changed. Now is: " + gate;
+            }
         }
-        if (!terminalOld.equals(terminal)) {
-            changedField = "Terminal";
-            changed = true;
-
+        if (bEstimated) {
+            sb.append("Estimated: " + OldGoogle.hourEstimated + " -> " + hourEstimated + " | ");
+            changeSummarized = "The estimated departure of the flight " + mFlight.code + " is now at: " + gate;
         }
-        if (!gateOld.equals(gate)) {
-            changedField = "Gate";
-
-            changed = true;
+        if (bTerminal) {
+            sb.append("Terminal: " + OldGoogle.terminal + " -> " + terminal + " | ");
+            changeSummarized = "Change in departure terminal for the flight " + mFlight.code + " . Now is: " + gate;//TODO put destination and codes
         }
-//        if (!arrivalExpectedOld.equals(arrivalExpected)) {
-//            changedField="Expected arrival";
-//            changed = true;
-//        }
 
-        if (!arrivalTerminalOld.equals(arrivalTerminal)) {
-            changedField = "Arrival Terminal";
-            changed = true;
+        changesText = sb.toString();
 
-        }
-//        if (!arrivalGateOld.equals(arrivalGate)) {
-//            changedField="Arrival Gate";
-//            changed = true;
-//
-//        }
-        return changed;
+        return bEstimated & bGate & bTerminal;
     }
 
-    private void toBuffer() {
-        hourEstimatedOld = hourEstimated;
-        terminalOld = terminal;
-        gateOld = gate;
-        arrivalExpectedOld = arrivalExpected;
-        arrivalTerminalOld = arrivalTerminal;
-        arrivalGateOld = arrivalGate;
-    }
+    public String getSummary() {
+        StringBuilder sb = new StringBuilder();
+        String status = "on time";//TODO on time, slight delay, delayed,
 
+        sb.append("The flight " + mFlight.code + " with destination " + mFlight.destination + " is " + status + ".\nThe expected departure is at " + hourEstimated);
+        if (gate.equals("-")) {
+            sb.append(".\nNo gate assigned yet");
+        } else {
+            sb.append(" at gate " + gate + ".");
+        }
+
+        return sb.toString();
+    }
 }

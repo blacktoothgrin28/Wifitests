@@ -49,7 +49,7 @@ import it.gmariotti.cardslib.library.cards.actions.TextSupplementalAction;
 import it.gmariotti.cardslib.library.cards.base.BaseMaterialCard;
 import it.gmariotti.cardslib.library.internal.Card;
 import it.gmariotti.cardslib.library.internal.ViewToClickToExpand;
-import util.AppendLog;
+import util.myLog;
 
 /**
  * @author Gabriele Mariotti (gabri.mariotti@gmail.com)
@@ -505,7 +505,7 @@ public class CompanyCard extends BaseMaterialCard {
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
                 mContext.startActivity(browserIntent);
             } catch (Exception e) {
-                AppendLog.appendLog("-err openweb: " + e.getMessage());
+                myLog.add("-err openweb: " + e.getMessage());
             }
         }
 
@@ -515,7 +515,7 @@ public class CompanyCard extends BaseMaterialCard {
                 intent.setData(Uri.parse("tel:" + mCompanyData.getPhone()));
                 mContext.startActivity(intent);
             } catch (Exception e) {
-                AppendLog.appendLog("----errror in call phone: " + e.getMessage());
+                myLog.add("----errror in call phone: " + e.getMessage());
             }
         }
 
@@ -642,7 +642,7 @@ public class CompanyCard extends BaseMaterialCard {
                     Toast.makeText(mContext, "Exception: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             } catch (Exception e) {
-                AppendLog.appendLog("---eror adding contact: " + e.getMessage());
+                myLog.add("---eror adding contact: " + e.getMessage());
             }
 
         }

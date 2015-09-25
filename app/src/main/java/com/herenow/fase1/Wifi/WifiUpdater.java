@@ -1,4 +1,4 @@
-package com.herenow.fase1;
+package com.herenow.fase1.Wifi;
 
 import android.app.Activity;
 import android.app.NotificationManager;
@@ -7,6 +7,7 @@ import android.net.wifi.WifiManager;
 import android.support.v4.app.NotificationCompat;
 import android.widget.TextView;
 
+import com.herenow.fase1.Notifications.Notifications;
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
@@ -15,7 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import parse.WeaconParse;
-import util.AppendLog;
+import util.myLog;
 import util.parameters;
 
 /**
@@ -51,7 +52,7 @@ public class WifiUpdater implements Runnable {
 
     @Override
     public void run() {
-        AppendLog.appendLog("Wifiuploader | run. demo =" + demo.toString());
+        myLog.add("Wifiuploader | run. demo =" + demo.toString());
         if (demo) {
             if (demoCount == 1 || demoCount % ntimes == 0) {
                 findFakeWeacon();
@@ -73,15 +74,15 @@ public class WifiUpdater implements Runnable {
                 @Override
                 public void done(WeaconParse we, ParseException e) {
                     if (e == null) {
-                        AppendLog.appendLog("WifiUpdater | findFakeWeacon. lauching = " + we);
+                        myLog.add("WifiUpdater | findFakeWeacon. lauching = " + we);
                         Notifications.sendNotification(we);
                     } else {
-                        AppendLog.appendLog("---Error in fakeweacon: " + e.getMessage());
+                        myLog.add("---Error in fakeweacon: " + e.getMessage());
                     }
                 }
             });
         } catch (Exception e) {
-            AppendLog.appendLog("---Error en fake weacon2: " + e.getMessage());
+            myLog.add("---Error en fake weacon2: " + e.getMessage());
         }
 
 

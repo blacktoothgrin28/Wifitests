@@ -6,7 +6,7 @@ import android.support.annotation.DrawableRes;
 
 import java.util.HashMap;
 
-import util.AppendLog;
+import util.myLog;
 
 /**
  * Created by Milenko on 25/08/2015.
@@ -102,7 +102,7 @@ public class CompanyData {
         String nameClean = name;
         for (String ab : abrev) {
             if (upper.endsWith(ab)) {
-                AppendLog.appendLog("company name ends with:" + ab);
+                myLog.add("company name ends with:" + ab);
                 nameClean = name.substring(0, name.length() - ab.length());
                 break;
             }

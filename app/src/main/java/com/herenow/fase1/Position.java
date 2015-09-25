@@ -7,6 +7,8 @@ import android.os.Bundle;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
+import com.herenow.fase1.Activities.MainActivity;
+import com.herenow.fase1.Sapo.SAPO2;
 import com.parse.DeleteCallback;
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -21,8 +23,8 @@ import java.util.List;
 
 import parse.WeaconParse;
 import parse.WifiSpot;
-import util.AppendLog;
 import util.GPSCoordinates;
+import util.myLog;
 import util.parameters;
 
 /**
@@ -33,8 +35,6 @@ public class Position implements GoogleApiClient.ConnectionCallbacks, GoogleApiC
     public Location mLastLocation;
     private String parseClass;
     private Collection<String> obIds;
-    //    private ParseGeoPoint point;
-    private List scanResultSSIDS;
     private GoogleApiClient mGoogleApiClient;
     private Context context;
     private GPSCoordinates gps;
@@ -68,13 +68,13 @@ public class Position implements GoogleApiClient.ConnectionCallbacks, GoogleApiC
 
     @Override
     public void onConnected(Bundle bundle) {
-        AppendLog.appendLog("Connected to google api. Reason:" + connectionReason);
+        myLog.add("Connected to google api. Reason:" + connectionReason);
 
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
         this.mGoogleApiClient.disconnect();
 
         if (mLastLocation == null) {
-            AppendLog.appendLog("Last location is null");
+            myLog.add("Last location is null");
             return;
         } else {
 //            SAPO.loc = new ParseGeoPoint(mLastLocation.getLatitude(), mLastLocation.getLongitude());
@@ -104,7 +104,7 @@ public class Position implements GoogleApiClient.ConnectionCallbacks, GoogleApiC
                         sb.append(we.getName() + "\n");
                     }
                     sb.append("******");
-                    AppendLog.appendLog(sb.toString(), "places");
+                    myLog.add(sb.toString(), "places");
                     MainActivity.writeOnScreen(sb.toString());
 
                 }
@@ -121,15 +121,15 @@ public class Position implements GoogleApiClient.ConnectionCallbacks, GoogleApiC
                     @Override
                     public void done(ParseException e) {
                         if (e == null) {
-                            AppendLog.appendLog("Parse object location has been updated");
+                            myLog.add("Parse object location has been updated");
                         } else {
-                            AppendLog.appendLog("--- error:Parse object location has been NOT updated " + e.getMessage());
+                            myLog.add("--- error:Parse object location has been NOT updated " + e.getMessage());
                         }
                     }
                 });
             } catch (Exception e) {
                 e.printStackTrace();
-                AppendLog.appendLog("---error in Position|onConnected: " + e.getMessage());
+                myLog.add("---error in Position|onConnected: " + e.getMessage());
             }
         } else if (connectionReason == REASON.JustUpdatLocation) {
 //            SAPO.setLoc(mLastLocation);
@@ -142,7 +142,7 @@ public class Position implements GoogleApiClient.ConnectionCallbacks, GoogleApiC
         try {
 
             //1.Remove spots and weacons in local
-            AppendLog.appendLog("retrieving SSIDS from local:" + bLocal + " user: " + ParseUser.getCurrentUser());
+            myLog.add("retrieving SSIDS from local:" + bLocal + " user: " + ParseUser.getCurrentUser());
             ParseObject.unpinAllInBackground(parameters.pinWeacons, new DeleteCallback() {
                 @Override
                 public void done(ParseException e) {
@@ -150,7 +150,11 @@ public class Position implements GoogleApiClient.ConnectionCallbacks, GoogleApiC
 
                         //2. Load them
                         ParseQuery<WifiSpot> query = ParseQuery.getQuery(WifiSpot.class);
-                        query.whereWithinKilometers("GPS", new ParseGeoPoint(gps.getLatitude(), gps.getLongitude()), 5);
+
+                        //Change, this is obli for tests
+//                      query.whereWithinKilometers("GPS", new ParseGeoPoint(gps.getLatitude(), gps.getLongitude()), parameters.radioSpotsQuery);
+                        query.whereEqualTo("ssid", "piripiri");
+
                         query.include("associated_place");
                         query.setLimit(700);
                         if (bLocal) query.fromLocalDatastore(); //TODO put a pin for weacons?
@@ -160,31 +164,31 @@ public class Position implements GoogleApiClient.ConnectionCallbacks, GoogleApiC
                                 if (e == null) {
 
                                     //3. Pin them
-                                    AppendLog.appendLog("number of SSIDS Loaded for weacons:" + spots.size());
+                                    myLog.add("number of SSIDS Loaded for weacons:" + spots.size());
                                     if (!bLocal)
                                         ParseObject.pinAllInBackground(parameters.pinWeacons, spots, new SaveCallback() {
                                             @Override
                                             public void done(ParseException e) {
                                                 if (e == null) {
-                                                    AppendLog.appendLog("Wecaons pinned ok");
+                                                    myLog.add("Wecaons pinned ok");
 
                                                 } else {
-                                                    AppendLog.appendLog("---Error retrieving Weacons from web: " + e.getMessage());
+                                                    myLog.add("---Error retrieving Weacons from web: " + e.getMessage());
                                                 }
                                             }
                                         });
                                 } else {
-                                    AppendLog.appendLog("---ERROR from parse obtienning ssids" + e.getMessage());
+                                    myLog.add("---ERROR from parse obtienning ssids" + e.getMessage());
                                 }
                             }
                         });
                     } else {
-                        AppendLog.appendLog("---error: " + e.getMessage());
+                        myLog.add("---error: " + e.getMessage());
                     }
                 }
             });
         } catch (Exception e) {
-            AppendLog.appendLog("---Error: failed retrieving SPOTS: " + e.getMessage());
+            myLog.add("---Error: failed retrieving SPOTS: " + e.getMessage());
         }
     }
 

@@ -5,6 +5,8 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import com.parse.ParseClassName;
 import com.parse.ParseException;
@@ -17,19 +19,14 @@ import com.parse.ParseUser;
 import java.io.ByteArrayOutputStream;
 import java.util.List;
 
-import util.AppendLog;
 import util.RoundImage;
+import util.myLog;
 
 /**
  * Created by Milenko on 30/07/2015.
  */
 @ParseClassName("Weacon")
-public class WeaconParse extends ParseObject {
-//    private String name,mainurl,phone, url2,url3,description, type;
-//    private ParseGeoPoint gps;
-//    private String rating;
-//    private boolean automatic;
-//    private ParseUser user;
+public class WeaconParse extends ParseObject implements Parcelable {
 
     public WeaconParse() {
     }
@@ -54,18 +51,6 @@ public class WeaconParse extends ParseObject {
         setRating(rating);
         setAutomatic(automatic);
         setOwner(user);
-
-//        this.name = name;
-//        this.mainurl = mainurl;
-//        this.phone = phone;
-//        this.url2 = url2;
-//        this.url3 = url3;
-//        this.description = description;
-//        this.type = type;
-//        this.gps = gps;
-//        this.rating = rating;
-//        this.automatic = automatic;
-//        this.user = user;
     }
 
     private static Bitmap drawableToBitmap(Drawable drawable) {
@@ -137,10 +122,10 @@ public class WeaconParse extends ParseObject {
         List elements = query.find();
         if (elements.size() == 0) {
             res = true;
-            AppendLog.appendLog("this SSID is free");
+            myLog.add("this SSID is free");
         } else {
             res = false;
-            AppendLog.appendLog("this SSID isn't free");
+            myLog.add("this SSID isn't free");
         }
         return res;
     }
@@ -185,6 +170,16 @@ public class WeaconParse extends ParseObject {
 
     public void setOwner(ParseUser owner) {
         put("Owner", owner);
+
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
 
     }
 }

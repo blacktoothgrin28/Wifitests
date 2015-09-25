@@ -33,7 +33,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MainActivity"
+            android:name=".Activities.MainActivity"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -45,50 +45,50 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".BrowserActivity"
+            android:name=".Activities.BrowserActivity"
             android:icon="@mipmap/ic_launcher"
             android:label="@string/title_activity_second"
             android:logo="@mipmap/ic_launcher"
-            android:parentActivityName=".WeaconListActivity">
+            android:parentActivityName=".Activities.WeaconListActivity">
 
             <!-- Parent activity meta-data to support 4.0 and lower -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="MainActivity" />
+                android:value=".Activities.MainActivity" />
         </activity>
         <!-- android:logo="@drawable/abc_ic_menu_paste_mtrl_am_alpha" /> -->
 
         <activity
-            android:name=".SettingsActivity"
+            android:name=".Activities.SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".Activities.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.herenow.fase1.MainActivity" />
+                android:value=".Activities.MainActivity" />
         </activity>
         <activity
-            android:name=".WeaconListActivity"
+            android:name=".Activities.WeaconListActivity"
             android:label="@string/title_activity_weacon_list"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".Activities.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.herenow.fase1.MainActivity" />
+                android:value=".Activities.MainActivity" />
         </activity>
         <activity
-            android:name=".AddWeaconActivity"
+            android:name=".Activities.AddWeaconActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_add_weacon"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".Activities.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.herenow.fase1.MainActivity" />
+                android:value=".Activities.MainActivity" />
         </activity>
 
         <!-- replace @drawable/push_icon with your push icon identifier -->
         <!-- <meta-data android:name="com.parse.push.notification_icon" android:resource="@drawable/push_icon"/> -->
 
         <activity
-            android:name=".CardsActivity"
+            android:name=".Activities.CardsActivity"
             android:label="@string/title_activity_test_cards"></activity>
 
         <!--PArse push staff-->

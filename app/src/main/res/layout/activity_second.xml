@@ -3,7 +3,7 @@
     android:id="@+id/containerSec"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.herenow.fase1.BrowserActivity">
+    tools:context="com.herenow.fase1.Activities.BrowserActivity">
 
     <WebView
         android:id="@+id/webView"

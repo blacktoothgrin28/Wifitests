@@ -1,4 +1,4 @@
-package com.herenow.fase1;
+package com.herenow.fase1.Activities;
 
 import android.app.Activity;
 import android.content.ComponentName;
@@ -30,6 +30,8 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
+import com.herenow.fase1.R;
+import com.herenow.fase1.SpotValidationTask;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
@@ -45,9 +47,9 @@ import java.util.List;
 
 import parse.WeaconParse;
 import parse.WifiSpot;
-import util.AppendLog;
 import util.GPSCoordinates;
 import util.TYPE;
+import util.myLog;
 import util.parameters;
 
 import static util.TYPE.OTHER;
@@ -106,7 +108,7 @@ public class AddWeaconActivity extends ActionBarActivity implements GoogleApiCli
             FillSpinner();
 //        GetLocation();
         } catch (Exception e) {
-            AppendLog.appendLog("petadoal crear add weacon: " + e.getMessage());
+            myLog.add("petadoal crear add weacon: " + e.getMessage());
         }
     }
 
@@ -125,7 +127,7 @@ public class AddWeaconActivity extends ActionBarActivity implements GoogleApiCli
             super.onResume();
 //            GetLocation();
         } catch (Exception e) {
-            AppendLog.appendLog("ha petado en onresume addweacon: " + e.getMessage());
+            myLog.add("ha petado en onresume addweacon: " + e.getMessage());
         }
     }
 
@@ -306,12 +308,12 @@ public class AddWeaconActivity extends ActionBarActivity implements GoogleApiCli
                         if (sp.isValidated()) {
                             String msg = selectedSSID + " was already used and validated. \nSelect another";
                             Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
-                            AppendLog.appendLog(msg);
+                            myLog.add(msg);
                             //TODo validation of several spots (like Creapolis)
                         } else {
                             String msg = selectedSSID + " was already used but not validated. \nwant to validate=";
                             Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
-                            AppendLog.appendLog(msg);
+                            myLog.add(msg);
                             //TODO put a button to validate
                             //todo put a chekbox for validation in creation
                         }
@@ -319,14 +321,14 @@ public class AddWeaconActivity extends ActionBarActivity implements GoogleApiCli
 
                         return;
                     } else if (i > 1) {
-                        AppendLog.appendLog("spot already present more than one time");
+                        myLog.add("spot already present more than one time");
                     } else {
                         spot.saveInBackground(new SaveCallback() {
                             @Override
                             public void done(ParseException e) {
                                 if (e == null) {
                                     Toast.makeText(context, "Saved", Toast.LENGTH_SHORT).show();
-                                    AppendLog.appendLog("se ha salvado el spot ");
+                                    myLog.add("se ha salvado el spot ");
 
                                     try {
                                         spot.fetchInBackground(new GetCallback<ParseObject>() {
@@ -343,7 +345,7 @@ public class AddWeaconActivity extends ActionBarActivity implements GoogleApiCli
                                     }
                                 } else {
                                     Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show();
-                                    AppendLog.appendLog("-Eeeoe uploafdin spot: " + e.getMessage());
+                                    myLog.add("-Eeeoe uploafdin spot: " + e.getMessage());
                                 }
                             }
                         });
@@ -386,7 +388,7 @@ public class AddWeaconActivity extends ActionBarActivity implements GoogleApiCli
 //            weacon.upload(this.getApplicationContext());
         } catch (Exception e) {
             e.printStackTrace();
-            AppendLog.appendLog("---Error: Can't upload the new weacon" + e.getLocalizedMessage());
+            myLog.add("---Error: Can't upload the new weacon" + e.getLocalizedMessage());
 
         }
     }
@@ -397,7 +399,7 @@ public class AddWeaconActivity extends ActionBarActivity implements GoogleApiCli
         try {
             getMenuInflater().inflate(R.menu.menu_add_weacon, menu);
         } catch (Exception e) {
-            AppendLog.appendLog("--- petado oncreaterOptionMenu ");
+            myLog.add("--- petado oncreaterOptionMenu ");
         }
         return true;
     }
@@ -422,9 +424,9 @@ public class AddWeaconActivity extends ActionBarActivity implements GoogleApiCli
 
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
         if (mLastLocation != null) {
-            AppendLog.appendLog("LOC: We got location in AddWeacon");
+            myLog.add("LOC: We got location in AddWeacon");
         } else {
-            AppendLog.appendLog("We got null location in AddWeacon");
+            myLog.add("We got null location in AddWeacon");
             mLastLocation = MainActivity.mPos.mLastLocation;
             mGoogleApiClient.reconnect();
         }

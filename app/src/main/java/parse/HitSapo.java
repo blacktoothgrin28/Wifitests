@@ -9,7 +9,7 @@ import com.parse.ParseObject;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
-import util.AppendLog;
+import util.myLog;
 import util.parameters;
 
 /**
@@ -44,7 +44,7 @@ public class HitSapo extends ParseObject {
                     ", l=" + getLocation() +
                     '}';
         } catch (Exception e) {
-            AppendLog.appendLog("---ERROR. could get hit.toString. Probably is empty object:" + e.getMessage(),
+            myLog.add("---ERROR. could get hit.toString. Probably is empty object:" + e.getMessage(),
                     "SAPO2");
             st = "Empty hit with objId=" + this.getObjectId();
         }
@@ -63,18 +63,18 @@ public class HitSapo extends ParseObject {
         this.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
-                AppendLog.appendLog("guardado el hit " + this, "SAPOA");
+                myLog.add("guardado el hit " + this, "SAPOA");
             }
         });//TOdo hacer pin
     }
 
     public void incrementMe() {
-        AppendLog.appendLog("incrementado el hit " + this, "SAPOA"); //Not possible since is empty;
+        myLog.add("incrementado el hit " + this, "SAPOA"); //Not possible since is empty;
         this.increment("nhits");
         this.pinInBackground(parameters.pinSapo, new SaveCallback() {
             @Override
             public void done(ParseException e) {
-                AppendLog.appendLog("pin con el incremento ", "SAPOA");
+                myLog.add("pin con el incremento ", "SAPOA");
             }
         });
 //        this.saveInBackground(new SaveCallback() {

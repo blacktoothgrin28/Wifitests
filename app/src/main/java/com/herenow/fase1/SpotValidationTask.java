@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import parse.WifiSpot;
-import util.AppendLog;
+import util.myLog;
 
 /**
  * Created by Milenko on 08/08/2015.
@@ -63,10 +63,10 @@ public class SpotValidationTask extends AsyncTask<String, Boolean, Long> {
         }
 
         if (listOld.contains(BSSID) && !listNew.contains(BSSID)) {
-            AppendLog.appendLog("se ha apagado correctmente " + BSSID, "VAL");
+            myLog.add("se ha apagado correctmente " + BSSID, "VAL");
             if (listOld.size() > 1 || listNew.size() > 0) {
                 int n = Intersection(listOld, listNew);
-                AppendLog.appendLog("Habia inicialmente " + oldResults.size() + " spots. la interseccion es " + n, "VAL");
+                myLog.add("Habia inicialmente " + oldResults.size() + " spots. la interseccion es " + n, "VAL");
 
                 return n > 0;
             } else {
@@ -74,16 +74,16 @@ public class SpotValidationTask extends AsyncTask<String, Boolean, Long> {
             }
 
         } else {
-            AppendLog.appendLog("NO se ha apagado correctmente " + BSSID, "VAL");
+            myLog.add("NO se ha apagado correctmente " + BSSID, "VAL");
 
         }
         return false;
     }
 
     private static int Intersection(ArrayList<String> listOld, ArrayList<String> listNew) {
-        AppendLog.appendLog("original list has: " + listOld.size());
+        myLog.add("original list has: " + listOld.size());
         listOld.retainAll(listNew);
-        AppendLog.appendLog("Now, original list has: " + listOld.size());
+        myLog.add("Now, original list has: " + listOld.size());
 
         return listOld.size();
     }
@@ -140,7 +140,7 @@ public class SpotValidationTask extends AsyncTask<String, Boolean, Long> {
         for (ScanResult sr : results) {
             sb.append(sr.SSID + "\n");
         }
-        AppendLog.appendLog(sb.toString(), "VAL");
+        myLog.add(sb.toString(), "VAL");
         Toast.makeText(context, sb.toString(), Toast.LENGTH_LONG).show();
     }
 
@@ -165,9 +165,9 @@ public class SpotValidationTask extends AsyncTask<String, Boolean, Long> {
                             @Override
                             public void done(List<WifiSpot> list, ParseException e) {
                                 if (list.size() == 0) {//create
-                                    AppendLog.appendLog("not possible to validate a spot not uplooaded, many regs in parse", "VAL");
+                                    myLog.add("not possible to validate a spot not uplooaded, many regs in parse", "VAL");
                                 } else if (list.size() > 1) {//too many
-                                    AppendLog.appendLog("not possible to save validation, many regs in parse", "VAL");
+                                    myLog.add("not possible to save validation, many regs in parse", "VAL");
                                 } else {//update
                                     WifiSpot we = list.get(0);
                                     we.setOwner(ParseUser.getCurrentUser());
@@ -180,7 +180,7 @@ public class SpotValidationTask extends AsyncTask<String, Boolean, Long> {
                     }
                 }
             } else {
-                AppendLog.appendLog("Entering in a different state of network: " + action, "CON");
+                myLog.add("Entering in a different state of network: " + action, "CON");
             }
         }
     }

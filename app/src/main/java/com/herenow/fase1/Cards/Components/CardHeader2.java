@@ -1,4 +1,4 @@
-package com.herenow.fase1.Cards;
+package com.herenow.fase1.Cards.Components;
 
 import android.content.Context;
 import android.view.View;

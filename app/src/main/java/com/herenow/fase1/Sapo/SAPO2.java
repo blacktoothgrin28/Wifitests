@@ -1,8 +1,10 @@
-package com.herenow.fase1;
+package com.herenow.fase1.Sapo;
 
 import android.location.Location;
 import android.net.wifi.ScanResult;
 
+import com.herenow.fase1.Activities.MainActivity;
+import com.herenow.fase1.Position;
 import com.parse.DeleteCallback;
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -16,7 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import parse.HitSapo;
-import util.AppendLog;
+import util.myLog;
 import util.parameters;
 
 /**
@@ -189,7 +191,7 @@ public abstract class SAPO2 {
     }
 
     private static void app(String msg) {
-        AppendLog.appendLog(msg, "SAPOA");
+        myLog.add(msg, "SAPOA");
     }
 
     public static void uploadIfRequired() {

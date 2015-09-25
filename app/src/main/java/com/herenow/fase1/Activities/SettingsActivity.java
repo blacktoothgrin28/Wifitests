@@ -1,4 +1,4 @@
-package com.herenow.fase1;
+package com.herenow.fase1.Activities;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -18,6 +18,8 @@ import android.preference.RingtonePreference;
 import android.support.v4.app.NavUtils;
 import android.text.TextUtils;
 import android.view.MenuItem;
+
+import com.herenow.fase1.R;
 
 import java.util.List;
 

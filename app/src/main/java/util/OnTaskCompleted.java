@@ -1,4 +1,4 @@
-package com.herenow.fase1.Cards;
+package util;
 
 import java.util.ArrayList;
 

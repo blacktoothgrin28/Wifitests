@@ -18,10 +18,13 @@ public class parameters {
     public static Integer hitRepetitions = 20; //number of HitSapo in SAPO for considering a SSID important
     public static int minTimeForUpdates = 60 * 1; //in mins
     public static int nHitsForLogIn = 3; //recommend 3. Number of hits for declaring the login in a spot
+    public static long timeBetweenFlightQueries = 1 * 60 * 1000;//in milliseconds, to verify if there are changes in gates, ets
+    public static double radioSpotsQuery = 1; //Determines how many spots to load, (kilometers around user's position
+    public static boolean isSapoActive = false;
 
 
     public static CompanyData getExampleCompanyCard() {
-        CompanyData companyData = new CompanyData("Aplicaciones en Informática Avanzada S.L.", R.drawable.im_aia_fondo_claro, R.drawable.im_aia_logo);
+        CompanyData companyData = new CompanyData("Aplicaciones en Informática Avanzada S.L.", R.drawable.im_aia_fondo_claro, R.drawable.im_aia_logom);
         companyData.setEmployeesNumber(55);
         companyData.setLemma("Algoritmos para un mundo mejor");
         companyData.setDirector("Regina Llopis");

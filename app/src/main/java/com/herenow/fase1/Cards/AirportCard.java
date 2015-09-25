@@ -1,14 +1,19 @@
 package com.herenow.fase1.Cards;
 
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+import android.support.v4.app.NotificationCompat;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.herenow.fase1.CardData.FlightData;
 import com.herenow.fase1.CardData.GoogleFlight;
-import com.herenow.fase1.CardData.flight;
 import com.herenow.fase1.R;
 
 import org.jsoup.Connection;
@@ -28,20 +33,27 @@ import it.gmariotti.cardslib.library.internal.CardHeader;
 import it.gmariotti.cardslib.library.prototypes.CardWithList;
 import it.gmariotti.cardslib.library.prototypes.LinearListView;
 import it.gmariotti.cardslib.library.view.CardViewNative;
-import util.AppendLog;
+import util.OnTaskCompleted;
+import util.myLog;
+import util.parameters;
+
+import static com.herenow.fase1.R.mipmap.ic_launcher;
 
 /**
  * Created by Milenko on 12/08/2015.
  */
 public class AirportCard extends CardWithList implements OnTaskCompleted {
 
+    private static NotificationCompat.Builder notif;
+    private final NotificationManager mNotificationManager;
     private List<ListObject> mObjects;
     private CardViewNative mCardViewAir;
-    private GoogleFlight mGoogleFlight;
     private GoogleFlight mCurrentGoogle, mOldGoogle;
+    private FlightData mSelectedFlight;
 
     public AirportCard(Context context) {
         super(context);
+        mNotificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
     }
 
 
@@ -92,18 +104,18 @@ public class AirportCard extends CardWithList implements OnTaskCompleted {
             if (est.startsWith("Schedu")) {
                 est = "";
             } else if (est.startsWith("Estimat")) {
-                est = est.substring(est.length() - 5);
+                est = "Est. " + est.substring(est.length() - 5);
 //                estimated.setTextColor();
             } else if (est.startsWith("Dela")) {
-                est = est.substring(est.length() - 5);
-                AppendLog.appendLog("hay uno con retraso grande, programado para las: " + flightObject.scheduledAt);
+                est = "Est. " + est.substring(est.length() - 5);
+                myLog.add("hay uno con retraso grande, programado para las: " + flightObject.scheduledAt);
                 estimated.setTextColor(getContext().getResources().getColor(R.color.red));
             }
 
             estimated.setText(est);
 
         } catch (Exception e) {
-            AppendLog.appendLog("eyyo " + e.getMessage());
+            myLog.add("eyyo " + e.getMessage());
         }
         return convertView;
     }
@@ -124,20 +136,12 @@ public class AirportCard extends CardWithList implements OnTaskCompleted {
     }
 
 
-    public void setData(ArrayList<flight> departures) {
+    public void setData(ArrayList<FlightData> departures) {
         mObjects = new ArrayList<>();
 
-        for (flight fl : departures) {
+        for (FlightData fl : departures) {
             flightObject fo = new flightObject(mParentCard);
-            fo.code = fl.code;
-            fo.scheduledAt = fl.scheduledAt;
-            fo.airline = fl.airline;
-            fo.destination = fl.destination;
-            fo.status = fl.status;
-            fo.title = fl.title;
-            fo.estimated = fl.estimated;
-
-            fo.setObjectId(fo.code);
+            fo.setData(fl);
 
             mObjects.add(fo);
         }
@@ -147,25 +151,28 @@ public class AirportCard extends CardWithList implements OnTaskCompleted {
     public void OnTaskCompleted(ArrayList googleFlights) {
         mCurrentGoogle = (GoogleFlight) googleFlights.get(0);
 
+        myLog.add("::::Hemos recibido la info del vuelo:" + mCurrentGoogle.getSummary());
+
+        Toast.makeText(mContext, mCurrentGoogle.getSummary(), Toast.LENGTH_LONG).show();
+
         //Start asking google flight each 20 secs:
         Timer t = new Timer();
         t.schedule(new TimerTask() {
             @Override
             public void run() {
-                AppendLog.appendLog("timer execution");
+                myLog.add("-----timer execution");
                 GetInfoFlightFromGoogleSync(mCurrentGoogle.code); //repeated
             }
-        }, 10000, 20000);
+        }, 10000, parameters.timeBetweenFlightQueries);
 
     }
 
     private void GetInfoFlightFromGoogleSync(String code) {
 
         try {
-            AppendLog.appendLog("getoin from google sync (timer)");
+            myLog.add("getting in google sync (timer)");
             Connection.Response response = Jsoup.connect("https://www.google.es/search?q=" + code)
                     .ignoreContentType(true)
-                            //                        .userAgent("Mozilla/5.0 (Windows NT 6.3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.85 Safari/537.36")
                     .referrer("http://www.google.com")
                     .timeout(5000)
                     .followRedirects(true)
@@ -175,14 +182,61 @@ public class AirportCard extends CardWithList implements OnTaskCompleted {
             Element googleFlightCard = doc.select("div[class=card-section vk_c]").first();
             Elements datos = googleFlightCard.select("tr[class=_FJg").first().children();
             mOldGoogle = mCurrentGoogle;
-            mCurrentGoogle = new GoogleFlight(datos);
+            mCurrentGoogle = new GoogleFlight(datos, mSelectedFlight);
             mCurrentGoogle.code = code;
 
-            AppendLog.appendLog("..primera info de timer: " + mCurrentGoogle.toString());
-            //TOdo Compare on e state with the previous and rise notification if disctinnt
+            myLog.add("..info de timer: " + mCurrentGoogle.toString());
+
+            String notiTitle;
+            String content;
+            if (mCurrentGoogle.hasChanged(mOldGoogle)) {
+                myLog.add("has changed: " + mCurrentGoogle.changesText);
+                notiTitle = mCurrentGoogle.changeSummarized;
+                content = mCurrentGoogle.getSummary();
+                myLog.add("******NOTIFICATION: " + notiTitle);
+                myLog.add("***NOTIFICATION: " + content);
+
+                //Notification
+                sendNotificationFlight(notiTitle, content);
+            } else {
+                myLog.add("Hasn't changed ");
+            }
+
+
+
+
         } catch (IOException e) {
-            AppendLog.appendLog("---error en sync:" + e.getMessage());
+            myLog.add("---error en sync:" + e.getMessage());
         }
+
+    }
+
+    private void sendNotificationFlight(String notiTitle, String content) {
+        myLog.add("|||trying to send notification");
+
+//        NotificationCompat.Action myAction = new NotificationCompat.Action(R.drawable.ic_silence,
+//                "Turn Off", resultPendingIntent);
+        Bitmap bmImage = BitmapFactory.decodeResource(mContext.getResources(), ic_launcher);//Todo get the image from other source
+        notif = new NotificationCompat.Builder(mContext)
+                .setSmallIcon(R.drawable.ic_stat_name_hn)
+                .setLargeIcon(bmImage)
+                .setContentTitle(notiTitle)
+                .setContentText(content)
+                .setAutoCancel(true)
+                .setDefaults(Notification.DEFAULT_VIBRATE | Notification.DEFAULT_SOUND | Notification.FLAG_SHOW_LIGHTS)
+                .setLights(0xE6D820, 300, 100)
+                .setTicker("Change in Flight");
+//                .setDeleteIntent(pendingDeleteIntent)
+//                .addAction(myAction);
+        //todo improve the notif
+        NotificationCompat.BigTextStyle bigTextStyle = new NotificationCompat.BigTextStyle();
+        bigTextStyle.setBigContentTitle("PP" + notiTitle);
+        bigTextStyle.bigText("PP" + content);
+
+        notif.setStyle(bigTextStyle);
+//        notif.setContentIntent(resultPendingIntent);
+
+        mNotificationManager.notify(1, notif.build());
 
     }
 
@@ -202,6 +256,8 @@ public class AirportCard extends CardWithList implements OnTaskCompleted {
         public String ignoro2;
         public String status;
         public String title;
+        public String[] SharedCodes;
+        private FlightData flight;
 
         public flightObject(Card parentCard) {
             super(parentCard);
@@ -213,9 +269,10 @@ public class AirportCard extends CardWithList implements OnTaskCompleted {
             setOnItemClickListener(new CardWithList.OnItemClickListener() {
                 @Override
                 public void onItemClick(LinearListView parent, View view, int position, CardWithList.ListObject object) {
-//                    Toast.makeText(getContext(), "Click on " + getObjectId(), Toast.LENGTH_SHORT).show();
-                    AppendLog.appendLog("asgink google for flight for first time: " + getObjectId());
-                    GetInfoFlightFromGoogle(getObjectId()); //First retrieving
+                    Toast.makeText(getContext(), "Getting info for " + getObjectId() + "\nAlerts Activated.", Toast.LENGTH_SHORT).show();
+                    myLog.add("asgink google for flight for first time: " + getObjectId());
+                    mSelectedFlight = ((flightObject) object).flight;
+                    GetInfoFlightFromGoogle(getObjectId()); //First retrieving from google
                 }
             });
 
@@ -227,13 +284,27 @@ public class AirportCard extends CardWithList implements OnTaskCompleted {
 //                }
 //            });
         }
+
+        public void setData(FlightData fl) {
+            flight = fl;
+
+            code = fl.code;
+            scheduledAt = fl.scheduledAt;
+            airline = fl.airline;
+            destination = fl.destination;
+            status = fl.status;
+            title = fl.title;
+            estimated = fl.estimated;
+
+            setObjectId(code);
+        }
     }
 
     class readGoogleFlight extends AsyncTask<String, Void, GoogleFlight> {
         private OnTaskCompleted listener;
 
         readGoogleFlight(OnTaskCompleted listener) {
-            AppendLog.appendLog("asignando listener en parseGoogleflight");
+            myLog.add("asignando listener en parseGoogleflight");
             this.listener = listener;
         }
 
@@ -253,22 +324,28 @@ public class AirportCard extends CardWithList implements OnTaskCompleted {
                 Document doc = response.parse();
                 Element googleFlightCard = doc.select("div[class=card-section vk_c]").first();
                 Elements datos = googleFlightCard.select("tr[class=_FJg").first().children();
-                googleFlight = new GoogleFlight(datos);
+                googleFlight = new GoogleFlight(datos, mSelectedFlight);
                 googleFlight.code = strings[0];
 //                Toast.makeText(mContext, googleFlight.toString(), Toast.LENGTH_SHORT).show();
-                AppendLog.appendLog("primera vista de google:" + googleFlight);
+                myLog.add("primera vista de google:" + googleFlight);
             } catch (Throwable t) {
-                AppendLog.appendLog("-eeeoo frist query a google flifht" + t.getMessage());
+                myLog.add("-eeeoo frist query a google flifht" + t.getMessage());
             }
             return googleFlight;
         }
 
         @Override
         protected void onPostExecute(GoogleFlight googleFlight) {
-            super.onPostExecute(googleFlight);
-            ArrayList buff = new ArrayList<>();
-            buff.add(googleFlight);
-            listener.OnTaskCompleted(buff);
+
+            try {
+                super.onPostExecute(googleFlight);
+                ArrayList buff = new ArrayList<>();
+                buff.add(googleFlight);
+                listener.OnTaskCompleted(buff);
+            } catch (Exception e) {
+                myLog.add("fallo en post execute del google wuery: " + e.getMessage());
+            }
+
         }
 
     }

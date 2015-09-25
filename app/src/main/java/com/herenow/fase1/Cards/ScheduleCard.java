@@ -9,6 +9,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.herenow.fase1.CardData.Schedule;
+import com.herenow.fase1.Cards.Components.CardHeader2;
 import com.herenow.fase1.R;
 
 import java.util.ArrayList;

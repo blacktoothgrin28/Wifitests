@@ -13,7 +13,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.herenow.fase1.Noticia;
+import com.herenow.fase1.CardData.Noticia;
 import com.herenow.fase1.R;
 import com.squareup.picasso.Picasso;
 
@@ -36,7 +36,8 @@ import it.gmariotti.cardslib.library.internal.CardHeader;
 import it.gmariotti.cardslib.library.prototypes.CardWithList;
 import it.gmariotti.cardslib.library.prototypes.LinearListView;
 import it.gmariotti.cardslib.library.view.CardViewNative;
-import util.AppendLog;
+import util.OnTaskCompleted;
+import util.myLog;
 
 import static com.herenow.fase1.Cards.NewsCard.ProcessHtmlNews;
 
@@ -78,7 +79,7 @@ public class NewsCard extends CardWithList implements OnTaskCompleted {
 
 
         } catch (Exception e) {
-            AppendLog.appendLog("fallo en crear una noticia" + e.getMessage());
+            myLog.add("fallo en crear una noticia" + e.getMessage());
         }
         return noticia;
     }
@@ -119,11 +120,11 @@ public class NewsCard extends CardWithList implements OnTaskCompleted {
         try {
 
             siteUrl = "https://www.google.es/search?q=%22" + URLEncoder.encode(mCompanyName, "UTF-8") + "%22&tbm=nws ";
-            AppendLog.appendLog("The query for news is " + siteUrl);
+            myLog.add("The query for news is " + siteUrl);
 
             (new ParseURL(this)).execute(new String[]{siteUrl});//async
         } catch (UnsupportedEncodingException e) {
-            AppendLog.appendLog("Encoding error : " + e.getMessage());
+            myLog.add("Encoding error : " + e.getMessage());
         }
 //        super.init();//Sync
     }
@@ -156,7 +157,7 @@ public class NewsCard extends CardWithList implements OnTaskCompleted {
             w3.setObjectId(w3.link);
             mObjects.add(w3);
         } catch (Exception e) {
-            AppendLog.appendLog("--eerron in news caard: " + e.getMessage());
+            myLog.add("--eerron in news caard: " + e.getMessage());
         }
 
 
@@ -175,20 +176,20 @@ public class NewsCard extends CardWithList implements OnTaskCompleted {
         ArrayList noticias = new ArrayList();
         //Todo tomar sólo las literales
         try {
-            AppendLog.appendLog("Connecting to [" + siteUrl + "]");
+            myLog.add("Connecting to [" + siteUrl + "]");
 
             Document doc = Jsoup.connect(siteUrl).get();
-            AppendLog.appendLog("Connected to [" + siteUrl + "]");
+            myLog.add("Connected to [" + siteUrl + "]");
 
             ///mhp
             Elements news = doc.select("li.g");
-            AppendLog.appendLog(" We ve got news: " + news.size());
+            myLog.add(" We ve got news: " + news.size());
 
             for (Element oneNew : news) {
 //                noticias.add(ProcessHtmlNews(oneNew, tableImages));
             }
         } catch (IOException e) {
-            AppendLog.appendLog("--errorn en getnews symc:" + e.getMessage());
+            myLog.add("--errorn en getnews symc:" + e.getMessage());
         }
 
         return noticias;
@@ -224,7 +225,7 @@ public class NewsCard extends CardWithList implements OnTaskCompleted {
                 ivImage.setImageBitmap(newsObject.image);
             }
         } catch (Exception e) {
-            AppendLog.appendLog("errror item news : " + e.getMessage());
+            myLog.add("errror item news : " + e.getMessage());
         }
 
         return convertView;
@@ -237,7 +238,7 @@ public class NewsCard extends CardWithList implements OnTaskCompleted {
 
     @Override
     public void OnTaskCompleted(ArrayList news) {
-        AppendLog.appendLog("ontaskcompleted:" + news.size() + " neews");
+        myLog.add("ontaskcompleted:" + news.size() + " neews");
         //Select three news with exact name
         mNewsToShow = new ArrayList<>();
         for (Object ob : news) {
@@ -247,7 +248,7 @@ public class NewsCard extends CardWithList implements OnTaskCompleted {
                 if (mNewsToShow.size() == 3) break;
             }
         }
-        AppendLog.appendLog("ontaskcompleted: tenemos :" + mNewsToShow.size() + " noticias para mostrar");
+        myLog.add("ontaskcompleted: tenemos :" + mNewsToShow.size() + " noticias para mostrar");
         super.init();
 
 
@@ -325,7 +326,7 @@ class ParseURL extends AsyncTask<String, Void, ArrayList<Noticia>> {
     private OnTaskCompleted listener;
 
     ParseURL(OnTaskCompleted listener) {
-        AppendLog.appendLog("asignando listener en parseURL");
+        myLog.add("asignando listener en parseURL");
         this.listener = listener;
     }
 
@@ -334,10 +335,10 @@ class ParseURL extends AsyncTask<String, Void, ArrayList<Noticia>> {
         ArrayList noticias = new ArrayList();
         try {
 
-            AppendLog.appendLog("Connecting to [" + strings[0] + "]");
+            myLog.add("Connecting to [" + strings[0] + "]");
 
             Document doc = Jsoup.connect(strings[0]).get();
-            AppendLog.appendLog("Connected to [" + strings[0] + "]");
+            myLog.add("Connected to [" + strings[0] + "]");
 //            String code = doc.select("script").get(9).html();//todo assure that is 9
 
 //            String mydata = "some string with 'the data i want' inside";
@@ -345,7 +346,7 @@ class ParseURL extends AsyncTask<String, Void, ArrayList<Noticia>> {
             HashMap<String, Bitmap> tableImages = ObtainCodedImages(doc.select("script").get(9).html());
 
             Elements news = doc.select("li.g");
-            AppendLog.appendLog(" We ve got persons (linkedin): " + news.size());
+            myLog.add(" We ve got persons (linkedin): " + news.size());
 
             for (Element oneNew : news) {
                 noticias.add(ProcessHtmlNews(oneNew, tableImages));
@@ -380,7 +381,7 @@ class ParseURL extends AsyncTask<String, Void, ArrayList<Noticia>> {
                 }
             }
         } catch (Exception e) {
-            AppendLog.appendLog("eerro " + e.getMessage());
+            myLog.add("eerro " + e.getMessage());
         }
         return res;
     }

@@ -1,4 +1,4 @@
-package com.herenow.fase1;
+package com.herenow.fase1.Wifi;
 
 import com.parse.ParseObject;
 

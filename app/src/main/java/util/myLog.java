@@ -7,35 +7,42 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
  * Created by Milenko on 16/07/2015.
  */
-public class AppendLog {
+public class myLog {
     private static String fileName;
     private static String currentDateandTime;
 
-    public static void initialize() {
+    public static void initialize(String filePath) {
         int file_size;
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
         currentDateandTime = sdf.format(new Date());
 
         fileName = currentDateandTime + "_mhp.txt";
-        File logFile = new File(Environment.getExternalStorageDirectory() + "/WCLOG/rt.txt");
+        File logFile = new File(Environment.getExternalStorageDirectory() + filePath);
         file_size = Integer.parseInt(String.valueOf(logFile.length() / 1024));
         if (file_size > parameters.LogFileSize) logFile.delete();
-        appendLog("++++++++++++++++++++++++Session: " + currentDateandTime + "+++++++++++++++++++++++");
+        add("++++++++++++++++++++++++Session: " + currentDateandTime + "+++++++++++++++++++++++");
 
     }
 
-    public static void appendLog(String text) {
-        appendLog(text, "mhp");
+    public static void add(String text) {
+        add(text, "mhp");
     }
 
-    public static void appendLog(String text, String TAG) {
+    /***
+     * Add the text to a file which has TAG in the name. It also prints in this tag.
+     *
+     * @param text
+     * @param TAG
+     */
+    public static void add(String text, String TAG) {
         Log.d(TAG, text);
 
         File logFile = new File(Environment.getExternalStorageDirectory(), "/WCLOG/" + currentDateandTime + "_" + TAG + ".txt");
@@ -58,6 +65,31 @@ public class AppendLog {
             buf.close();
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    /***
+     * Send unhandled errors to a text file in the phone
+     *
+     * @param activated
+     */
+    public static void WriteUnhandledErrors(boolean activated) {
+        if (activated) {
+            Thread.currentThread().setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+                @Override
+                public void uncaughtException(Thread thread, Throwable ex) {
+                    PrintWriter pw;
+                    try {
+                        pw = new PrintWriter(
+                                new FileWriter(Environment.getExternalStorageDirectory() + "/WCLOG//rt.txt", true));
+                        ex.printStackTrace(pw);
+                        pw.flush();
+                        pw.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
         }
     }
 }

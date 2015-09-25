@@ -1,4 +1,4 @@
-package com.herenow.fase1;
+package com.herenow.fase1.Activities;
 
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
@@ -9,6 +9,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+
+import com.herenow.fase1.R;
 
 
 public class BrowserActivity extends ActionBarActivity {

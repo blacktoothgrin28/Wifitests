@@ -1,4 +1,4 @@
-package com.herenow.fase1;
+package com.herenow.fase1.Wifi;
 
 import com.parse.ParseException;
 import com.parse.ParsePush;
@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import parse.WifiSpot;
-import util.AppendLog;
+import util.myLog;
 import util.parameters;
 
 /**
@@ -64,26 +64,26 @@ public abstract class LogInManagement {
     private static void LogOut(String bssid) {
         //TODO inform parse
         loggedWeacons.remove(bssid);
-        AppendLog.appendLog("Logged out:" + bssid);
+        myLog.add("Logged out:" + bssid);
         ParsePush.unsubscribeInBackground(ChannelName(bssid));
     }
 
     private static void LogIn(WifiSpot spot) {
         //TODO Register in parse or is automatic to kwnow how many subscribers?
-        AppendLog.appendLog("Logged in:" + spot);
+        myLog.add("Logged in:" + spot);
         loggedWeacons.put(spot.getBSSID(), 0);
 
         final String channelName = ChannelName(spot.getBSSID());
-        AppendLog.appendLog("channel name=" + channelName);
+        myLog.add("channel name=" + channelName);
 
         //TODo ver si puedo hacer canales nuevos
         ParsePush.subscribeInBackground(channelName, new SaveCallback() {//The channel must start with a letter
             @Override
             public void done(ParseException e) {
                 if (e == null) {
-                    AppendLog.appendLog("successfully subscribed to the broadcast channel." + channelName);
+                    myLog.add("successfully subscribed to the broadcast channel." + channelName);
                 } else {
-                    AppendLog.appendLog("failed to subscribe for push: " + e.getMessage() + " \n" + e);
+                    myLog.add("failed to subscribe for push: " + e.getMessage() + " \n" + e);
                 }
             }
         });

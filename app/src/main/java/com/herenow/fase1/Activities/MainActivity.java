@@ -1,15 +1,10 @@
-package com.herenow.fase1;
+package com.herenow.fase1.Activities;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.net.NetworkInfo;
-import android.net.wifi.ScanResult;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -18,31 +13,37 @@ import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.herenow.fase1.Notifications.Notifications;
+import com.herenow.fase1.Position;
+import com.herenow.fase1.R;
+import com.herenow.fase1.Wifi.WifiBoss;
+import com.herenow.fase1.Wifi.WifiUpdater;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
 
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import util.AppendLog;
+import util.myLog;
+
+import static util.myLog.WriteUnhandledErrors;
 
 
 public class MainActivity extends ActionBarActivity {
 
     public static Position mPos; //WARN. Lo he hecho static para poder usarlo en SAPO
+
+
     //Demo
     public static boolean demoMode;
     private static TextView tv;
     private Intent intentAddWeacon;
     private Intent intentCards;
     //Wifi
-    private WifiReceiver receiverWifi;
-    private WifiManager mainWifi;
+//    private WifiReceiver receiverWifi;
+//    private WifiManager mainWifi;
     private WifiUpdater wu;
     private Timer t;
     private Switch mySwitch;
@@ -52,7 +53,8 @@ public class MainActivity extends ActionBarActivity {
     private long newTime, oldTime;
     private String msg = "";
 
-    private boolean isSapoActive = true; //TODO activate /deactivate sapo remotely
+    //    private boolean isSapoActive = true; //TODO activate /deactivate sapo remotely
+    private WifiBoss wifiBoss;
 
     /***
      * Write in the main activity
@@ -80,29 +82,13 @@ public class MainActivity extends ActionBarActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        WriteUnhandledErrors(true);
+        myLog.initialize("/WCLOG/rt.txt"); //Log in a file on thephone
+        Notifications.Initialize(this); //TODO: Really neededto initialize?
 
-        AppendLog.initialize();
-        Notifications.Initialize(this);
+        mPos = new Position(this);
+        mPos.connect(Position.REASON.GetWeacons);
 
-//        mPos = new Position(this);
-//        mPos.connect(Position.REASON.GetWeacons);
-
-        //Write  unhandled exceptions in a log file in the phone
-        Thread.currentThread().setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-            @Override
-            public void uncaughtException(Thread thread, Throwable ex) {
-                PrintWriter pw;
-                try {
-                    pw = new PrintWriter(
-                            new FileWriter(Environment.getExternalStorageDirectory() + "/WCLOG//rt.txt", true));
-                    ex.printStackTrace(pw);
-                    pw.flush();
-                    pw.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
 
         mySwitch = (Switch) findViewById(R.id.sw_demo);
         mySwitch.setChecked(false);
@@ -124,46 +110,41 @@ public class MainActivity extends ActionBarActivity {
         ParseUserLogIn();
 
         //Wifi
-        mainWifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-        receiverWifi = new WifiReceiver();
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
-        intentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
+        wifiBoss = new WifiBoss(this);
+//
+//        mainWifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+//        receiverWifi = new WifiReceiver();
+//        IntentFilter intentFilter = new IntentFilter();
+//        intentFilter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
+//        intentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
 //        registerReceiver(receiverWifi, intentFilter);
-    clickCards(null);
     }
 
-    public void clickCards(View view) {
-        //open the card activity
-        intentCards = new Intent(this, CardsActivity.class);
-        startActivity(intentCards);
-    }
-
-    /**
-     * Upload the pinned info form SAP and from Weacons
-     */
-    private void syncAllPinned() {
-        SAPO2.uploadIfRequired();
-    }
+//    /**
+//     * Upload the pinned info form SAP and from Weacons
+//     */
+//    private void syncAllPinned() {
+//        SAPO2.uploadIfRequired();
+//    }
 
     private void ParseUserLogIn() {
 
         ParseUser curr = ParseUser.getCurrentUser();
         if (curr == null) {
-            AppendLog.appendLog("sin user, vamos a loggear");
+            myLog.add("sin user, vamos a loggear");
 
             ParseUser.logInInBackground("sorrento2", "spidey", new LogInCallback() {
                 public void done(ParseUser user, ParseException e) {
                     if (user != null) {
-                        AppendLog.appendLog("Logged in");
+                        myLog.add("Logged in");
                     } else {
-                        AppendLog.appendLog("Not Logged in");
+                        myLog.add("Not Logged in");
                     }
                 }
             });
 
         } else {
-            AppendLog.appendLog("Ya tenia user,");
+            myLog.add("Ya tenia user,");
         }
     }
 
@@ -253,33 +234,39 @@ public class MainActivity extends ActionBarActivity {
 
     }
 
+    public void clickCards(View view) {
+        //open the card activity
+        intentCards = new Intent(this, CardsActivity.class);
+        startActivity(intentCards);
+    }
+
     public void clickAddWeacon(View view) {
         intentAddWeacon = new Intent(this, AddWeaconActivity.class);
         startActivity(intentAddWeacon);
     }
 
-    class WifiReceiver extends BroadcastReceiver {
-        public void onReceive(Context c, Intent intent) {
-            final String action = intent.getAction();
-
-            if (action.equals(WifiManager.NETWORK_STATE_CHANGED_ACTION)) {
-                NetworkInfo netInfo = intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
-                if ((netInfo.getDetailedState() == (NetworkInfo.DetailedState.CONNECTED))) {
-                    AppendLog.appendLog("*** We just connected to wifi: " + netInfo.getExtraInfo(), "CON");
-                    syncAllPinned();
-                }
-
-            } else if (action.equals(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION)) {
-                List<ScanResult> sr = mainWifi.getScanResults();
-                Notifications.CheckScanResults(sr);
-
-                if (isSapoActive) {
-                    SAPO2.addSPOTS(sr);
-                }
-            } else {
-                AppendLog.appendLog("Entering in a different state of network: " + action, "CON");
-            }
-        }
-    }
-
+//    class WifiReceiver extends BroadcastReceiver {
+//
+//        public void onReceive(Context c, Intent intent) {
+//            final String action = intent.getAction();
+//
+//            if (action.equals(WifiManager.NETWORK_STATE_CHANGED_ACTION)) {
+//                NetworkInfo netInfo = intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
+//                if ((netInfo.getDetailedState() == (NetworkInfo.DetailedState.CONNECTED))) {
+//                    myLog.add("*** We just connected to wifi: " + netInfo.getExtraInfo(), "CON");
+//                    syncAllPinned();
+//                }
+//
+//            } else if (action.equals(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION)) {
+//                List<ScanResult> sr = mainWifi.getScanResults();
+//                Notifications.CheckScanResults(sr);
+//
+//                if (isSapoActive) {
+//                    SAPO2.addSPOTS(sr);
+//                }
+//            } else {
+//                myLog.add("Entering in a different state of network: " + action, "CON");
+//            }
+//        }
+//    }
 }

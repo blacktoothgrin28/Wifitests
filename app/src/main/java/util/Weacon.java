@@ -95,7 +95,7 @@ public class Weacon {
     public Weacon(ParseObject obj) {
         String n = obj.getString("Name");
         if (n == null || n.equals(""))
-            AppendLog.appendLog("---Warn: Creating an empty weacon objId= " + obj.getObjectId() + " name= " + n);
+            myLog.add("---Warn: Creating an empty weacon objId= " + obj.getObjectId() + " name= " + n);
 
         try {
             this.name = obj.getString("Name");
@@ -115,7 +115,7 @@ public class Weacon {
             this.createAt = obj.getCreatedAt();
             this.updatedAt = obj.getUpdatedAt();
         } catch (Exception e) {
-            AppendLog.appendLog("---Some of thes atributes of the parse object (weacon)are empty: " + name + " | " + e.getMessage());
+            myLog.add("---Some of thes atributes of the parse object (weacon)are empty: " + name + " | " + e.getMessage());
         }
         try {
 
@@ -129,7 +129,7 @@ public class Weacon {
 //                this.createdby
         } catch (Exception e) {
             e.printStackTrace();
-            AppendLog.appendLog(name + "hasn't any image" + e.toString());
+            myLog.add(name + "hasn't any image" + e.toString());
         }
     }
 
@@ -165,7 +165,7 @@ public class Weacon {
 
         try {
             if (isSpotFree(this.getBSSID())) {
-                AppendLog.appendLog("Trying to upload weacon: " + this);
+                myLog.add("Trying to upload weacon: " + this);
                 ParseObject parseWeacon = new ParseObject("Weacon");
                 parseWeacon.put("Name", this.getName());
                 parseWeacon.put("GPS", this.getParseGps());
@@ -195,26 +195,26 @@ public class Weacon {
                     public void done(ParseException e) {
                         if (e == null) {
                             // Saved successfully.
-                            AppendLog.appendLog("Weacon uploaded. Toast should be shown");
+                            myLog.add("Weacon uploaded. Toast should be shown");
                             Toast.makeText(context, "Weacon Uploaded", Toast.LENGTH_SHORT).show();
                             //                    String id = po.getObjectId();
                             //                    Log.d(TAG, "The object id is: " + id);
                             //Load it
                         } else {
                             // The save failed.
-                            AppendLog.appendLog("Sorry, error: " + e);
+                            myLog.add("Sorry, error: " + e);
                             Toast.makeText(context, "Error uploading: " + e, Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
             } else {
                 String msg = "Sorry, WIFI spot already used";
-                AppendLog.appendLog(msg);
+                myLog.add(msg);
                 Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
             }
         } catch (Exception e) {
             e.printStackTrace();
-            AppendLog.appendLog("Sorry, pff, error: " + e);
+            myLog.add("Sorry, pff, error: " + e);
         }
     }
 
@@ -233,10 +233,10 @@ public class Weacon {
         List elements = query.find();
         if (elements.size() == 0) {
             res = true;
-            AppendLog.appendLog("this SSID is free");
+            myLog.add("this SSID is free");
         } else {
             res = false;
-            AppendLog.appendLog("this SSID isn't free");
+            myLog.add("this SSID isn't free");
         }
         return res;
     }

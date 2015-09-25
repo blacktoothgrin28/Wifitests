@@ -1,8 +1,9 @@
 package com.herenow.fase1.CardData;
 
-public class flight {
+public class FlightData {
 
     public String code;
+    public String[] sharedCodes;//TODO complete
     public String scheduledAt;
     public String destination;
     public String airline;
@@ -13,6 +14,6 @@ public class flight {
     public String status;
     public String title;
 
-    public flight() {
+    public FlightData() {
     }
 }

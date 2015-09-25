@@ -1,4 +1,4 @@
-package com.herenow.fase1;
+package com.herenow.fase1.CardData;
 
 import android.graphics.Bitmap;
 

@@ -7,7 +7,7 @@ import com.parse.ParseObject;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
-import util.AppendLog;
+import util.myLog;
 
 /**
  * Created by Milenko on 30/07/2015.
@@ -106,9 +106,9 @@ public class WifiSpot extends ParseObject {
             @Override
             public void done(ParseException e) {
                 if (e == null) {
-                    AppendLog.appendLog("spot saved ");
+                    myLog.add("spot saved ");
                 } else {
-                    AppendLog.appendLog("spot not saved " + e.getMessage());
+                    myLog.add("spot not saved " + e.getMessage());
 
                 }
 

@@ -1,4 +1,4 @@
-package com.herenow.fase1;
+package com.herenow.fase1.Activities;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -6,12 +6,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
 
-import com.herenow.fase1.CardData.flight;
+import com.herenow.fase1.CardData.CompanyData;
+import com.herenow.fase1.CardData.FlightData;
 import com.herenow.fase1.Cards.AirportCard;
+import com.herenow.fase1.Cards.CompanyCard;
 import com.herenow.fase1.Cards.ScheduleCard;
+import com.herenow.fase1.R;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -21,7 +22,8 @@ import org.jsoup.select.Elements;
 import java.util.ArrayList;
 
 import it.gmariotti.cardslib.library.view.CardViewNative;
-import util.AppendLog;
+import util.myLog;
+import util.parameters;
 
 import static com.google.android.gms.internal.zzhl.runOnUiThread;
 
@@ -33,6 +35,7 @@ import static com.google.android.gms.internal.zzhl.runOnUiThread;
 public class CardsActivityFragment extends Fragment {
     AirportCard airportCard;
     ScheduleCard scheduleCard;
+    private boolean injectJavaScript = true;
 //    CompanyCard card2;
 
     public CardsActivityFragment() {
@@ -61,15 +64,14 @@ public class CardsActivityFragment extends Fragment {
 
         try {
 
+            // Company Card
+            CompanyData companyData = parameters.getExampleCompanyCard();
+            CompanyCard companyCardtest = CompanyCard.with(getActivity())
+                    .setData(companyData)
+                    .build();
 
-            //Company Card
-//            CompanyData companyData = parameters.getExampleCompanyCard();
-//            CompanyCard companyCardtest = CompanyCard.with(getActivity())
-//                    .setData(companyData)
-//                    .build();
-//
-//            CardViewNative cardViewCompany = (CardViewNative) getActivity().findViewById(R.id.card_view_company);
-//            cardViewCompany.setCard(companyCardtest);
+            CardViewNative cardViewCompany = (CardViewNative) getActivity().findViewById(R.id.card_view_company);
+            cardViewCompany.setCard(companyCardtest);
 
 //            // News Card
 //            NewsCard newsCard = new NewsCard(getActivity(), companyData.getNameClean());
@@ -84,7 +86,7 @@ public class CardsActivityFragment extends Fragment {
 //            CardViewNative cvLinkedin = (CardViewNative) getActivity().findViewById(R.id.card_view_linkedin);
 //            linkedinCard.setView(cvLinkedin);
 //            linkedinCard.init();
-//
+
 
             //Schedule card
 //            scheduleCard = new ScheduleCard(getActivity());
@@ -95,7 +97,7 @@ public class CardsActivityFragment extends Fragment {
 //            cardViewSchedule.setCard(scheduleCard);
 //
 //
-            // Airport card
+       /*   // Airport card
             airportCard = new AirportCard(getActivity());
             CardViewNative cardViewAirport = (CardViewNative) getActivity().findViewById(R.id.card_view_airport);
             airportCard.setView(cardViewAirport);
@@ -104,24 +106,27 @@ public class CardsActivityFragment extends Fragment {
 
             final WebView browser = (WebView) getActivity().findViewById(R.id.wbChanta);
             //TODO quita la carga de imagenes:
-//            browser.getSettings().setLoadsImagesAutomatically(false);
+            browser.getSettings().setLoadsImagesAutomatically(false);
 //            browser.getSettings().setBlockNetworkLoads (true);
             browser.getSettings().setJavaScriptEnabled(true);
             browser.addJavascriptInterface(new MyJavaScriptInterface(), "HTMLOUT");
             browser.setWebViewClient(new WebViewClient() {
                 @Override
                 public void onPageFinished(WebView view, String url) {
-            /* This call inject JavaScript into the page which just finished loading. */
-                    browser.loadUrl("javascript:window.HTMLOUT.extractHtml('<head>'+document.getElementsByTagName('html')[0].innerHTML+'</head>');");
-
+            *//* This call inject JavaScript into the page which just finished loading. *//*
+                    AppendLog.appendLog("VAMOS leer pagina de radar24 CON JAVASCRIPT INJECT");
+                    if (injectJavaScript)
+                        browser.loadUrl("javascript:window.HTMLOUT.extractHtml('<head>'+document.getElementsByTagName('html')[0].innerHTML+'</head>');");
+                    injectJavaScript = false; //To avoid calling this several times
                 }
             });
-                /* load a web page */
+
+            AppendLog.appendLog("VAMOS leer pagina de radar24");
             browser.loadUrl("http://flightradar24.com/airport/bcn/departures");
 
-
+*/
         } catch (Exception e) {
-            AppendLog.appendLog("---error init cards: " + e.getMessage());
+            myLog.add("---error init cards: " + e.getMessage());
         }
 
     }
@@ -134,7 +139,7 @@ public class CardsActivityFragment extends Fragment {
             if (airportCard != null)
                 airportCard.unregisterDataSetObserver();//TODO, VER CoMO VA ESTE ROLLO DEL REGISTRO DE OBSERVER
         } catch (Exception e) {
-            AppendLog.appendLog("--error on Pause cards" + e.getMessage());
+            myLog.add("--error on Pause cards" + e.getMessage());
         }
     }
 
@@ -143,7 +148,7 @@ public class CardsActivityFragment extends Fragment {
 
         @JavascriptInterface
         public void extractHtml(String html) {
-            ArrayList<flight> departures = new ArrayList<>();
+            ArrayList<FlightData> departures = new ArrayList<>();
 
             try {
                 Document doc = Jsoup.parse(html);
@@ -154,7 +159,7 @@ public class CardsActivityFragment extends Fragment {
                     departures.add(ProcessHtmlFlights(item)); //todo agregar los codigos compartidos
                 }
 
-                AppendLog.appendLog("tenemos ya procesasdo aviones partiendo: " + departures.size());
+                myLog.add("tenemos ya procesasdo aviones partiendo: " + departures.size());
 
                 airportCard.setData(departures);
                 runOnUiThread(new Runnable() {
@@ -164,13 +169,13 @@ public class CardsActivityFragment extends Fragment {
                     }
                 });
             } catch (Exception e) {
-                AppendLog.appendLog("error en parsing la web aviones:" + e.getMessage());
+                myLog.add("error en parsing la web aviones:" + e.getMessage());
             }
 
         }
 
-        private flight ProcessHtmlFlights(Element flight) {
-            flight fo = new flight();
+        private FlightData ProcessHtmlFlights(Element flight) {
+            FlightData fo = new FlightData();
             Elements children = flight.children();
 
             try {
@@ -185,7 +190,7 @@ public class CardsActivityFragment extends Fragment {
                 fo.title = children.get(6).child(0).attr("title");
                 fo.ignoro2 = children.get(7).text();
             } catch (Exception e) {
-                AppendLog.appendLog("errror capturanfo flight " + e.getMessage());
+                myLog.add("errror capturanfo flight " + e.getMessage());
             }
             return fo;
         }

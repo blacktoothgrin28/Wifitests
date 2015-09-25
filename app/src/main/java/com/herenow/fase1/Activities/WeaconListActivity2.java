@@ -1,4 +1,4 @@
-package com.herenow.fase1;
+package com.herenow.fase1.Activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,11 +9,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.herenow.fase1.Notifications.Notifications;
+import com.herenow.fase1.R;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import parse.WeaconParse;
+import util.DividerItemDecoration;
 import util.WeaconAdapter;
 
 /***
