@@ -2,9 +2,16 @@ package com.herenow.fase1.CardData;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.annotation.DrawableRes;
 
+import com.parse.ParseException;
+import com.parse.ParseFile;
+import com.parse.ParseObject;
+
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import util.myLog;
 
@@ -47,6 +54,46 @@ public class CompanyData {
         this.name = name;
         this.mainImage = mainImage;
         this.logo = logo;
+    }
+
+    public CompanyData(ParseObject po) {
+        name = po.getString("Name");
+        description = po.getString("Description");
+        phone = po.getString("Phone");
+        email = po.getString("Email");
+        website = po.getString("Website");
+        lemma = po.getString("Lemma");
+        foundationYear = po.getString("FoundationYear");
+        headQuarters = po.getString("Headquarters");
+        memberOfGroup = po.getString("MemberOfGroup");
+        foundationPlace = po.getString("FoundationPlace");
+        linkedinUrl = po.getString("LinkedinUrl");
+        typeOfBusiness = po.getString("TypeOfBusiness");
+        director = po.getString("Director");
+//        subsidiaries=po.getString("Subsidiaries"); todo include subsidiaries
+
+        nEmployees = (int) po.getNumber("Employees");
+
+        //Images
+        try {
+            //todo use picasso
+            ParseFile parseFile = po.getParseFile("Logo");
+            byte[] bitmapdata = new byte[0];
+            bitmapdata = parseFile.getData();
+            logo = BitmapFactory.decodeByteArray(bitmapdata, 0, bitmapdata.length);
+
+            parseFile = po.getParseFile("MainImage");
+            bitmapdata = parseFile.getData();
+            mainImage = BitmapFactory.decodeByteArray(bitmapdata, 0, bitmapdata.length);
+
+            List<Object> al = po.getList("Founders");
+//            founders = al.toArray(String[0]);
+            founders = new String[al.size()];
+            al.toArray(founders);
+
+        } catch (ParseException e) {
+            myLog.addError(this.getClass(), e);
+        }
     }
 
     public static SetupWizard with(Context context) {
@@ -174,6 +221,14 @@ public class CompanyData {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public Bitmap getLogo() {
+        return logo;
+    }
+
+    public Bitmap getMainImage() {
+        return mainImage;
     }
 
     public static final class SetupWizard {

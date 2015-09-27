@@ -39,7 +39,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="top|right"
             android:onClick="clickAddWeacon"
-            android:text="Blank"
+            android:text="Trigger W"
             android:visibility="visible" />
     </FrameLayout>
 

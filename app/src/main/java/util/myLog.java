@@ -92,4 +92,9 @@ public class myLog {
             });
         }
     }
+
+
+    public static void addError(Class<?> clase, Exception e) {
+        add("-----Error en " + clase.getSimpleName() + ": " + e.getLocalizedMessage());
+    }
 }

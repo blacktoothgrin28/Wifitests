@@ -89,7 +89,13 @@
 
         <activity
             android:name=".Activities.CardsActivity"
-            android:label="@string/title_activity_test_cards"></activity>
+            android:label="@string/title_activity_test_cards">
+            android:parentActivityName=".Activities.MainActivity">
+            <!-- Parent activity meta-data to support 4.0 and lower -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".Activities.MainActivity" />
+        </activity>
 
         <!--PArse push staff-->
         <service android:name="com.parse.PushService" />

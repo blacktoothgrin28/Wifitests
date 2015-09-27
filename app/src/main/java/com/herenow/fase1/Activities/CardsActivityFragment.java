@@ -6,13 +6,18 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 
 import com.herenow.fase1.CardData.CompanyData;
 import com.herenow.fase1.CardData.FlightData;
 import com.herenow.fase1.Cards.AirportCard;
 import com.herenow.fase1.Cards.CompanyCard;
+import com.herenow.fase1.Cards.LinkedinCard;
+import com.herenow.fase1.Cards.NewsCard;
 import com.herenow.fase1.Cards.ScheduleCard;
 import com.herenow.fase1.R;
+import com.parse.ParseObject;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -20,8 +25,10 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import it.gmariotti.cardslib.library.view.CardViewNative;
+import parse.ParseActions;
 import util.myLog;
 import util.parameters;
 
@@ -36,7 +43,6 @@ public class CardsActivityFragment extends Fragment {
     AirportCard airportCard;
     ScheduleCard scheduleCard;
     private boolean injectJavaScript = true;
-//    CompanyCard card2;
 
     public CardsActivityFragment() {
     }
@@ -51,84 +57,106 @@ public class CardsActivityFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        //get the cardobjId from activity
+        try {
+//            String wCompanyDataObId = getArguments().getString("cardObId");
+
+            //TODO fix it: it ask parse each time the fragment is created. Make the Company data parcelable
+            // so we can ask  parse before...
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            myLog.addError(this.getClass(), e);
+
+        }
+
         return inflater.inflate(R.layout.demo_fragment_cardwithlist_card, container, false);
     }
 
     private void initCards() {
-
         try {
 
-            // Company Card
-            CompanyData companyData = parameters.getExampleCompanyCard();
-            CompanyCard companyCardtest = CompanyCard.with(getActivity())
-                    .setData(companyData)
-                    .build();
+//            initCompanyCard(parameters.getExampleCompanyCard());
+//            initNewsCard(companyData.getNameClean());
+//            initLinkedinCard(companyData.getLinkedinUrl());
 
-            CardViewNative cardViewCompany = (CardViewNative) getActivity().findViewById(R.id.card_view_company);
-            cardViewCompany.setCard(companyCardtest);
+//            initScheduleCard();
+//            initAirportCard();
 
-//            // News Card
-//            NewsCard newsCard = new NewsCard(getActivity(), companyData.getNameClean());
-//            CardViewNative cardViewNews = (CardViewNative) getActivity().findViewById(R.id.card_view_news);
-//            newsCard.setView(cardViewNews);
-//            newsCard.init();
-//
-//
-//            //Linkedin card
-//            // todo change format of linkedin card
-//            LinkedinCard linkedinCard = new LinkedinCard(getActivity(), companyData.getLinkedinUrl());
-//            CardViewNative cvLinkedin = (CardViewNative) getActivity().findViewById(R.id.card_view_linkedin);
-//            linkedinCard.setView(cvLinkedin);
-//            linkedinCard.init();
-
-
-            //Schedule card
-//            scheduleCard = new ScheduleCard(getActivity());
-//            scheduleCard.setData(parameters.getExampleScheduleData());//it has 11 items
-//            scheduleCard.init();
-//
-//            CardViewNative cardViewSchedule = (CardViewNative) getActivity().findViewById(R.id.card_view_schedule);
-//            cardViewSchedule.setCard(scheduleCard);
-//
-//
-       /*   // Airport card
-            airportCard = new AirportCard(getActivity());
-            CardViewNative cardViewAirport = (CardViewNative) getActivity().findViewById(R.id.card_view_airport);
-            airportCard.setView(cardViewAirport);
-// cardViewAirport.setCard(airportCard);
-
-
-            final WebView browser = (WebView) getActivity().findViewById(R.id.wbChanta);
-            //TODO quita la carga de imagenes:
-            browser.getSettings().setLoadsImagesAutomatically(false);
-//            browser.getSettings().setBlockNetworkLoads (true);
-            browser.getSettings().setJavaScriptEnabled(true);
-            browser.addJavascriptInterface(new MyJavaScriptInterface(), "HTMLOUT");
-            browser.setWebViewClient(new WebViewClient() {
-                @Override
-                public void onPageFinished(WebView view, String url) {
-            *//* This call inject JavaScript into the page which just finished loading. *//*
-                    AppendLog.appendLog("VAMOS leer pagina de radar24 CON JAVASCRIPT INJECT");
-                    if (injectJavaScript)
-                        browser.loadUrl("javascript:window.HTMLOUT.extractHtml('<head>'+document.getElementsByTagName('html')[0].innerHTML+'</head>');");
-                    injectJavaScript = false; //To avoid calling this several times
-                }
-            });
-
-            AppendLog.appendLog("VAMOS leer pagina de radar24");
-            browser.loadUrl("http://flightradar24.com/airport/bcn/departures");
-
-*/
         } catch (Exception e) {
             myLog.add("---error init cards: " + e.getMessage());
         }
+    }
 
+    private void initAirportCard() {
+
+        airportCard = new AirportCard(getActivity());
+        CardViewNative cardViewAirport = (CardViewNative) getActivity().findViewById(R.id.card_view_airport);
+        airportCard.setView(cardViewAirport);
+        // cardViewAirport.setCard(airportCard);
+
+
+        final WebView browser = (WebView) getActivity().findViewById(R.id.wbChanta);
+        //TODO quita la carga de imagenes:
+        browser.getSettings().setLoadsImagesAutomatically(false);
+        browser.getSettings().setJavaScriptEnabled(true);
+        browser.addJavascriptInterface(new MyJavaScriptInterface(), "HTMLOUT");
+        browser.setWebViewClient(new WebViewClient() {
+            @Override
+            public void onPageFinished(WebView view, String url) {
+//             This call inject JavaScript into the page which just finished loading. *//*
+                myLog.add("VAMOS leer pagina de radar24 CON JAVASCRIPT INJECT");
+                if (injectJavaScript)
+                    browser.loadUrl("javascript:window.HTMLOUT.extractHtml('<head>'+document.getElementsByTagName('html')[0].innerHTML+'</head>');");
+                injectJavaScript = false; //To avoid calling this several times
+            }
+        });
+        myLog.add("VAMOS leer pagina de radar24");
+        browser.loadUrl("http://flightradar24.com/airport/bcn/departures");
+    }
+
+    private void initScheduleCard() {
+        //Schedule card
+        scheduleCard = new ScheduleCard(getActivity());
+        scheduleCard.setData(parameters.getExampleScheduleData());//it has 11 items
+        scheduleCard.init();
+
+        CardViewNative cardViewSchedule = (CardViewNative) getActivity().findViewById(R.id.card_view_schedule);
+        cardViewSchedule.setCard(scheduleCard);
+    }
+
+    private void initLinkedinCard(String linkedinUrl) {
+        //
+//            //Linkedin card
+        // todo change format of linkedin card
+        LinkedinCard linkedinCard = new LinkedinCard(getActivity(), linkedinUrl);
+        CardViewNative cvLinkedin = (CardViewNative) getActivity().findViewById(R.id.card_view_linkedin);
+        linkedinCard.setView(cvLinkedin);
+        linkedinCard.init();
+    }
+
+    private void initNewsCard(String nameCleanCompany) {
+        // News Card
+        NewsCard newsCard = new NewsCard(getActivity(), nameCleanCompany);
+        CardViewNative cardViewNews = (CardViewNative) getActivity().findViewById(R.id.card_view_news);
+        newsCard.setView(cardViewNews);
+        newsCard.init();
+    }
+
+    private void initCompanyCard(CompanyData companyCard) {
+        // Company Card
+        CompanyData companyData = companyCard;
+        CompanyCard companyCardtest = CompanyCard.with(getActivity())
+                .setData(companyData)
+                .build();
+
+        CardViewNative cardViewCompany = (CardViewNative) getActivity().findViewById(R.id.card_view_company);
+        cardViewCompany.setCard(companyCardtest);
     }
 
     @Override
@@ -141,6 +169,31 @@ public class CardsActivityFragment extends Fragment {
         } catch (Exception e) {
             myLog.add("--error on Pause cards" + e.getMessage());
         }
+    }
+
+    public void setCardData(String wCompanyDataObId) {
+        ParseActions.getCompanyData(wCompanyDataObId, new ParseCallback() {
+            @Override
+            public void DatafromParseReceived(List<ParseObject> datos) {
+                myLog.add("etntramos en el callback. datossize="+datos.size());
+                try {
+                    ParseObject po = datos.get(0);
+                    CompanyData companyData = new CompanyData(po);
+                    initCompanyCard(companyData);
+                    initNewsCard(companyData.getNameClean());
+                    initLinkedinCard(companyData.getLinkedinUrl());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    myLog.add("error aquí."+e.getLocalizedMessage());
+                }
+            }
+
+            @Override
+            public void OnError(Exception e) {
+
+            }
+        });
+
     }
 
 

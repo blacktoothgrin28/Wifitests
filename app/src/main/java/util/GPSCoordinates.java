@@ -16,18 +16,9 @@ public class GPSCoordinates {
         this.longitude = location.getLongitude();
     }
 
-    @Override
-//    public String toString() {
-//        return "GPSCoordinates{" +
-//                "latitude=" + latitude +
-//                ", longitude=" + longitude +
-//                '}';
-//}
-
     public String toString() {
         return "GPS{" + latitude + "," + longitude + '}';
     }
-
 
     public double getLongitude() {
         return longitude;

@@ -12,7 +12,7 @@
 
     <!--android:name="com.herenow.fase1.CardsActivityFragment-->
     <fragment
-        android:id="@+id/list"
+        android:id="@+id/cards_fragment"
         class="com.herenow.fase1.Activities.CardsActivityFragment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

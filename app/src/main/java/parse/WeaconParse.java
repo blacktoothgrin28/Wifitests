@@ -8,6 +8,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.herenow.fase1.CardData.CompanyData;
 import com.parse.ParseClassName;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -26,7 +27,7 @@ import util.myLog;
  * Created by Milenko on 30/07/2015.
  */
 @ParseClassName("Weacon")
-public class WeaconParse extends ParseObject implements Parcelable {
+public class WeaconParse extends ParseObject {
 
     public WeaconParse() {
     }
@@ -105,6 +106,11 @@ public class WeaconParse extends ParseObject implements Parcelable {
         return bm;
     }
 
+    public String getCompanyDataObjectId() {
+        ParseObject po = getParseObject("CardCompany");
+        return po.getObjectId();
+    }
+
     public void setLogo(ParseFile fileLogo) {
         put("Logo", fileLogo);
     }
@@ -170,16 +176,6 @@ public class WeaconParse extends ParseObject implements Parcelable {
 
     public void setOwner(ParseUser owner) {
         put("Owner", owner);
-
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
 
     }
 }

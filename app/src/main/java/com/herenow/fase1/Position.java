@@ -9,20 +9,18 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.herenow.fase1.Activities.MainActivity;
 import com.herenow.fase1.Sapo.SAPO2;
-import com.parse.DeleteCallback;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
-import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 import java.util.Collection;
 import java.util.List;
 
+import parse.ParseActions;
 import parse.WeaconParse;
-import parse.WifiSpot;
 import util.GPSCoordinates;
 import util.myLog;
 import util.parameters;
@@ -85,7 +83,7 @@ public class Position implements GoogleApiClient.ConnectionCallbacks, GoogleApiC
 
         if (connectionReason == REASON.GetWeacons) {
             gps = new GPSCoordinates(mLastLocation);
-            retrieveSPOTSFromParse(bFromLocalParse);
+            ParseActions.getSpots(bFromLocalParse, parameters.radioSpotsQuery, gps);
 //            SAPO.downloadSPOTSFromParse();
 //            SAPO.downloadHitsFromParse();
         } else if (connectionReason == REASON.SaveSAPOssidswithLocation) {
@@ -138,59 +136,6 @@ public class Position implements GoogleApiClient.ConnectionCallbacks, GoogleApiC
         }
     }
 
-    public void retrieveSPOTSFromParse(final boolean bLocal) {
-        try {
-
-            //1.Remove spots and weacons in local
-            myLog.add("retrieving SSIDS from local:" + bLocal + " user: " + ParseUser.getCurrentUser());
-            ParseObject.unpinAllInBackground(parameters.pinWeacons, new DeleteCallback() {
-                @Override
-                public void done(ParseException e) {
-                    if (e == null) {
-
-                        //2. Load them
-                        ParseQuery<WifiSpot> query = ParseQuery.getQuery(WifiSpot.class);
-
-                        //Change, this is obli for tests
-//                      query.whereWithinKilometers("GPS", new ParseGeoPoint(gps.getLatitude(), gps.getLongitude()), parameters.radioSpotsQuery);
-                        query.whereEqualTo("ssid", "piripiri");
-
-                        query.include("associated_place");
-                        query.setLimit(700);
-                        if (bLocal) query.fromLocalDatastore(); //TODO put a pin for weacons?
-                        query.findInBackground(new FindCallback<WifiSpot>() {
-                            @Override
-                            public void done(List<WifiSpot> spots, ParseException e) {
-                                if (e == null) {
-
-                                    //3. Pin them
-                                    myLog.add("number of SSIDS Loaded for weacons:" + spots.size());
-                                    if (!bLocal)
-                                        ParseObject.pinAllInBackground(parameters.pinWeacons, spots, new SaveCallback() {
-                                            @Override
-                                            public void done(ParseException e) {
-                                                if (e == null) {
-                                                    myLog.add("Wecaons pinned ok");
-
-                                                } else {
-                                                    myLog.add("---Error retrieving Weacons from web: " + e.getMessage());
-                                                }
-                                            }
-                                        });
-                                } else {
-                                    myLog.add("---ERROR from parse obtienning ssids" + e.getMessage());
-                                }
-                            }
-                        });
-                    } else {
-                        myLog.add("---error: " + e.getMessage());
-                    }
-                }
-            });
-        } catch (Exception e) {
-            myLog.add("---Error: failed retrieving SPOTS: " + e.getMessage());
-        }
-    }
 
 
 //    private void retrievePlacesFromParse(final boolean bLocal, Collection weaconsIds) {

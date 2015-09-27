@@ -336,6 +336,8 @@ public class CompanyCard extends BaseMaterialCard {
         private CharSequence mSubTitle;
         private ArrayList<BaseSupplementalAction> mActions;
         private int mSupplementalActionLayoutId;
+        private Bitmap mLogo;
+        private Bitmap mMainImage;
 
 
         private SetupWizard(Context context) {
@@ -345,8 +347,11 @@ public class CompanyCard extends BaseMaterialCard {
         public SetupWizard setData(CompanyData companyData) {
             mCompanyData = companyData;
             mTextOverImage = mCompanyData.getName();
-            mDrawableCardIcon = mCompanyData.getLogoResId();
-            mDrawableCardThumbnail = mCompanyData.getImageResId();
+//            mDrawableCardIcon = mCompanyData.getLogoResId();
+//            mDrawableCardThumbnail = mCompanyData.getImageResId();
+            mLogo = mCompanyData.getLogo();
+            mMainImage = mCompanyData.getMainImage();
+
             return this;
         }
 
@@ -412,6 +417,7 @@ public class CompanyCard extends BaseMaterialCard {
             card.setTextOverImageResId(mTextOverImageResId);
 
             card.setDrawableIconIdCardThumbnail(mDrawableCardIcon);
+//            card.ico(mDrawableCardIcon);
 
             if (mTitle != null)
                 card.setTitle(mTitle.toString());

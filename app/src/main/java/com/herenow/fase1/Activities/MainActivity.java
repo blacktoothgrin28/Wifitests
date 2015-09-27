@@ -16,6 +16,7 @@ import android.widget.TextView;
 import com.herenow.fase1.Notifications.Notifications;
 import com.herenow.fase1.Position;
 import com.herenow.fase1.R;
+import com.herenow.fase1.Wifi.LocationAsker;
 import com.herenow.fase1.Wifi.WifiBoss;
 import com.herenow.fase1.Wifi.WifiUpdater;
 import com.parse.LogInCallback;
@@ -26,7 +27,10 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import parse.ParseActions;
+import util.GPSCoordinates;
 import util.myLog;
+import util.parameters;
 
 import static util.myLog.WriteUnhandledErrors;
 
@@ -41,9 +45,6 @@ public class MainActivity extends ActionBarActivity {
     private static TextView tv;
     private Intent intentAddWeacon;
     private Intent intentCards;
-    //Wifi
-//    private WifiReceiver receiverWifi;
-//    private WifiManager mainWifi;
     private WifiUpdater wu;
     private Timer t;
     private Switch mySwitch;
@@ -55,6 +56,75 @@ public class MainActivity extends ActionBarActivity {
 
     //    private boolean isSapoActive = true; //TODO activate /deactivate sapo remotely
     private WifiBoss wifiBoss;
+
+
+    protected void onCreate(Bundle savedInstanceState) {
+
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        WriteUnhandledErrors(true);
+        myLog.initialize("/WCLOG/rt.txt"); //Log in a file on thephone
+        Notifications.Initialize(this); //TODO: Really neededto initialize?
+
+        retrieveSpotsAround(false, parameters.radioSpotsQuery);
+
+        initializeViews();
+
+        //PARSE
+        ParseUserLogIn();
+
+        //Wifi
+        wifiBoss = new WifiBoss(this);
+
+        ParseActions.ssidForcedDetection("piripiri");
+//
+//        mainWifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+//        receiverWifi = new WifiReceiver();
+//        IntentFilter intentFilter = new IntentFilter();
+//        intentFilter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
+//        intentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
+//        registerReceiver(receiverWifi, intentFilter);
+    }
+
+    private void initializeViews() {
+        mySwitch = (Switch) findViewById(R.id.sw_demo);
+        mySwitch.setChecked(false);
+        tv = (TextView) findViewById(R.id.tv_demoStatus);
+        tv.setText("demo OFF");
+        mySwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView,
+                                         boolean isChecked) {
+                demoMode = isChecked;
+                modeChange(isChecked);
+            }
+        });
+        //check the current state before we display the screen
+        demoMode = mySwitch.isChecked();
+    }
+
+    /**
+     * Load the spots from parse that are around from current postion
+     *
+     * @param bLocal If they are stored in local database
+     * @param radio
+     */
+    private void retrieveSpotsAround(final boolean bLocal, final double radio) {
+        (new LocationAsker()).DoSomethingWithPosition(new LocationCallback() {
+            @Override
+            public void LocationReceived(GPSCoordinates gps) {
+                ParseActions.getSpots(bLocal, radio, gps);
+            }
+        }, this);
+    }
+
+//    /**
+//     * Upload the pinned info form SAP and from Weacons
+//     */
+//    private void syncAllPinned() {
+//        SAPO2.uploadIfRequired();
+//    }
 
     /***
      * Write in the main activity
@@ -76,56 +146,6 @@ public class MainActivity extends ActionBarActivity {
         //TODO restructurate notifications package
 
     }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        WriteUnhandledErrors(true);
-        myLog.initialize("/WCLOG/rt.txt"); //Log in a file on thephone
-        Notifications.Initialize(this); //TODO: Really neededto initialize?
-
-        mPos = new Position(this);
-        mPos.connect(Position.REASON.GetWeacons);
-
-
-        mySwitch = (Switch) findViewById(R.id.sw_demo);
-        mySwitch.setChecked(false);
-        tv = (TextView) findViewById(R.id.tv_demoStatus);
-        tv.setText("demo OFF");
-        mySwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView,
-                                         boolean isChecked) {
-                demoMode = isChecked;
-                modeChange(isChecked);
-            }
-        });
-
-        //check the current state before we display the screen
-        demoMode = mySwitch.isChecked();
-
-        //PARSE
-        ParseUserLogIn();
-
-        //Wifi
-        wifiBoss = new WifiBoss(this);
-//
-//        mainWifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-//        receiverWifi = new WifiReceiver();
-//        IntentFilter intentFilter = new IntentFilter();
-//        intentFilter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
-//        intentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
-//        registerReceiver(receiverWifi, intentFilter);
-    }
-
-//    /**
-//     * Upload the pinned info form SAP and from Weacons
-//     */
-//    private void syncAllPinned() {
-//        SAPO2.uploadIfRequired();
-//    }
 
     private void ParseUserLogIn() {
 
@@ -241,8 +261,10 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void clickAddWeacon(View view) {
-        intentAddWeacon = new Intent(this, AddWeaconActivity.class);
-        startActivity(intentAddWeacon);
+        ParseActions.ssidForcedDetection("piripiri");
+
+//        intentAddWeacon = new Intent(this, AddWeaconActivity.class);
+//        startActivity(intentAddWeacon);
     }
 
 //    class WifiReceiver extends BroadcastReceiver {

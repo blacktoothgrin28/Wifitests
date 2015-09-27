@@ -47,7 +47,7 @@ public abstract class SAPO2 {
             for (ScanResult r : sr) {
                 String b = r.BSSID;
 
-                if (true){//TODO !blackList.containsKey(b)) {
+                if (true) {//TODO !blackList.containsKey(b)) {
                     if (parseHits.containsKey(b)) {
                         incrementHit(b);
                     } else {
@@ -78,7 +78,7 @@ public abstract class SAPO2 {
                 oldSpots = newSpots;
             }
         } catch (Exception e) {
-            app("---error en sapo addspot:"+e.getMessage());
+            app("---error en sapo addspot:" + e.getMessage());
         }
     }
 
@@ -238,7 +238,6 @@ public abstract class SAPO2 {
                                             public void done(ParseException e) {
                                                 if (e == null) {
                                                     app("hits saved sucefully");
-
                                                 } else {
                                                     app("---ERROR uploading hits" + e.getMessage());
                                                 }
@@ -247,11 +246,11 @@ public abstract class SAPO2 {
                                         ParseObject.unpinAllInBackground(parameters.pinSapo, new DeleteCallback() {
                                             @Override
                                             public void done(ParseException e) {
-                                               if(e==null){
-                                                   app("unpinned el sapo");
-                                               }else{
-                                                   app("ello"+e.getMessage());
-                                               }
+                                                if (e == null) {
+                                                    app("unpinned el sapo");
+                                                } else {
+                                                    app("ello" + e.getMessage());
+                                                }
                                             }
                                         });
                                     }

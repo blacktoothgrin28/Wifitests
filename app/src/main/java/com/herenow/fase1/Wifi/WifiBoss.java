@@ -8,23 +8,18 @@ import android.net.NetworkInfo;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 
-import com.herenow.fase1.Activities.MainActivity;
-import com.herenow.fase1.Notifications.Notifications;
-import com.herenow.fase1.Position;
+import com.herenow.fase1.Activities.LocationCallback;
 import com.herenow.fase1.Sapo.SAPO2;
-import com.parse.FindCallback;
-import com.parse.ParseException;
-import com.parse.ParseObject;
-import com.parse.ParseQuery;
-import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import parse.WeaconParse;
-import parse.WifiSpot;
+import parse.ParseActions;
+import util.GPSCoordinates;
 import util.myLog;
 import util.parameters;
+
+import static parse.ParseActions.CheckSpotMatches;
 
 /**
  * Created by Milenko on 24/09/2015.
@@ -33,8 +28,10 @@ public class WifiBoss {
     private static int iScan = 0;
     private final WifiManager mainWifi;
     private final WifiReceiver receiverWifi;
+    private  Context mContext;
 
     public WifiBoss(Context context) {
+        mContext = context;
         mainWifi = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
         receiverWifi = new WifiReceiver();
         IntentFilter intentFilter = new IntentFilter();
@@ -44,13 +41,13 @@ public class WifiBoss {
     }
 
     /**
-     * From the list of ScanResults, it looks if SSIDS are present in the table of weacons,
+     * From the list of ScanResults, it looks if SSIDS are present in parse list,
      * and launch the notifications
      *
      * @param sr scanResults
      * @return number of matches
      */
-    public static void CheckScanResults(final List<ScanResult> sr) {
+    public  void CheckScanResults(final List<ScanResult> sr) {
         iScan++;
         if (iScan % 8 == 0) {
             ReportLocalPlaces();
@@ -65,104 +62,25 @@ public class WifiBoss {
             ssids.add(r.SSID);
             sb.append("  '" + r.SSID + "' | " + r.BSSID + " | l= " + r.level + "\n");
         }
+
         sb.append("+++++++++");
         myLog.add(sb.toString(), "WE");
 
-        //Query BSSID
-        ParseQuery<WifiSpot> qb = ParseQuery.getQuery(WifiSpot.class);
-        qb.whereContainedIn("bssid", bssids);
-        //Query SSID
-        ParseQuery<WifiSpot> qs = ParseQuery.getQuery(WifiSpot.class);
-        qs.whereContainedIn("ssid", ssids);
-        qs.whereEqualTo("relevant", true);
-        //Main Query
-        List<ParseQuery<WifiSpot>> queries = new ArrayList<>();
-        queries.add(qb);
-        queries.add(qs);
+        CheckSpotMatches(sr, bssids, ssids);
 
-        ParseQuery<WifiSpot> mainQuery = ParseQuery.or(queries);
-        mainQuery.fromPin(parameters.pinWeacons);
-        mainQuery.include("associated_place");
-
-        mainQuery.findInBackground(new FindCallback<WifiSpot>() {
-
-            @Override
-            public void done(List<WifiSpot> spots, ParseException e) {
-                if (e == null) {
-                    int n = spots.size();
-                    LogInManagement.ReportDetectedSpots(spots);
-                    if (n == 0) {
-                        myLog.add("MegaQuery no match", "WE");
-                    } else { //There are matches
-                        myLog.add("From megaquery we have several matches: " + n, "WE");
-                        MainActivity.reportScanning(n, sr.size());
-
-                        StringBuilder sb = new StringBuilder("***********\n");
-                        for (WifiSpot spot : spots) {
-                            sb.append(spot.toString() + "\n");
-                            registerHitSSID(spot);
-                            WeaconParse we = spot.getWeacon();
-
-                            //TODO  Log in y log out
-                            //send a Notification for each one if has
-                            if (Notifications.shouldBeLaunched(we)) {
-                                Notifications.sendNotification(we);
-                            }
-                        }
-                        sb.append("**********");
-                        myLog.add(sb.toString(), "WE");
-                    }
-                } else {
-                    myLog.add("---Error en megaquery Checkresults", "WE");
-                }
-            }
-        });
-
-    }
-
-    /***
-     * save in Parse that the spot has benn hit
-     *
-     * @param spot
-     */
-    private static void registerHitSSID(final WifiSpot spot) {
-        // Check if already upladed
-        myLog.add(spot.toString(), "HIT");
-        try {
-            ParseQuery query = ParseQuery.getQuery("w_hit");
-            query.whereEqualTo("user", ParseUser.getCurrentUser());
-            query.whereEqualTo("ssid", spot);
-            query.findInBackground(new FindCallback<ParseObject>() {
-                @Override
-                public void done(List<ParseObject> list, ParseException e) {
-                    if (list.size() == 0) { //create
-                        ParseObject hit = new ParseObject("w_hit");
-                        hit.put("ssid", spot);
-                        hit.put("user", ParseUser.getCurrentUser());
-                        hit.put("nhits", 1);
-                        hit.saveInBackground();
-                    } else {//update
-                        ParseObject hit = list.get(0);
-                        hit.increment("nhits");
-                        hit.saveInBackground();
-                    }
-                }
-
-
-            });
-
-
-        } catch (Exception e) {
-            myLog.add("--error en subir hit: " + e.getMessage());
-        }
     }
 
     /***
      * Ask the position and shows the weacons nearby
      */
-    private static void ReportLocalPlaces() {
-        MainActivity.mPos.connect(Position.REASON.AwareOfPlaces);
+    private  void ReportLocalPlaces() {
 
+        (new LocationAsker()).DoSomethingWithPosition(new LocationCallback() {
+            @Override
+            public void LocationReceived(GPSCoordinates gps) {
+                ParseActions.getPlacesAround(gps, 0.3);
+            }
+        }, mContext);
     }
 
     class WifiReceiver extends BroadcastReceiver {

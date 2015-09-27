@@ -1,18 +1,65 @@
 package com.herenow.fase1.Activities;
 
+import android.app.Fragment;
+import android.app.FragmentTransaction;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.herenow.fase1.CardData.CompanyData;
 import com.herenow.fase1.R;
+import com.parse.ParseObject;
+
+import java.util.List;
+
+import parse.ParseActions;
+import util.myLog;
 
 public class CardsActivity extends ActionBarActivity {
+
+    private Bitmap wLogo;
+    private String wName;
+    private String wUrl;
+    private String wCompanyDataObId;
+    private CompanyData mCompanyData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_cards);
+        setContentView(R.layout.activity_cards);//Estaba al principio...
+
+        try {
+            Bundle b = getIntent().getExtras();
+            wName = b.getString("wName");
+            wUrl = b.getString("wUrl");
+            wLogo = (Bitmap) b.get("wLogo");
+            wCompanyDataObId = b.getString("wComapanyDataObId");
+            setTitle(wName);
+
+
+            //segundo intento:
+            CardsActivityFragment rf =  (CardsActivityFragment) getSupportFragmentManager().findFragmentById(R.id.cards_fragment);
+
+            if(rf!=null){
+                rf.setCardData(wCompanyDataObId);
+            }
+
+
+//            // Pass the  companydata ObId to fragment:
+//            Bundle bundle = new Bundle();
+//            bundle.putString("cardObId", wCompanyDataObId);
+//            CardsActivityFragment fragInfo = new CardsActivityFragment();
+//            fragInfo.setArguments(bundle);
+//            FragmentTransaction transaction = null;
+//            transaction.replace(R.id.cards_fragment, fragInfo);
+//            transaction.commit();
+        } catch (Exception e) {
+            myLog.addError(this.getClass(), e);
+        }
+
+
     }
 
 
