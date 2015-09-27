@@ -20,6 +20,7 @@ package com.herenow.fase1.test;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.IdRes;
@@ -30,10 +31,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.herenow.fase1.R;
+import com.squareup.picasso.Picasso;
 
 import it.gmariotti.cardslib.library.cards.material.MaterialLargeImageCard;
 import it.gmariotti.cardslib.library.cards.material.utils.RoundCornersDrawable;
 import it.gmariotti.cardslib.library.internal.CardThumbnail;
+import util.myLog;
 
 /**
  * CardThumbanail with a TextView over the images
@@ -70,6 +73,7 @@ public class mMaterialLargeImageCardThumbnail extends CardThumbnail {
     protected
     @IdRes
     int default_text_id = it.gmariotti.cardslib.library.cards.R.id.card_thumbnail_image_text_over;
+    private Uri mIconOverImageUrl;
 
     // -------------------------------------------------------------
     // Constructors
@@ -142,13 +146,19 @@ public class mMaterialLargeImageCardThumbnail extends CardThumbnail {
 
     protected void buildIconOverImage() {
 
-        if (mIconOverImageView!= null) {
-            if (mIconOverImageResId!= 0) {
+        if (mIconOverImageView != null) {
+            myLog.add("****11iconrsid="+mIconOverImageResId+"\n iconUrl="+mIconOverImageUrl);
+
+            if (mIconOverImageResId != 0) {
                 if (mContext != null)
 //                    mIconOverImageView.setImageResource(mContext.getResources().getString(mIconOverImageResId));
                     mIconOverImageView.setImageResource(mIconOverImageResId);
             } else {
-                mIconOverImageView.setImageResource(mIconOverImageResId);
+                Picasso.with(mContext).load(mIconOverImageUrl)
+                        .error(R.drawable.abc_ic_ab_back_mtrl_am_alpha)
+                        .placeholder(R.mipmap.ic_launcher)
+                        .into(mIconOverImageView);
+//                mIconOverImageView.setImageURI(mIconOverImageUrl);
             }
         }
     }
@@ -175,6 +185,12 @@ public class mMaterialLargeImageCardThumbnail extends CardThumbnail {
 
     public void setIconOverImageResId(int iconOverImageResId) {
         mIconOverImageResId = iconOverImageResId;
+    }
+
+    public void setIconOverImageUrl(String Url) {
+        myLog.add("****9urlIcono=" + Url);
+        mIconOverImageUrl = Uri.parse(Url);
+        myLog.add("****10urlIcono="+mIconOverImageUrl);
     }
 
 

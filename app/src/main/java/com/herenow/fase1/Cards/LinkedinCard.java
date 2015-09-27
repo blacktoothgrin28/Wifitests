@@ -144,7 +144,7 @@ public class LinkedinCard extends CardWithList implements OnTaskCompleted {
 
     @Override
     public void OnTaskCompleted(ArrayList elements) {
-        myLog.add("ontaskcompleted:" + elements.size() + " neews");
+        myLog.add("ontaskcompleted:" + elements.size() + " perfiles");
         //Select three news with exact name
         mEmployeesToShow = elements;
         super.init();

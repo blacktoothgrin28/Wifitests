@@ -88,6 +88,7 @@ public class CompanyCard extends BaseMaterialCard {
      */
     protected CharSequence mSubTitle;
     private boolean couldUseNativeInnerLayout = false;
+    private String mDrawableIconUrl;
 
     public CompanyCard(Context context) {
         this(context, it.gmariotti.cardslib.library.cards.R.layout.native_material_largeimage_inner_base_main);
@@ -131,7 +132,9 @@ public class CompanyCard extends BaseMaterialCard {
 
         ((mMaterialLargeImageCardThumbnail) mCardThumbnail).setTextOverImage(mTextOverImage);
         ((mMaterialLargeImageCardThumbnail) mCardThumbnail).setTextOverImageResId(mTextOverImageResId);
-        ((mMaterialLargeImageCardThumbnail) mCardThumbnail).setIconOverImageResId(mDrawableIconIdCardThumbnail);
+//        ((mMaterialLargeImageCardThumbnail) mCardThumbnail).setIconOverImageResId(mDrawableIconIdCardThumbnail);
+        myLog.add("****8urlIcono="+mDrawableIconUrl);
+        ((mMaterialLargeImageCardThumbnail) mCardThumbnail).setIconOverImageUrl(mDrawableIconUrl);
 
     }
 
@@ -254,6 +257,11 @@ public class CompanyCard extends BaseMaterialCard {
         mUrlCardThumbnail = urlCardThumbnail;
     }
 
+    public void setUrlCardIcon(String urlCardIcon) {
+        myLog.add("****6urlIcono="+urlCardIcon);
+        mDrawableIconUrl = urlCardIcon;
+    }
+
     /**
      * Sets the interface to be called with the thumbnail
      *
@@ -338,6 +346,7 @@ public class CompanyCard extends BaseMaterialCard {
         private int mSupplementalActionLayoutId;
         private Bitmap mLogo;
         private Bitmap mMainImage;
+        private String iconUrl;
 
 
         private SetupWizard(Context context) {
@@ -347,10 +356,15 @@ public class CompanyCard extends BaseMaterialCard {
         public SetupWizard setData(CompanyData companyData) {
             mCompanyData = companyData;
             mTextOverImage = mCompanyData.getName();
+
+            iconUrl = companyData.getLogoUrl();
+            myLog.add("****5urlIcono="+iconUrl);
 //            mDrawableCardIcon = mCompanyData.getLogoResId();
 //            mDrawableCardThumbnail = mCompanyData.getImageResId();
-            mLogo = mCompanyData.getLogo();
-            mMainImage = mCompanyData.getMainImage();
+//            mExternalCardThumbnail=new Fondo(mCompanyData.getMainImage());
+//            mLogo = mCompanyData.getLogo(   );
+//            mMainImage = mCompanyData.getMainImage();
+
 
             return this;
         }
@@ -416,7 +430,10 @@ public class CompanyCard extends BaseMaterialCard {
             card.setTextOverImage(mTextOverImage);
             card.setTextOverImageResId(mTextOverImageResId);
 
-            card.setDrawableIconIdCardThumbnail(mDrawableCardIcon);
+//            card.setDrawableIconIdCardThumbnail(mDrawableCardIcon);
+            myLog.add("****7urlIcono="+iconUrl);
+            card.setUrlCardIcon(iconUrl);
+
 //            card.ico(mDrawableCardIcon);
 
             if (mTitle != null)

@@ -9,6 +9,7 @@ import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,6 +20,8 @@ import util.myLog;
  * Created by Milenko on 25/08/2015.
  */
 public class CompanyData {
+    private String logoUrl;
+    private String mainImageUrl;
     Bitmap mainImage, logo;
     String name;
     String description;
@@ -56,6 +59,14 @@ public class CompanyData {
         this.logo = logo;
     }
 
+    public String getLogoUrl() {
+        return logoUrl;
+    }
+
+    public String getMainImageUrl() {
+        return mainImageUrl;
+    }
+
     public CompanyData(ParseObject po) {
         name = po.getString("Name");
         description = po.getString("Description");
@@ -75,25 +86,23 @@ public class CompanyData {
         nEmployees = (int) po.getNumber("Employees");
 
         //Images
-        try {
-            //todo use picasso
-            ParseFile parseFile = po.getParseFile("Logo");
-            byte[] bitmapdata = new byte[0];
-            bitmapdata = parseFile.getData();
-            logo = BitmapFactory.decodeByteArray(bitmapdata, 0, bitmapdata.length);
+        //todo use picasso
+        ParseFile parseFile = po.getParseFile("Logo");
+        logoUrl = parseFile.getUrl();
+        myLog.add("****4urlIcono=" + logoUrl);
+//            byte[] bitmapdata = parseFile.getData();
+//            logo = BitmapFactory.decodeByteArray(bitmapdata, 0, bitmapdata.length);
 
-            parseFile = po.getParseFile("MainImage");
-            bitmapdata = parseFile.getData();
-            mainImage = BitmapFactory.decodeByteArray(bitmapdata, 0, bitmapdata.length);
+        parseFile = po.getParseFile("MainImage");
+        mainImageUrl = parseFile.getUrl();
+//            bitmapdata = parseFile.getData();
+//            mainImage = BitmapFactory.decodeByteArray(bitmapdata, 0, bitmapdata.length);
 
-            List<Object> al = po.getList("Founders");
-//            founders = al.toArray(String[0]);
-            founders = new String[al.size()];
-            al.toArray(founders);
+        List<Object> al = po.getList("Founders");
+        founders = new String[al.size()];
+        al.toArray(founders);
 
-        } catch (ParseException e) {
-            myLog.addError(this.getClass(), e);
-        }
+
     }
 
     public static SetupWizard with(Context context) {
@@ -171,8 +180,9 @@ public class CompanyData {
         //Foundation (year, people)
         StringBuilder sbFoundation = new StringBuilder();
         if (foundationYear != null) sbFoundation.append("In " + foundationYear);
-        if (founders.length > 0) {
-            sbFoundation.append(" by ");
+        if (founders.length == 1) {
+            sbFoundation.append(" by " + founders[0] + ".");
+        } else if (founders.length > 1) {
             for (int i = 0; i < founders.length - 1; i++) {
                 sbFoundation.append(founders[i]).append(", ");
             }

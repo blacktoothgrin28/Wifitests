@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ImageView;
 
 import com.herenow.fase1.CardData.CompanyData;
 import com.herenow.fase1.CardData.FlightData;
@@ -18,6 +19,7 @@ import com.herenow.fase1.Cards.NewsCard;
 import com.herenow.fase1.Cards.ScheduleCard;
 import com.herenow.fase1.R;
 import com.parse.ParseObject;
+import com.squareup.picasso.Picasso;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -27,6 +29,7 @@ import org.jsoup.select.Elements;
 import java.util.ArrayList;
 import java.util.List;
 
+import it.gmariotti.cardslib.library.cards.material.MaterialLargeImageCard;
 import it.gmariotti.cardslib.library.view.CardViewNative;
 import parse.ParseActions;
 import util.myLog;
@@ -86,7 +89,7 @@ public class CardsActivityFragment extends Fragment {
 //            initLinkedinCard(companyData.getLinkedinUrl());
 
 //            initScheduleCard();
-//            initAirportCard();
+            initAirportCard();
 
         } catch (Exception e) {
             myLog.add("---error init cards: " + e.getMessage());
@@ -148,11 +151,12 @@ public class CardsActivityFragment extends Fragment {
         newsCard.init();
     }
 
-    private void initCompanyCard(CompanyData companyCard) {
+    private void initCompanyCard(final CompanyData companyCard) {
         // Company Card
         CompanyData companyData = companyCard;
         CompanyCard companyCardtest = CompanyCard.with(getActivity())
                 .setData(companyData)
+                .useDrawableUrl(companyData.getMainImageUrl())
                 .build();
 
         CardViewNative cardViewCompany = (CardViewNative) getActivity().findViewById(R.id.card_view_company);
@@ -184,7 +188,7 @@ public class CardsActivityFragment extends Fragment {
                     initLinkedinCard(companyData.getLinkedinUrl());
                 } catch (Exception e) {
                     e.printStackTrace();
-                    myLog.add("error aquí."+e.getLocalizedMessage());
+                    myLog.add("error aquí." + e.getLocalizedMessage());
                 }
             }
 

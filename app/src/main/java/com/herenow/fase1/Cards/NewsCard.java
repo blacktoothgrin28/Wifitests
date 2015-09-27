@@ -344,17 +344,18 @@ class ParseURL extends AsyncTask<String, Void, ArrayList<Noticia>> {
 //            String mydata = "some string with 'the data i want' inside";
 
             HashMap<String, Bitmap> tableImages = ObtainCodedImages(doc.select("script").get(9).html());
-
-            Elements news = doc.select("li.g");
-            myLog.add(" We ve got persons (linkedin): " + news.size());
-
-            for (Element oneNew : news) {
+            myLog.add("news:la tablde de imagenes: " + tableImages.size());
+            Element table = doc.select("ol[id=rso]").first();
+//            Elements news = doc.select("li.g");
+//            myLog.add(" We ve got noticias: " + news.size());
+            myLog.add("news: numero de elemnts: " + table.children().size());
+            for (Element oneNew : table.children()) {
                 noticias.add(ProcessHtmlNews(oneNew, tableImages));
             }
 
 
-        } catch (Throwable t) {
-            t.printStackTrace();
+        } catch (Exception e) {
+            myLog.addError(this.getClass(), e);
         }
         return noticias;
     }
