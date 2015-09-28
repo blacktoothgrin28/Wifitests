@@ -2,6 +2,7 @@ package com.herenow.fase1.Activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
@@ -28,6 +29,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import parse.ParseActions;
+import parse.WeaconParse;
 import util.GPSCoordinates;
 import util.myLog;
 import util.parameters;
@@ -77,6 +79,7 @@ public class MainActivity extends ActionBarActivity {
         //Wifi
         wifiBoss = new WifiBoss(this);
 
+        //Force
         ParseActions.ssidForcedDetection("piripiri");
 //
 //        mainWifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
@@ -85,6 +88,16 @@ public class MainActivity extends ActionBarActivity {
 //        intentFilter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
 //        intentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
 //        registerReceiver(receiverWifi, intentFilter);
+    }
+
+    private void ForcedWeaconDetection() {
+//        WeaconParse we = new WeaconParse("Weacon de test(Airport)", "", "phone", "", "", "This is a weacon made only for test. It's harcoded."
+//                , "airport", 0, 0, 3, false, ParseUser.getCurrentUser(), BitmapFactory.decodeResource(getResources(),
+//                R.drawable.ic_stat_name_hn));
+//        we.setCompanyDataObjectId("D92eRp51KD"); //El prat
+//        we.setObjectId("psnoc");
+
+
     }
 
     private void initializeViews() {
@@ -261,7 +274,9 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void clickAddWeacon(View view) {
-        ParseActions.ssidForcedDetection("piripiri");
+//        ParseActions.ssidForcedDetection("piripiri");
+
+        ForcedWeaconDetection();
 
 //        intentAddWeacon = new Intent(this, AddWeaconActivity.class);
 //        startActivity(intentAddWeacon);

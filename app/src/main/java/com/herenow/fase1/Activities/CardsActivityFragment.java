@@ -46,6 +46,7 @@ public class CardsActivityFragment extends Fragment {
     AirportCard airportCard;
     ScheduleCard scheduleCard;
     private boolean injectJavaScript = true;
+    private String url;
 
     public CardsActivityFragment() {
     }
@@ -69,6 +70,8 @@ public class CardsActivityFragment extends Fragment {
         try {
 //            String wCompanyDataObId = getArguments().getString("cardObId");
 
+//            myLog.add("ONcreatevire en fragmento del card. hemos recibido el argumento: " + wCompanyDataObId);
+
             //TODO fix it: it ask parse each time the fragment is created. Make the Company data parcelable
             // so we can ask  parse before...
 
@@ -89,19 +92,18 @@ public class CardsActivityFragment extends Fragment {
 //            initLinkedinCard(companyData.getLinkedinUrl());
 
 //            initScheduleCard();
-            initAirportCard();
 
         } catch (Exception e) {
             myLog.add("---error init cards: " + e.getMessage());
         }
     }
 
-    private void initAirportCard() {
+    private void initAirportCard(AirportCard.TypeOfCard typeOfCard, String airportCode) {
 
-        airportCard = new AirportCard(getActivity());
+
+        airportCard = new AirportCard(getActivity(), typeOfCard, airportCode);//departure just for test
         CardViewNative cardViewAirport = (CardViewNative) getActivity().findViewById(R.id.card_view_airport);
         airportCard.setView(cardViewAirport);
-        // cardViewAirport.setCard(airportCard);
 
 
         final WebView browser = (WebView) getActivity().findViewById(R.id.wbChanta);
@@ -120,7 +122,10 @@ public class CardsActivityFragment extends Fragment {
             }
         });
         myLog.add("VAMOS leer pagina de radar24");
-        browser.loadUrl("http://flightradar24.com/airport/bcn/departures");
+//        browser.loadUrl("http://flightradar24.com/airport/bcn/departures");
+        url = "http://flightradar24.com/airport/" + airportCode.toLowerCase() + "/" + AirportCard.nameOfType(typeOfCard);
+        myLog.add("RADAR 24 url:"+url);
+        browser.loadUrl(url);
     }
 
     private void initScheduleCard() {
@@ -175,14 +180,18 @@ public class CardsActivityFragment extends Fragment {
         }
     }
 
-    public void setCardData(String wCompanyDataObId) {
+
+    public void setCardData(final String wCompanyDataObId, final AirportCard.TypeOfCard mTypeAirportCard) {
         ParseActions.getCompanyData(wCompanyDataObId, new ParseCallback() {
             @Override
             public void DatafromParseReceived(List<ParseObject> datos) {
-                myLog.add("etntramos en el callback. datossize="+datos.size());
+                myLog.add("etntramos en el callback. datossize=" + datos.size());
                 try {
                     ParseObject po = datos.get(0);
                     CompanyData companyData = new CompanyData(po);
+                    initAirportCard(mTypeAirportCard, companyData.getAirportCode());
+//                    initAirportCard(mTypeOfAirportCard,companyData.getAirportCode()); //todo see how to pass the type of card from notification
+
                     initCompanyCard(companyData);
                     initNewsCard(companyData.getNameClean());
                     initLinkedinCard(companyData.getLinkedinUrl());
@@ -209,14 +218,15 @@ public class CardsActivityFragment extends Fragment {
 
             try {
                 Document doc = Jsoup.parse(html);
-                Elements dep = doc.select("table[class=flightList mainFlightList]").get(1).children().get(1).children();//el segundo tiene la chicha
+//                Elements dep = doc.select("table[class=flightList mainFlightList]").get(1).children().get(1).children();//el segundo tiene la chicha
+                Elements dep = doc.select("table[class=flightList mainFlightList]").select("tr[class=scheduledFlight]").first().parent().children();//el segundo tiene la chicha
 
                 for (Element item : dep) {
                     if (item.className().equals("codeshareFlights")) continue;
                     departures.add(ProcessHtmlFlights(item)); //todo agregar los codigos compartidos
                 }
 
-                myLog.add("tenemos ya procesasdo aviones partiendo: " + departures.size());
+                myLog.add("tenemos ya procesasdo aviones partiendo//llegando: " + departures.size());
 
                 airportCard.setData(departures);
                 runOnUiThread(new Runnable() {

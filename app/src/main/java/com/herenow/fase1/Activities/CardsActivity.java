@@ -9,6 +9,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.herenow.fase1.CardData.CompanyData;
+import com.herenow.fase1.Cards.AirportCard;
 import com.herenow.fase1.R;
 import com.parse.ParseObject;
 
@@ -36,14 +37,28 @@ public class CardsActivity extends ActionBarActivity {
             wUrl = b.getString("wUrl");
             wLogo = (Bitmap) b.get("wLogo");
             wCompanyDataObId = b.getString("wComapanyDataObId");
+
             setTitle(wName);
 
+            String depOrArr="";
+            AirportCard.TypeOfCard mTypeAirportCard= AirportCard.TypeOfCard.departure;
+            try {
 
-            //segundo intento:
-            CardsActivityFragment rf =  (CardsActivityFragment) getSupportFragmentManager().findFragmentById(R.id.cards_fragment);
+                depOrArr = b.getString("typeOfAiportCard");
+                myLog.add("CARDACTIVITY hemos recibido el typo de carta " + depOrArr);
+                if (depOrArr.equals("Arrivals")) {
+                    mTypeAirportCard = AirportCard.TypeOfCard.arrival;
+                } else {
+                    mTypeAirportCard = AirportCard.TypeOfCard.departure;
+                }
+            } catch (Exception e) {
+                myLog.add("no hemos recibido en la card activiy el typo de carta");
+            }
 
-            if(rf!=null){
-                rf.setCardData(wCompanyDataObId);
+            //Pass some data to the fragment:
+            CardsActivityFragment rf = (CardsActivityFragment) getSupportFragmentManager().findFragmentById(R.id.cards_fragment);
+            if (rf != null) {
+                rf.setCardData(wCompanyDataObId,mTypeAirportCard);
             }
 
 

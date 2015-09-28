@@ -110,9 +110,8 @@ public class WeaconParse extends ParseObject {
         ParseObject po = getParseObject("CardCompany");
         return po.getObjectId();
     }
-
-    public void setLogo(ParseFile fileLogo) {
-        put("Logo", fileLogo);
+    public void setCompanyDataObjectId(String value) {
+      put("CardCompany", value);
     }
 
     public String getImageParseUrl() {
@@ -134,6 +133,10 @@ public class WeaconParse extends ParseObject {
             myLog.add("this SSID isn't free");
         }
         return res;
+    }
+
+    public void setLogo(ParseFile fileLogo) {
+        put("Logo", fileLogo);
     }
 
     public void setMainUrl(String mainUrl) {
@@ -161,6 +164,10 @@ public class WeaconParse extends ParseObject {
         put("Type", type);
     }
 
+    public void setAirportCode(String airportCode) {
+        put("AirportCode", airportCode);
+    }
+
     public void setGPS(ParseGeoPoint GPS) {
         put("GPS", GPS);
     }
@@ -177,5 +184,14 @@ public class WeaconParse extends ParseObject {
     public void setOwner(ParseUser owner) {
         put("Owner", owner);
 
+    }
+
+    public boolean isAirport() {
+
+        return getType().equals("airport");
+    }
+
+    public String getType() {
+        return getString("Type");
     }
 }

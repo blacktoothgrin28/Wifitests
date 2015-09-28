@@ -230,7 +230,6 @@ public abstract class ParseActions {
         //Query SSID
         ParseQuery<WifiSpot> qs = ParseQuery.getQuery(WifiSpot.class);
         qs.whereEqualTo("ssid", ssid);
-        qs.fromPin(parameters.pinWeacons);
         qs.include("associated_place");
 
         qs.findInBackground(new FindCallback<WifiSpot>() {

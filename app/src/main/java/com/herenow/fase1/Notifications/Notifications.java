@@ -14,7 +14,9 @@ import android.graphics.BitmapFactory;
 import android.support.v4.app.NotificationCompat;
 
 import com.herenow.fase1.Activities.CardsActivity;
+import com.herenow.fase1.Activities.MainActivity;
 import com.herenow.fase1.Activities.WeaconListActivity;
+import com.herenow.fase1.Cards.AirportCard;
 import com.herenow.fase1.R;
 
 import java.util.ArrayList;
@@ -64,6 +66,7 @@ public abstract class Notifications {
                 updateNotification(we);
             }
 
+
             weaconsLaunchedTable.put(we.getObjectId(), we);
         } catch (Exception e) {
             myLog.add("---ERROR in sendNotification: " + e.getMessage());
@@ -89,13 +92,20 @@ public abstract class Notifications {
         resultIntent.putExtra("wLogo", we.getLogoRounded());
         resultIntent.putExtra("wComapanyDataObId", we.getCompanyDataObjectId());
 
+        Intent arrivalsIntent= (Intent) resultIntent.clone();
+        resultIntent.putExtra("typeOfAiportCard", "Departures");
+        arrivalsIntent.putExtra("typeOfAiportCard", "Arrivals");
+
         stackBuilder = TaskStackBuilder.create(acti.getBaseContext());
         stackBuilder.addParentStack(CardsActivity.class);
         stackBuilder.addNextIntent(resultIntent);
         resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
 
+        PendingIntent pendingArrivals=PendingIntent.getActivity(acti.getBaseContext(),0,arrivalsIntent,PendingIntent.FLAG_UPDATE_CURRENT);
 
-        NotificationCompat.Action myAction = new NotificationCompat.Action(R.drawable.ic_silence, "Turn Off", resultPendingIntent);
+        NotificationCompat.Action myAction = new NotificationCompat.Action(R.drawable.ic_silence, "Turn Off", resultPendingIntent);//TODO to create the silence intent
+        NotificationCompat.Action DepartureAction= new NotificationCompat.Action(R.drawable.ic_flight_takeoff_white_24dp, "Departures", resultPendingIntent);
+        NotificationCompat.Action ArrivalAction = new NotificationCompat.Action(R.drawable.ic_flight_land_white_24dp, "Arrivals", pendingArrivals);
         notif = new NotificationCompat.Builder(acti)
                 .setSmallIcon(R.drawable.ic_stat_name_hn)
                 .setLargeIcon(we.getLogoRounded())
@@ -104,10 +114,19 @@ public abstract class Notifications {
                 .setAutoCancel(true)
                 .setDefaults(Notification.DEFAULT_VIBRATE | Notification.DEFAULT_SOUND | Notification.FLAG_SHOW_LIGHTS)
                 .setLights(0xE6D820, 300, 100)
-                .setTicker("HearNow weacon detected\n" + we.getName())
+                .setTicker("Weacon detected\n" + we.getName())
                 .setDeleteIntent(pendingDeleteIntent)
-                .addAction(myAction);
+                .addAction(myAction)
+                .addAction(DepartureAction)
+                .addAction(ArrivalAction);
+
         NotificationCompat.BigTextStyle bigTextStyle = new NotificationCompat.BigTextStyle();
+
+        //Airport buttons
+//        if(we.isAirport()) {
+//            notif = addAirportActions(notif,we, stackBuilder);
+//        }
+
         bigTextStyle.setBigContentTitle(we.getName());
         bigTextStyle.bigText(we.getMessage());
 
@@ -115,6 +134,34 @@ public abstract class Notifications {
         notif.setContentIntent(resultPendingIntent);
 
         mNotificationManager.notify(mIdSingle, notif.build());
+    }
+
+    private static NotificationCompat.Builder addAirportActions(NotificationCompat.Builder notif, WeaconParse we, TaskStackBuilder stackBuilder) {
+
+        //todo make the buttons work in the notification
+        PendingIntent pendingIntent;
+
+        //Departure
+        Intent intent = new Intent(acti.getBaseContext(), CardsActivity.class);
+        intent.putExtra("wName", we.getName());
+        intent.putExtra("wUrl", we.getUrl());
+        intent.putExtra("wLogo", we.getLogoRounded());
+        intent.putExtra("typeOfFlight", AirportCard.TypeOfCard.departure);
+
+
+//        stackBuilder.addParentStack(MainActivity.class);
+        stackBuilder.addNextIntent(intent);
+
+        pendingIntent = stackBuilder.getPendingIntent(0,PendingIntent.FLAG_UPDATE_CURRENT);
+//        notif.setContentIntent(pendingIntent);
+
+        NotificationCompat.Action departureAction = new NotificationCompat.Action(R.drawable.ic_flight_takeoff_white_24dp, "Departures", pendingIntent);
+        NotificationCompat.Action arrivalAction = new NotificationCompat.Action(R.drawable.ic_flight_land_white_24dp, "Arrivals", pendingIntent);
+
+        notif.addAction(departureAction);
+        notif.addAction(arrivalAction);
+
+        return notif;
     }
 
     private static void updateNotification(WeaconParse we) {
@@ -140,7 +187,8 @@ public abstract class Notifications {
                 .setTicker(msg);
         NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
         inboxStyle.setBigContentTitle(msg);
-        inboxStyle.setSummaryText("Currently " + Integer.toString(showedNotifications.size() + 5) + " weacons active");//TODO Add a meaningfull summary, probably containing the number of weacons in app
+        inboxStyle.setSummaryText("Currently " + Integer.toString(showedNotifications.size() + 5)
+                + " weacons active");//TODO Add a meaningfull summary, probably containing the number of weacons in app
 
         for (WeaconParse weacon : showedNotifications) {
             inboxStyle.addLine(weacon.getName());

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginLeft="8dp"
+    android:layout_marginRight="8dp"
+    android:background="@drawable/demo_item_selector"
+    android:orientation="vertical">
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginLeft="4dp"
+        android:layout_marginRight="4dp"
+        android:minHeight="40dp">
+
+        <TextView
+            android:id="@+id/destination"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/time"
+            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_toEndOf="@+id/time"
+            android:layout_toRightOf="@+id/time"
+            android:text="MADRID (MAD)"
+            android:textColor="@color/carddemo_blackcolored_color"
+            android:textSize="17sp" />
+
+
+        <TextView
+            android:id="@+id/time"
+            android:layout_width="70dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:gravity="center_horizontal"
+            android:text="16:30"
+            android:textColor="@color/demo_card_weather_temperature_color"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/company_and_flight"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/destination"
+            android:layout_alignStart="@+id/destination"
+            android:layout_below="@+id/destination"
+
+            android:text="Vueling VY1634"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+
+        <TextView
+            android:id="@+id/estimated"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/destination"
+            android:layout_marginEnd="10dp"
+            android:layout_marginRight="10dp"
+            android:text="16:45"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@color/theme_accent_1"
+            android:textStyle="bold" />
+
+
+    </RelativeLayout>
+
+</LinearLayout>

@@ -133,7 +133,6 @@ public class CompanyCard extends BaseMaterialCard {
         ((mMaterialLargeImageCardThumbnail) mCardThumbnail).setTextOverImage(mTextOverImage);
         ((mMaterialLargeImageCardThumbnail) mCardThumbnail).setTextOverImageResId(mTextOverImageResId);
 //        ((mMaterialLargeImageCardThumbnail) mCardThumbnail).setIconOverImageResId(mDrawableIconIdCardThumbnail);
-        myLog.add("****8urlIcono="+mDrawableIconUrl);
         ((mMaterialLargeImageCardThumbnail) mCardThumbnail).setIconOverImageUrl(mDrawableIconUrl);
 
     }
@@ -258,7 +257,6 @@ public class CompanyCard extends BaseMaterialCard {
     }
 
     public void setUrlCardIcon(String urlCardIcon) {
-        myLog.add("****6urlIcono="+urlCardIcon);
         mDrawableIconUrl = urlCardIcon;
     }
 
@@ -358,7 +356,6 @@ public class CompanyCard extends BaseMaterialCard {
             mTextOverImage = mCompanyData.getName();
 
             iconUrl = companyData.getLogoUrl();
-            myLog.add("****5urlIcono="+iconUrl);
 //            mDrawableCardIcon = mCompanyData.getLogoResId();
 //            mDrawableCardThumbnail = mCompanyData.getImageResId();
 //            mExternalCardThumbnail=new Fondo(mCompanyData.getMainImage());
@@ -431,7 +428,6 @@ public class CompanyCard extends BaseMaterialCard {
             card.setTextOverImageResId(mTextOverImageResId);
 
 //            card.setDrawableIconIdCardThumbnail(mDrawableCardIcon);
-            myLog.add("****7urlIcono="+iconUrl);
             card.setUrlCardIcon(iconUrl);
 
 //            card.ico(mDrawableCardIcon);

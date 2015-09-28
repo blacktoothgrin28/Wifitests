@@ -1,6 +1,10 @@
 package com.herenow.fase1.CardData;
 
+import com.herenow.fase1.Cards.AirportCard;
+
 import org.jsoup.select.Elements;
+
+import util.myLog;
 
 /**
  * Created by Milenko on 23/09/2015.
@@ -9,9 +13,16 @@ public class GoogleFlight {
     private final FlightData mFlight;
     public String hourEstimated, terminal, gate, arrivalExpected, arrivalTerminal, arrivalGate, code;
     public String changesText, changeSummarized;
+    private String from;
+
 
     public GoogleFlight(Elements datos, FlightData flight) {
+
+
         mFlight = flight;
+
+
+//        Elements datos= datosOri.get(2).child(0).child(2).children();
 
         hourEstimated = datos.first().text();
         terminal = datos.get(1).text();
@@ -19,6 +30,7 @@ public class GoogleFlight {
         arrivalExpected = datos.get(3).text();
         arrivalTerminal = datos.get(4).text();
         arrivalGate = datos.get(5).text();
+
     }
 
     @Override
@@ -63,15 +75,25 @@ public class GoogleFlight {
         return bEstimated & bGate & bTerminal;
     }
 
-    public String getSummary() {
+    public String getSummary(AirportCard.TypeOfCard mTypeOfCard) {
         StringBuilder sb = new StringBuilder();
         String status = "on time";//TODO on time, slight delay, delayed,
 
-        sb.append("The flight " + mFlight.code + " with destination " + mFlight.destination + " is " + status + ".\nThe expected departure is at " + hourEstimated);
-        if (gate.equals("-")) {
-            sb.append(".\nNo gate assigned yet");
-        } else {
-            sb.append(" at gate " + gate + ".");
+        try {
+            sb.append("The flight " + mFlight.code);
+
+            if (mTypeOfCard == AirportCard.TypeOfCard.departure) {
+                sb.append(" with destination " + mFlight.destination + " is " + status + ".\nThe expected departure is at " + hourEstimated);
+                if (gate.equals("-")) {
+                    sb.append(".\nNo gate assigned yet");
+                } else {
+                    sb.append(" at gate " + gate + ".");
+                }
+            } else {
+                sb.append(" coming from " + mFlight.destination + " is " + status + ".\nThe expected landing is at " + arrivalExpected); //improve
+            }
+        } catch (Exception e) {
+            myLog.add("No flight summary available:" + e.getLocalizedMessage());
         }
 
         return sb.toString();

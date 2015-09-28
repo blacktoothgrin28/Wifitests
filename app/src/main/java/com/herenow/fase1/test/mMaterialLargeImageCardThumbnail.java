@@ -147,8 +147,6 @@ public class mMaterialLargeImageCardThumbnail extends CardThumbnail {
     protected void buildIconOverImage() {
 
         if (mIconOverImageView != null) {
-            myLog.add("****11iconrsid="+mIconOverImageResId+"\n iconUrl="+mIconOverImageUrl);
-
             if (mIconOverImageResId != 0) {
                 if (mContext != null)
 //                    mIconOverImageView.setImageResource(mContext.getResources().getString(mIconOverImageResId));
@@ -188,9 +186,7 @@ public class mMaterialLargeImageCardThumbnail extends CardThumbnail {
     }
 
     public void setIconOverImageUrl(String Url) {
-        myLog.add("****9urlIcono=" + Url);
         mIconOverImageUrl = Uri.parse(Url);
-        myLog.add("****10urlIcono="+mIconOverImageUrl);
     }
 
 

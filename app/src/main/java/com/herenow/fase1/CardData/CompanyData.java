@@ -20,6 +20,7 @@ import util.myLog;
  * Created by Milenko on 25/08/2015.
  */
 public class CompanyData {
+    private String airportCode;
     private String logoUrl;
     private String mainImageUrl;
     Bitmap mainImage, logo;
@@ -81,6 +82,7 @@ public class CompanyData {
         linkedinUrl = po.getString("LinkedinUrl");
         typeOfBusiness = po.getString("TypeOfBusiness");
         director = po.getString("Director");
+        airportCode=po.getString("AirportCode");
 //        subsidiaries=po.getString("Subsidiaries"); todo include subsidiaries
 
         nEmployees = (int) po.getNumber("Employees");
@@ -89,7 +91,6 @@ public class CompanyData {
         //todo use picasso
         ParseFile parseFile = po.getParseFile("Logo");
         logoUrl = parseFile.getUrl();
-        myLog.add("****4urlIcono=" + logoUrl);
 //            byte[] bitmapdata = parseFile.getData();
 //            logo = BitmapFactory.decodeByteArray(bitmapdata, 0, bitmapdata.length);
 
@@ -239,6 +240,19 @@ public class CompanyData {
 
     public Bitmap getMainImage() {
         return mainImage;
+    }
+
+    public String getAirportCode() {
+        return airportCode;
+    }
+
+    public boolean isAirport() {
+
+        return getTypeOfBusiness().equals("Airport");
+    }
+
+    public String getTypeOfBusiness() {
+        return typeOfBusiness;
     }
 
     public static final class SetupWizard {

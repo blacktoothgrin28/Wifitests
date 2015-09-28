@@ -51,6 +51,7 @@ public class NewsCard extends CardWithList implements OnTaskCompleted {
     private ArrayList<Noticia> mNewsToShow;
     private String siteUrl;
     private CardViewNative mCardViewNews;
+    private int maxNews;
 
     public NewsCard(Context context, String companyName) {
         super(context);
@@ -76,12 +77,11 @@ public class NewsCard extends CardWithList implements OnTaskCompleted {
                 imageId = oneNew.select("img[class=th _lub]").attr("id");
                 noticia.image = tableImages.get(imageId);
             }
-
-
+            return noticia;
         } catch (Exception e) {
             myLog.add("fallo en crear una noticia" + e.getMessage());
+            return null;
         }
-        return noticia;
     }
 
     @Override
@@ -135,27 +135,16 @@ public class NewsCard extends CardWithList implements OnTaskCompleted {
 //        mNewsToShow = GetNewsSync();
         //Init the list
         List<ListObject> mObjects = new ArrayList<ListObject>();
-
-        //TODO repleacebla by FOR
         //Todo Handle if there is no or less than three new
         try {
-            NewsObject w1 = new NewsObject(this);
-            w1.setData(mNewsToShow.get(0));
-//            AppendLog.appendLog("w1 es " + w1.title + " | " + w1.content);
-            w1.setObjectId(w1.link);
-            mObjects.add(w1);
 
-            NewsObject w2 = new NewsObject(this);
-            w2.setData(mNewsToShow.get(1));
-//            AppendLog.appendLog("w2 es " + w2.title + " | " + w2.content);
-            w2.setObjectId(w2.link);
-            mObjects.add(w2);
+            for (Noticia noti : mNewsToShow) {
+                NewsObject newsObject = new NewsObject(this);
+                newsObject.setData(noti);
+                newsObject.setObjectId(newsObject.link);
+                mObjects.add(newsObject);
+            }
 
-            NewsObject w3 = new NewsObject(this);
-            w3.setData(mNewsToShow.get(2));
-//            AppendLog.appendLog("w3 es " + w3.title + " | " + w3.content);
-            w3.setObjectId(w3.link);
-            mObjects.add(w3);
         } catch (Exception e) {
             myLog.add("--eerron in news caard: " + e.getMessage());
         }
@@ -239,16 +228,31 @@ public class NewsCard extends CardWithList implements OnTaskCompleted {
     @Override
     public void OnTaskCompleted(ArrayList news) {
         myLog.add("ontaskcompleted:" + news.size() + " neews");
-        //Select three news with exact name
+
+        //Select maxNews news with exact name
+        maxNews = 4;
         mNewsToShow = new ArrayList<>();
         for (Object ob : news) {
             Noticia not = (Noticia) ob;
             if (not.isExact) {
                 mNewsToShow.add(not);
-                if (mNewsToShow.size() == 3) break;
+                if (mNewsToShow.size() == maxNews) break;
             }
         }
+        myLog.add("Noticias exactas:"+mNewsToShow.size());
+
+        //Complete with the other news
+        for (Object ob : news) {
+            if (mNewsToShow.size() == maxNews) break;
+            Noticia not = (Noticia) ob;
+            if (!not.isExact) {
+                mNewsToShow.add(not);
+            }
+        }
+
+
         myLog.add("ontaskcompleted: tenemos :" + mNewsToShow.size() + " noticias para mostrar");
+
         super.init();
 
 
@@ -346,11 +350,10 @@ class ParseURL extends AsyncTask<String, Void, ArrayList<Noticia>> {
             HashMap<String, Bitmap> tableImages = ObtainCodedImages(doc.select("script").get(9).html());
             myLog.add("news:la tablde de imagenes: " + tableImages.size());
             Element table = doc.select("ol[id=rso]").first();
-//            Elements news = doc.select("li.g");
-//            myLog.add(" We ve got noticias: " + news.size());
             myLog.add("news: numero de elemnts: " + table.children().size());
             for (Element oneNew : table.children()) {
-                noticias.add(ProcessHtmlNews(oneNew, tableImages));
+                Noticia noticia = ProcessHtmlNews(oneNew, tableImages);
+                if (noticia != null) noticias.add(noticia);
             }
 
 

@@ -46,13 +46,20 @@ public class AirportCard extends CardWithList implements OnTaskCompleted {
 
     private static NotificationCompat.Builder notif;
     private final NotificationManager mNotificationManager;
+    private final TypeOfCard mTypeOfCard;
     private List<ListObject> mObjects;
     private CardViewNative mCardViewAir;
     private GoogleFlight mCurrentGoogle, mOldGoogle;
     private FlightData mSelectedFlight;
+    private String mAirportCode = "Airport code";
 
-    public AirportCard(Context context) {
+    public enum TypeOfCard {departure, arrival}
+
+    public AirportCard(Context context, TypeOfCard typeOfCard, String airportCode) {
         super(context);
+        mAirportCode=airportCode;
+        mTypeOfCard = typeOfCard;
+        myLog.add("the type of cards is" + typeOfCard);
         mNotificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
     }
 
@@ -62,7 +69,11 @@ public class AirportCard extends CardWithList implements OnTaskCompleted {
         //Add Header
         CardHeader header = new CardHeader(getContext(), R.layout.carddemo_googlenowweather_inner_header);
 
-        header.setTitle("Departures " + "BCN");
+        if (mTypeOfCard == TypeOfCard.departure)
+            header.setTitle("Departures " + mAirportCode.toUpperCase());
+        else {
+            header.setTitle("Arrivals " + mAirportCode.toUpperCase());
+        }
         return header;
     }
 
@@ -88,36 +99,73 @@ public class AirportCard extends CardWithList implements OnTaskCompleted {
     public View setupChildView(int childPosition, CardWithList.ListObject object, View convertView, ViewGroup parent) {
         try {
             //Setup the ui elements inside the item
-            TextView time = (TextView) convertView.findViewById(R.id.time);
-            TextView destination = (TextView) convertView.findViewById(R.id.destination);
             TextView companyAndFlight = (TextView) convertView.findViewById(R.id.company_and_flight);
+            TextView time = (TextView) convertView.findViewById(R.id.time);
             TextView estimated = (TextView) convertView.findViewById(R.id.estimated);
+            TextView destination = (TextView) convertView.findViewById(R.id.destination);//it's origin when arrival
 
-            //Retrieve the values from the object
-            flightObject flightObject = (flightObject) object;
+            if (mTypeOfCard == TypeOfCard.departure) {
 
-            time.setText(flightObject.scheduledAt);
-            destination.setText(flightObject.destination);
-            companyAndFlight.setText(flightObject.airline + " " + flightObject.code);
+                //Retrieve the values from the object
+                DepartureObject departureObject = (DepartureObject) object;
 
-            String est = flightObject.estimated;
-            if (est.startsWith("Schedu")) {
-                est = "";
-            } else if (est.startsWith("Estimat")) {
-                est = "Est. " + est.substring(est.length() - 5);
-//                estimated.setTextColor();
-            } else if (est.startsWith("Dela")) {
-                est = "Est. " + est.substring(est.length() - 5);
-                myLog.add("hay uno con retraso grande, programado para las: " + flightObject.scheduledAt);
-                estimated.setTextColor(getContext().getResources().getColor(R.color.red));
+                time.setText(departureObject.scheduledAt);
+                destination.setText(departureObject.destination);
+                companyAndFlight.setText(departureObject.airline + " " + departureObject.code);
+
+                String est = departureObject.estimated;
+                if (est.startsWith("Schedu")) {
+                    est = "";
+                } else if (est.startsWith("Estimat")) {
+                    est = "Est. " + est.substring(est.length() - 5);
+                    //                estimated.setTextColor();
+                } else if (est.startsWith("Dela")) {
+                    est = "Est. " + est.substring(est.length() - 5);
+                    myLog.add("hay uno con retraso grande, programado para las: " + departureObject.scheduledAt);
+                    estimated.setTextColor(getContext().getResources().getColor(R.color.red));
+                }
+
+                estimated.setText(est);
+            } else {
+                //Arrival
+                //Retrieve the values from the object
+                ArrivalObject arrival = (ArrivalObject) object;
+
+                time.setText(arrival.scheduledAt);
+                destination.setText(arrival.origin);
+                companyAndFlight.setText(arrival.airline + " " + arrival.code);
+
+                String est = arrival.estimated;
+//                if (est.startsWith("Schedu")) {
+//                    est = "";
+//                } else if (est.startsWith("Estimat")) {
+//                    est = "Est. " + est.substring(est.length() - 5);
+//                    //                estimated.setTextColor();
+//                } else if (est.startsWith("Dela")) {
+//                    est = "Est. " + est.substring(est.length() - 5);
+//                    myLog.add("hay uno con retraso grande, programado para las: " + arrival.scheduledAt);
+//                    estimated.setTextColor(getContext().getResources().getColor(R.color.red));
+//                }
+//
+//                estimated.setText(est);
+
             }
-
-            estimated.setText(est);
 
         } catch (Exception e) {
             myLog.add("eyyo " + e.getMessage());
         }
         return convertView;
+    }
+
+    public static  String nameOfType(TypeOfCard toc) {
+    String st;
+        if(toc==TypeOfCard.departure){
+            st="departures";
+        }else{
+            st="arrivals";
+        }
+        return st;
+
     }
 
     @Override
@@ -132,7 +180,13 @@ public class AirportCard extends CardWithList implements OnTaskCompleted {
 
     @Override
     public int getChildLayoutId() {
-        return R.layout.flight_card_inner_main;
+        int innerLayout;
+        if (mTypeOfCard == TypeOfCard.departure) {
+            innerLayout = R.layout.departure_card_inner_main;
+        } else {
+            innerLayout = R.layout.arrival_card_inner_main;
+        }
+        return innerLayout;
     }
 
 
@@ -140,10 +194,18 @@ public class AirportCard extends CardWithList implements OnTaskCompleted {
         mObjects = new ArrayList<>();
 
         for (FlightData fl : departures) {
-            flightObject fo = new flightObject(mParentCard);
-            fo.setData(fl);
+            DepartureObject depOb;
+            ArrivalObject arrOb;
+            if (mTypeOfCard == TypeOfCard.departure) {
+                depOb = new DepartureObject(mParentCard);
+                depOb.setData(fl);
+                mObjects.add(depOb);
+            } else {
+                arrOb = new ArrivalObject(mParentCard);
+                arrOb.setData(fl);
+                mObjects.add(arrOb);
+            }
 
-            mObjects.add(fo);
         }
     }
 
@@ -151,9 +213,9 @@ public class AirportCard extends CardWithList implements OnTaskCompleted {
     public void OnTaskCompleted(ArrayList googleFlights) {
         mCurrentGoogle = (GoogleFlight) googleFlights.get(0);
 
-        myLog.add("::::Hemos recibido la info del vuelo:" + mCurrentGoogle.getSummary());
+        myLog.add("::::Hemos recibido la info del vuelo:" + mCurrentGoogle.getSummary(TypeOfCard.departure));
 
-        Toast.makeText(mContext, mCurrentGoogle.getSummary(), Toast.LENGTH_LONG).show();
+        Toast.makeText(mContext, mCurrentGoogle.getSummary(mTypeOfCard), Toast.LENGTH_LONG).show();
 
         //Start asking google flight each 20 secs:
         Timer t = new Timer();
@@ -192,7 +254,7 @@ public class AirportCard extends CardWithList implements OnTaskCompleted {
             if (mCurrentGoogle.hasChanged(mOldGoogle)) {
                 myLog.add("has changed: " + mCurrentGoogle.changesText);
                 notiTitle = mCurrentGoogle.changeSummarized;
-                content = mCurrentGoogle.getSummary();
+                content = mCurrentGoogle.getSummary(TypeOfCard.departure);
                 myLog.add("******NOTIFICATION: " + notiTitle);
                 myLog.add("***NOTIFICATION: " + content);
 
@@ -201,8 +263,6 @@ public class AirportCard extends CardWithList implements OnTaskCompleted {
             } else {
                 myLog.add("Hasn't changed ");
             }
-
-
 
 
         } catch (IOException e) {
@@ -244,7 +304,7 @@ public class AirportCard extends CardWithList implements OnTaskCompleted {
         (new readGoogleFlight(this)).execute(new String[]{flightCode});
     }
 
-    class flightObject extends CardWithList.DefaultListObject {
+    class DepartureObject extends CardWithList.DefaultListObject {
 
         public String code;
         public String scheduledAt;
@@ -259,7 +319,7 @@ public class AirportCard extends CardWithList implements OnTaskCompleted {
         public String[] SharedCodes;
         private FlightData flight;
 
-        public flightObject(Card parentCard) {
+        public DepartureObject(Card parentCard) {
             super(parentCard);
             init();
         }
@@ -271,7 +331,7 @@ public class AirportCard extends CardWithList implements OnTaskCompleted {
                 public void onItemClick(LinearListView parent, View view, int position, CardWithList.ListObject object) {
                     Toast.makeText(getContext(), "Getting info for " + getObjectId() + "\nAlerts Activated.", Toast.LENGTH_SHORT).show();
                     myLog.add("asgink google for flight for first time: " + getObjectId());
-                    mSelectedFlight = ((flightObject) object).flight;
+                    mSelectedFlight = ((DepartureObject) object).flight;
                     GetInfoFlightFromGoogle(getObjectId()); //First retrieving from google
                 }
             });
@@ -292,6 +352,62 @@ public class AirportCard extends CardWithList implements OnTaskCompleted {
             scheduledAt = fl.scheduledAt;
             airline = fl.airline;
             destination = fl.destination;
+            status = fl.status;
+            title = fl.title;
+            estimated = fl.estimated;
+
+            setObjectId(code);
+        }
+    }
+
+    class ArrivalObject extends CardWithList.DefaultListObject {
+
+        public String code;
+        public String scheduledAt;
+        public String origin;
+        public String airline;
+        public String plane;
+        public String ignoro;
+        public String estimated;
+        public String ignoro2;
+        public String status;
+        public String title;
+        public String[] SharedCodes;
+        private FlightData flight;
+
+        public ArrivalObject(Card parentCard) {
+            super(parentCard);
+            init();
+        }
+
+        private void init() {
+            //OnClick Listener
+            setOnItemClickListener(new CardWithList.OnItemClickListener() {
+                @Override
+                public void onItemClick(LinearListView parent, View view, int position, CardWithList.ListObject object) {
+                    Toast.makeText(getContext(), "Getting info for " + getObjectId() + "\nAlerts Activated.", Toast.LENGTH_SHORT).show();
+                    myLog.add("asgink google for flight for first time: " + getObjectId());
+                    mSelectedFlight = ((ArrivalObject) object).flight;
+                    GetInfoFlightFromGoogle(getObjectId()); //First retrieving from google
+                }
+            });
+
+//            //OnItemSwipeListener
+//            setOnItemSwipeListener(new OnItemSwipeListener() {
+//                @Override
+//                public void onItemSwipe(ListObject object, boolean dismissRight) {
+//                    Toast.makeText(getContext(), "Swipe on " + object.getObjectId(), Toast.LENGTH_SHORT).show();
+//                }
+//            });
+        }
+
+        public void setData(FlightData fl) {
+            flight = fl;
+
+            code = fl.code;
+            scheduledAt = fl.scheduledAt;
+            airline = fl.airline;
+            origin = fl.destination;
             status = fl.status;
             title = fl.title;
             estimated = fl.estimated;
