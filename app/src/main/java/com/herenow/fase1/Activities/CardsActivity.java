@@ -40,8 +40,8 @@ public class CardsActivity extends ActionBarActivity {
 
             setTitle(wName);
 
-            String depOrArr="";
-            AirportCard.TypeOfCard mTypeAirportCard= AirportCard.TypeOfCard.departure;
+            String depOrArr = "";
+            AirportCard.TypeOfCard mTypeAirportCard = AirportCard.TypeOfCard.departure;
             try {
 
                 depOrArr = b.getString("typeOfAiportCard");
@@ -58,7 +58,7 @@ public class CardsActivity extends ActionBarActivity {
             //Pass some data to the fragment:
             CardsActivityFragment rf = (CardsActivityFragment) getSupportFragmentManager().findFragmentById(R.id.cards_fragment);
             if (rf != null) {
-                rf.setCardData(wCompanyDataObId,mTypeAirportCard);
+                rf.setCardData(wCompanyDataObId, mTypeAirportCard);
             }
 
 

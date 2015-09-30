@@ -11,26 +11,23 @@ import util.myLog;
  */
 public class GoogleFlight {
     private final FlightData mFlight;
+    private final boolean dataAvailable;
     public String hourEstimated, terminal, gate, arrivalExpected, arrivalTerminal, arrivalGate, code;
     public String changesText, changeSummarized;
-    private String from;
-
 
     public GoogleFlight(Elements datos, FlightData flight) {
-
-
         mFlight = flight;
+        dataAvailable = (datos.size() > 0);
 
+        if (dataAvailable) {
 
-//        Elements datos= datosOri.get(2).child(0).child(2).children();
-
-        hourEstimated = datos.first().text();
-        terminal = datos.get(1).text();
-        gate = datos.get(2).text();
-        arrivalExpected = datos.get(3).text();
-        arrivalTerminal = datos.get(4).text();
-        arrivalGate = datos.get(5).text();
-
+            hourEstimated = datos.first().text();
+            terminal = datos.get(1).text();
+            gate = datos.get(2).text();
+            arrivalExpected = datos.get(3).text();
+            arrivalTerminal = datos.get(4).text();
+            arrivalGate = datos.get(5).text();
+        }
     }
 
     @Override
@@ -79,6 +76,8 @@ public class GoogleFlight {
         StringBuilder sb = new StringBuilder();
         String status = "on time";//TODO on time, slight delay, delayed,
 
+        if (!dataAvailable) return "No data available for flight " + mFlight.code;
+
         try {
             sb.append("The flight " + mFlight.code);
 
@@ -90,7 +89,7 @@ public class GoogleFlight {
                     sb.append(" at gate " + gate + ".");
                 }
             } else {
-                sb.append(" coming from " + mFlight.destination + " is " + status + ".\nThe expected landing is at " + arrivalExpected); //improve
+                sb.append(" coming from " + mFlight.destination + " is " + status + ".\nThe expected landing is at " + arrivalExpected); //todo improve
             }
         } catch (Exception e) {
             myLog.add("No flight summary available:" + e.getLocalizedMessage());

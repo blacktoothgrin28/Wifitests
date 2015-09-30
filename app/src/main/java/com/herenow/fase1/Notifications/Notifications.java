@@ -36,6 +36,20 @@ public abstract class Notifications {
     private static Activity acti;
     private static int mIdSingle, mIdGroup;
     private static int currentId = 1;
+    private final static BroadcastReceiver receiverDeleteNotification = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            try {
+                myLog.add("<<<<<<<<<<<<Has borrado una notif>>>>");
+                currentId = currentId + 2;
+                showedNotifications = new ArrayList<>();
+
+            } catch (Exception e) {
+                myLog.add("---ERROR<<<<<<<<<<<<Has borrado una notif>>>>" + e.getMessage());
+            }
+            context.unregisterReceiver(this);
+        }
+    };
     private static NotificationCompat.Builder notif;
     private static PendingIntent pendingDeleteIntent;
 
@@ -85,26 +99,26 @@ public abstract class Notifications {
 
         acti.registerReceiver(receiverDeleteNotification, new IntentFilter(NOTIFICATION_DELETED_ACTION));
 
-        resultIntent = new Intent(acti.getBaseContext(), CardsActivity.class);
-//        resultIntent.putExtra("weacon", we);
-        resultIntent.putExtra("wName", we.getName());
-        resultIntent.putExtra("wUrl", we.getUrl());
-        resultIntent.putExtra("wLogo", we.getLogoRounded());
-        resultIntent.putExtra("wComapanyDataObId", we.getCompanyDataObjectId());
+        resultIntent = new Intent(acti.getBaseContext(), CardsActivity.class)
+                .putExtra("wName", we.getName())
+                .putExtra("wUrl", we.getUrl())
+                .putExtra("wLogo", we.getLogoRounded())
+                .putExtra("wComapanyDataObId", we.getCompanyDataObjectId());
 
-        Intent arrivalsIntent= (Intent) resultIntent.clone();
+        Intent arrivalsIntent = new Intent(resultIntent);
+
         resultIntent.putExtra("typeOfAiportCard", "Departures");
         arrivalsIntent.putExtra("typeOfAiportCard", "Arrivals");
 
         stackBuilder = TaskStackBuilder.create(acti.getBaseContext());
         stackBuilder.addParentStack(CardsActivity.class);
         stackBuilder.addNextIntent(resultIntent);
-        resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+        resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT); //Todo solve the stack for going back from cards
 
-        PendingIntent pendingArrivals=PendingIntent.getActivity(acti.getBaseContext(),0,arrivalsIntent,PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingArrivals = PendingIntent.getActivity(acti.getBaseContext(), 1, arrivalsIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         NotificationCompat.Action myAction = new NotificationCompat.Action(R.drawable.ic_silence, "Turn Off", resultPendingIntent);//TODO to create the silence intent
-        NotificationCompat.Action DepartureAction= new NotificationCompat.Action(R.drawable.ic_flight_takeoff_white_24dp, "Departures", resultPendingIntent);
+        NotificationCompat.Action DepartureAction = new NotificationCompat.Action(R.drawable.ic_flight_takeoff_white_24dp, "Departures", resultPendingIntent);
         NotificationCompat.Action ArrivalAction = new NotificationCompat.Action(R.drawable.ic_flight_land_white_24dp, "Arrivals", pendingArrivals);
         notif = new NotificationCompat.Builder(acti)
                 .setSmallIcon(R.drawable.ic_stat_name_hn)
@@ -152,7 +166,7 @@ public abstract class Notifications {
 //        stackBuilder.addParentStack(MainActivity.class);
         stackBuilder.addNextIntent(intent);
 
-        pendingIntent = stackBuilder.getPendingIntent(0,PendingIntent.FLAG_UPDATE_CURRENT);
+        pendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
 //        notif.setContentIntent(pendingIntent);
 
         NotificationCompat.Action departureAction = new NotificationCompat.Action(R.drawable.ic_flight_takeoff_white_24dp, "Departures", pendingIntent);
@@ -207,20 +221,5 @@ public abstract class Notifications {
 
         mNotificationManager.notify(mIdGroup, notif.build());
     }
-
-    private final static BroadcastReceiver receiverDeleteNotification = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            try {
-                myLog.add("<<<<<<<<<<<<Has borrado una notif>>>>");
-                currentId = currentId + 2;
-                showedNotifications = new ArrayList<>();
-
-            } catch (Exception e) {
-                myLog.add("---ERROR<<<<<<<<<<<<Has borrado una notif>>>>" + e.getMessage());
-            }
-            context.unregisterReceiver(this);
-        }
-    };
 
 }
