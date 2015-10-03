@@ -9,6 +9,6 @@ import java.util.List;
  * Created by Milenko on 26/09/2015.
  */
 public interface  ParseCallback {
-    public void DatafromParseReceived(List<ParseObject> datos);
-    public void OnError(Exception e);
+     void DatafromParseReceived(List<ParseObject> datos);
+     void OnError(Exception e);
 }

@@ -91,7 +91,7 @@ public class CardsActivityFragment extends Fragment {
 //            initNewsCard(companyData.getNameClean());
 //            initLinkedinCard(companyData.getLinkedinUrl());
 
-//            initScheduleCard();
+            initScheduleCard();
 
         } catch (Exception e) {
             myLog.add("---error init cards: " + e.getMessage());
@@ -218,8 +218,7 @@ public class CardsActivityFragment extends Fragment {
 
             try {
                 Document doc = Jsoup.parse(html);
-//                Elements dep = doc.select("table[class=flightList mainFlightList]").get(1).children().get(1).children();//el segundo tiene la chicha
-                Elements dep = doc.select("table[class=flightList mainFlightList]").select("tr[class=scheduledFlight]").first().parent().children();//el segundo tiene la chicha
+                Elements dep = doc.select("table[class=flightList mainFlightList]").get(1).children().get(1).children();//el segundo tiene la chicha
 
                 for (Element item : dep) {
                     if (item.className().equals("codeshareFlights")) continue;

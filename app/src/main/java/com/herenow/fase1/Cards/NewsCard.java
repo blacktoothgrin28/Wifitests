@@ -77,11 +77,12 @@ public class NewsCard extends CardWithList implements OnTaskCompleted {
                 imageId = oneNew.select("img[class=th _lub]").attr("id");
                 noticia.image = tableImages.get(imageId);
             }
-            return noticia;
+
+
         } catch (Exception e) {
             myLog.add("fallo en crear una noticia" + e.getMessage());
-            return null;
         }
+        return noticia;
     }
 
     @Override
@@ -234,19 +235,17 @@ public class NewsCard extends CardWithList implements OnTaskCompleted {
         mNewsToShow = new ArrayList<>();
         for (Object ob : news) {
             Noticia not = (Noticia) ob;
+            if (mNewsToShow.size() == maxNews) break;
             if (not.isExact) {
                 mNewsToShow.add(not);
-                if (mNewsToShow.size() == maxNews) break;
             }
         }
-        myLog.add("Noticias exactas:"+mNewsToShow.size());
-
         //Complete with the other news
         for (Object ob : news) {
-            if (mNewsToShow.size() == maxNews) break;
             Noticia not = (Noticia) ob;
             if (!not.isExact) {
                 mNewsToShow.add(not);
+                if (mNewsToShow.size() == maxNews) break;
             }
         }
 
@@ -352,8 +351,7 @@ class ParseURL extends AsyncTask<String, Void, ArrayList<Noticia>> {
             Element table = doc.select("ol[id=rso]").first();
             myLog.add("news: numero de elemnts: " + table.children().size());
             for (Element oneNew : table.children()) {
-                Noticia noticia = ProcessHtmlNews(oneNew, tableImages);
-                if (noticia != null) noticias.add(noticia);
+                noticias.add(ProcessHtmlNews(oneNew, tableImages));
             }
 
 

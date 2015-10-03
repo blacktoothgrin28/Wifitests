@@ -136,18 +136,18 @@ public class AirportCard extends CardWithList implements OnTaskCompleted {
                 companyAndFlight.setText(arrival.airline + " " + arrival.code);
 
                 String est = arrival.estimated;
-                if (est.startsWith("Schedu")) {
-                    est = "";
-                } else if (est.startsWith("Estimat")) {
-                    est = "Est. " + est.substring(est.length() - 5);
-                    //                estimated.setTextColor();
-                } else if (est.startsWith("Dela")) {
-                    est = "Est. " + est.substring(est.length() - 5);
-                    myLog.add("hay uno con retraso grande, programado para las: " + arrival.scheduledAt);
-                    estimated.setTextColor(getContext().getResources().getColor(R.color.red));
-                }
-
-                estimated.setText(est);
+//                if (est.startsWith("Schedu")) {
+//                    est = "";
+//                } else if (est.startsWith("Estimat")) {
+//                    est = "Est. " + est.substring(est.length() - 5);
+//                    //                estimated.setTextColor();
+//                } else if (est.startsWith("Dela")) {
+//                    est = "Est. " + est.substring(est.length() - 5);
+//                    myLog.add("hay uno con retraso grande, programado para las: " + arrival.scheduledAt);
+//                    estimated.setTextColor(getContext().getResources().getColor(R.color.red));
+//                }
+//
+//                estimated.setText(est);
 
             }
 
@@ -217,7 +217,7 @@ public class AirportCard extends CardWithList implements OnTaskCompleted {
 
         Toast.makeText(mContext, mCurrentGoogle.getSummary(mTypeOfCard), Toast.LENGTH_LONG).show();
 
-        //Start asking google flight each 20 secs:
+        //Start asking google flight periodically
         Timer t = new Timer();
         t.schedule(new TimerTask() {
             @Override

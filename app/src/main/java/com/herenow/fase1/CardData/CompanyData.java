@@ -68,7 +68,7 @@ public class CompanyData {
         return mainImageUrl;
     }
 
-    public CompanyData(ParseObject po) {
+    public CompanyData(ParseObject po) throws ParseException {
         name = po.getString("Name");
         description = po.getString("Description");
         phone = po.getString("Phone");
@@ -82,17 +82,16 @@ public class CompanyData {
         linkedinUrl = po.getString("LinkedinUrl");
         typeOfBusiness = po.getString("TypeOfBusiness");
         director = po.getString("Director");
-        airportCode=po.getString("AirportCode");
+        airportCode = po.getString("AirportCode");
 //        subsidiaries=po.getString("Subsidiaries"); todo include subsidiaries
 
         nEmployees = (int) po.getNumber("Employees");
 
         //Images
-        //todo use picasso
         ParseFile parseFile = po.getParseFile("Logo");
         logoUrl = parseFile.getUrl();
-//            byte[] bitmapdata = parseFile.getData();
-//            logo = BitmapFactory.decodeByteArray(bitmapdata, 0, bitmapdata.length);
+        byte[] bitmapdata = parseFile.getData();
+        logo = BitmapFactory.decodeByteArray(bitmapdata, 0, bitmapdata.length);
 
         parseFile = po.getParseFile("MainImage");
         mainImageUrl = parseFile.getUrl();

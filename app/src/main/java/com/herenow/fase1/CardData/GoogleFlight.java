@@ -45,11 +45,11 @@ public class GoogleFlight {
     public boolean hasChanged(GoogleFlight OldGoogle) {
         StringBuilder sb = new StringBuilder();
 
-        boolean bEstimated = hourEstimated.equals(OldGoogle.hourEstimated);
-        boolean bGate = gate.equals(OldGoogle.gate);
-        boolean bTerminal = terminal.equals(OldGoogle.gate);
+        boolean changeEstimated = !hourEstimated.equals(OldGoogle.hourEstimated);
+        boolean changeGate = !gate.equals(OldGoogle.gate);
+        boolean changeTerminal = !terminal.equals(OldGoogle.terminal);
 
-        if (bGate) {
+        if (changeGate) {
             sb.append(mFlight.toString() + "\n");
             sb.append("Gate: " + OldGoogle.gate + " -> " + gate + " | ");
             if (OldGoogle.equals("-")) {//Check
@@ -58,18 +58,18 @@ public class GoogleFlight {
                 changeSummarized = "The gate for the flight " + mFlight.code + " has been changed. Now is: " + gate;
             }
         }
-        if (bEstimated) {
+        if (changeEstimated) {
             sb.append("Estimated: " + OldGoogle.hourEstimated + " -> " + hourEstimated + " | ");
             changeSummarized = "The estimated departure of the flight " + mFlight.code + " is now at: " + gate;
         }
-        if (bTerminal) {
+        if (changeTerminal) {
             sb.append("Terminal: " + OldGoogle.terminal + " -> " + terminal + " | ");
-            changeSummarized = "Change in departure terminal for the flight " + mFlight.code + " . Now is: " + gate;//TODO put destination and codes
+            changeSummarized = "Change in departure terminal for the flight " + mFlight.code + " . Now is: " + terminal;//TODO put destination and codes
         }
 
         changesText = sb.toString();
 
-        return bEstimated & bGate & bTerminal;
+        return changeEstimated || changeGate || changeTerminal;
     }
 
     public String getSummary(AirportCard.TypeOfCard mTypeOfCard) {

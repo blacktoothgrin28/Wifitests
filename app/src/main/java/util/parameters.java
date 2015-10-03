@@ -23,6 +23,8 @@ public class parameters {
     public static boolean isSapoActive = false;
 
 
+    public enum CardType {COMPANY, SCHEDULE, LINKEDIN, NEWS, FLIGHTS}
+
     public static CompanyData getExampleCompanyCard() {
         CompanyData companyData = new CompanyData("Aplicaciones en Informática Avanzada S.L.", R.drawable.im_aia_fondo_claro, R.drawable.im_aia_logom);
         companyData.setEmployeesNumber(55);
