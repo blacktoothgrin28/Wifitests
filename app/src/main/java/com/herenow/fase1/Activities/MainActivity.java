@@ -17,9 +17,11 @@ import android.widget.TextView;
 import com.herenow.fase1.Notifications.Notifications;
 import com.herenow.fase1.Position;
 import com.herenow.fase1.R;
+import com.herenow.fase1.TimerService;
 import com.herenow.fase1.Wifi.LocationAsker;
 import com.herenow.fase1.Wifi.WifiBoss;
 import com.herenow.fase1.Wifi.WifiUpdater;
+import com.herenow.fase1.WifiObserverService;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
@@ -56,8 +58,11 @@ public class MainActivity extends ActionBarActivity {
     private long newTime, oldTime;
     private String msg = "";
 
+
+    Intent intentWifiObs;
+
     //    private boolean isSapoActive = true; //TODO activate /deactivate sapo remotely
-    private WifiBoss wifiBoss;
+//    private WifiBoss wifiBoss;
 
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,7 +82,11 @@ public class MainActivity extends ActionBarActivity {
         ParseUserLogIn();
 
         //Wifi
-        wifiBoss = new WifiBoss(this);
+//        wifiBoss = new WifiBoss(this); //HERE THE DIFFERENCE USING SERVICE OR NOT
+        Context mContext = getApplicationContext();
+        intentWifiObs = new Intent(mContext, WifiObserverService.class);
+        mContext.startService(intentWifiObs);
+
 
 //        //Force
 //        ParseActions.ssidForcedDetection("piripiri");
@@ -233,41 +242,44 @@ public class MainActivity extends ActionBarActivity {
      */
     public void clickConnect(View view) {
 
-        String networkSSID = "piripiri";
-        String networkPass = "spideyhg3711";
+        getApplicationContext().stopService(intentWifiObs);
 
-        WifiConfiguration conf = new WifiConfiguration();
-        conf.SSID = "\"" + networkSSID + "\"";
-
-        //WEP In case of WEP, if your password is in hex, you do not need to surround it with quotes.
-//        conf.wepKeys[0] = "\"" + networkPass + "\"";
-//        conf.wepTxKeyIndex = 0;
-//        conf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
-//        conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP40);
-
-        //WPA
-        conf.preSharedKey = "\"" + networkPass + "\"";
-
-        //open
-//        conf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
-
-        WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-        if (!wifiManager.isWifiEnabled()) {
-            wifiManager.setWifiEnabled(true);
-        }
-        wifiManager.addNetwork(conf);
-
-        List<WifiConfiguration> list = wifiManager.getConfiguredNetworks();
-
-        for (WifiConfiguration i : list) {
-            if (i.SSID != null && i.SSID.equals("\"" + networkSSID + "\"")) {
-                wifiManager.disconnect();
-                wifiManager.enableNetwork(i.networkId, true);
-                wifiManager.reconnect();
-
-                break;
-            }
-        }
+        //This is for connecting programatelly
+//        String networkSSID = "piripiri";
+//        String networkPass = "spideyhg3711";
+//
+//        WifiConfiguration conf = new WifiConfiguration();
+//        conf.SSID = "\"" + networkSSID + "\"";
+//
+//        //WEP In case of WEP, if your password is in hex, you do not need to surround it with quotes.
+////        conf.wepKeys[0] = "\"" + networkPass + "\"";
+////        conf.wepTxKeyIndex = 0;
+////        conf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
+////        conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP40);
+//
+//        //WPA
+//        conf.preSharedKey = "\"" + networkPass + "\"";
+//
+//        //open
+////        conf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
+//
+//        WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+//        if (!wifiManager.isWifiEnabled()) {
+//            wifiManager.setWifiEnabled(true);
+//        }
+//        wifiManager.addNetwork(conf);
+//
+//        List<WifiConfiguration> list = wifiManager.getConfiguredNetworks();
+//
+//        for (WifiConfiguration i : list) {
+//            if (i.SSID != null && i.SSID.equals("\"" + networkSSID + "\"")) {
+//                wifiManager.disconnect();
+//                wifiManager.enableNetwork(i.networkId, true);
+//                wifiManager.reconnect();
+//
+//                break;
+//            }
+//        }
 
     }
 

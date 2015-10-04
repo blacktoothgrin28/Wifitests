@@ -98,11 +98,13 @@
         </activity>
 
         <service
-            android:name=".services.FlightsVigilant"
+            android:name=".WifiObserverService"
             android:exported="false" />
+
         <service
             android:name=".TimerService"
             android:exported="false" />
+
 
         <!--PArse push staff-->
         <service android:name="com.parse.PushService" />

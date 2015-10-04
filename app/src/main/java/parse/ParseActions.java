@@ -126,6 +126,8 @@ public abstract class ParseActions {
                             //send a Notification for each one if has
                             if (Notifications.shouldBeLaunched(we)) {
                                 Notifications.sendNotification(we);
+                            }else{
+                                myLog.add("Weacon already notified: "+we.getName());
                             }
                         }
                         sb.append("**********");
