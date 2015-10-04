@@ -117,6 +117,8 @@ public class MainActivity extends ActionBarActivity {
         demoMode = mySwitch.isChecked();
     }
 
+
+
     /**
      * Load the spots from parse that are around from current postion
      *

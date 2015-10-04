@@ -97,6 +97,13 @@
                 android:value=".Activities.MainActivity" />
         </activity>
 
+        <service
+            android:name=".services.FlightsVigilant"
+            android:exported="false" />
+        <service
+            android:name=".TimerService"
+            android:exported="false" />
+
         <!--PArse push staff-->
         <service android:name="com.parse.PushService" />
 

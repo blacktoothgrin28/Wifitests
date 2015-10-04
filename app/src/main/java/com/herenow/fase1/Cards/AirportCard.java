@@ -3,6 +3,7 @@ package com.herenow.fase1.Cards;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -12,9 +13,11 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.herenow.fase1.CardData.FlightData;
+import com.herenow.fase1.FlightData;
 import com.herenow.fase1.CardData.GoogleFlight;
 import com.herenow.fase1.R;
+import com.herenow.fase1.TimerService;
+import com.herenow.fase1.services.FlightsVigilant;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -25,8 +28,6 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import it.gmariotti.cardslib.library.internal.Card;
 import it.gmariotti.cardslib.library.internal.CardHeader;
@@ -35,7 +36,6 @@ import it.gmariotti.cardslib.library.prototypes.LinearListView;
 import it.gmariotti.cardslib.library.view.CardViewNative;
 import util.OnTaskCompleted;
 import util.myLog;
-import util.parameters;
 
 import static com.herenow.fase1.R.mipmap.ic_launcher;
 
@@ -57,7 +57,7 @@ public class AirportCard extends CardWithList implements OnTaskCompleted {
 
     public AirportCard(Context context, TypeOfCard typeOfCard, String airportCode) {
         super(context);
-        mAirportCode=airportCode;
+        mAirportCode = airportCode;
         mTypeOfCard = typeOfCard;
         myLog.add("the type of cards is" + typeOfCard);
         mNotificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -157,12 +157,12 @@ public class AirportCard extends CardWithList implements OnTaskCompleted {
         return convertView;
     }
 
-    public static  String nameOfType(TypeOfCard toc) {
-    String st;
-        if(toc==TypeOfCard.departure){
-            st="departures";
-        }else{
-            st="arrivals";
+    public static String nameOfType(TypeOfCard toc) {
+        String st;
+        if (toc == TypeOfCard.departure) {
+            st = "departures";
+        } else {
+            st = "arrivals";
         }
         return st;
 
@@ -217,15 +217,26 @@ public class AirportCard extends CardWithList implements OnTaskCompleted {
 
         Toast.makeText(mContext, mCurrentGoogle.getSummary(mTypeOfCard), Toast.LENGTH_LONG).show();
 
+
+        //Aquí lanzamos el intentservice para preguntar a google periodicamente
+//        Intent intent = new Intent(mContext, FlightsVigilant.class);
+        Intent intent = new Intent(mContext, TimerService.class);
+
+        intent.putExtra("remoteCity", mCurrentGoogle.remoteCity);
+        intent.putExtra("code", mCurrentGoogle.code);
+        myLog.add("+++++++++++++hemos añadido al intent: " + mCurrentGoogle.remoteCity + " | " + mCurrentGoogle.code)
+        ;
+        mContext.startService(intent);
+
         //Start asking google flight periodically
-        Timer t = new Timer();
-        t.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                myLog.add("-----timer execution");
-                GetInfoFlightFromGoogleSync(mCurrentGoogle.code); //repeated
-            }
-        }, 10000, parameters.timeBetweenFlightQueries);
+//        Timer t = new Timer();
+//        t.schedule(new TimerTask() {
+//            @Override
+//            public void run() {
+//                myLog.add("-----timer execution");
+//                GetInfoFlightFromGoogleSync(mCurrentGoogle.code); //repeated
+//            }
+//        }, 10000, parameters.timeBetweenFlightQueries);
 
     }
 
@@ -351,7 +362,7 @@ public class AirportCard extends CardWithList implements OnTaskCompleted {
             code = fl.code;
             scheduledAt = fl.scheduledAt;
             airline = fl.airline;
-            destination = fl.destination;
+            destination = fl.remoteCity;
             status = fl.status;
             title = fl.title;
             estimated = fl.estimated;
@@ -407,7 +418,7 @@ public class AirportCard extends CardWithList implements OnTaskCompleted {
             code = fl.code;
             scheduledAt = fl.scheduledAt;
             airline = fl.airline;
-            origin = fl.destination;
+            origin = fl.remoteCity;
             status = fl.status;
             title = fl.title;
             estimated = fl.estimated;

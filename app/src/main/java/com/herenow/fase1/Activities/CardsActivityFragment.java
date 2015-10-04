@@ -8,10 +8,9 @@ import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.ImageView;
 
 import com.herenow.fase1.CardData.CompanyData;
-import com.herenow.fase1.CardData.FlightData;
+import com.herenow.fase1.FlightData;
 import com.herenow.fase1.Cards.AirportCard;
 import com.herenow.fase1.Cards.CompanyCard;
 import com.herenow.fase1.Cards.LinkedinCard;
@@ -19,7 +18,6 @@ import com.herenow.fase1.Cards.NewsCard;
 import com.herenow.fase1.Cards.ScheduleCard;
 import com.herenow.fase1.R;
 import com.parse.ParseObject;
-import com.squareup.picasso.Picasso;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -29,7 +27,6 @@ import org.jsoup.select.Elements;
 import java.util.ArrayList;
 import java.util.List;
 
-import it.gmariotti.cardslib.library.cards.material.MaterialLargeImageCard;
 import it.gmariotti.cardslib.library.view.CardViewNative;
 import parse.ParseActions;
 import util.myLog;
@@ -45,7 +42,9 @@ import static com.google.android.gms.internal.zzhl.runOnUiThread;
 public class CardsActivityFragment extends Fragment {
     AirportCard airportCard;
     ScheduleCard scheduleCard;
-    private boolean injectJavaScript = true;
+    private boolean injectJavaScript;
+
+
     private String url;
 
     public CardsActivityFragment() {
@@ -54,6 +53,8 @@ public class CardsActivityFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        myLog.add("Fragment creatred");
+        injectJavaScript = true;
         initCards();
     }
 
@@ -218,7 +219,7 @@ public class CardsActivityFragment extends Fragment {
 
             try {
                 Document doc = Jsoup.parse(html);
-                Elements dep = doc.select("table[class=flightList mainFlightList]").get(1).children().get(1).children();//el segundo tiene la chicha
+                Elements dep = doc.select("table[class=flightList mainFlightList]").select("tr[class=scheduledFlight]").first().parent().children();
 
                 for (Element item : dep) {
                     if (item.className().equals("codeshareFlights")) continue;
@@ -247,7 +248,7 @@ public class CardsActivityFragment extends Fragment {
             try {
                 fo.scheduledAt = children.get(0).text(); //scheduled
                 fo.code = children.get(1).text(); //code
-                fo.destination = children.get(2).text();
+                fo.remoteCity = children.get(2).text();
                 fo.airline = children.get(3).text(); //airline
                 fo.plane = children.get(4).text(); //codigo del modelo de avion
                 fo.ignoro = children.get(5).text(); //no se que
