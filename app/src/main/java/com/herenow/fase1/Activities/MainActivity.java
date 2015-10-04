@@ -79,8 +79,8 @@ public class MainActivity extends ActionBarActivity {
         //Wifi
         wifiBoss = new WifiBoss(this);
 
-        //Force
-        ParseActions.ssidForcedDetection("piripiri");
+//        //Force
+//        ParseActions.ssidForcedDetection("piripiri");
 //
 //        mainWifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 //        receiverWifi = new WifiReceiver();
@@ -184,21 +184,23 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private void modeChange(boolean Demo) {
+        //Force
+        ParseActions.ssidForcedDetection("piripiri");
 
-        t = new Timer();
-        wu = new WifiUpdater((TextView) findViewById(R.id.tv_demoStatus), this, Demo);
-
-        if (Demo) {
-            tv.setText("demo ON");
-        } else {
-            tv.setText("demo OFF");
-        }
-        t.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                runOnUiThread(wu);
-            }
-        }, 4000, 3000);
+//        t = new Timer();
+//        wu = new WifiUpdater((TextView) findViewById(R.id.tv_demoStatus), this, Demo);
+//
+//        if (Demo) {
+//            tv.setText("demo ON");
+//        } else {
+//            tv.setText("demo OFF");
+//        }
+//        t.schedule(new TimerTask() {
+//            @Override
+//            public void run() {
+//                runOnUiThread(wu);
+//            }
+//        }, 4000, 3000);
 
     }
 

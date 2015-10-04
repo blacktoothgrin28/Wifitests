@@ -48,7 +48,7 @@ public abstract class ParseActions {
                         ParseQuery<WifiSpot> query = ParseQuery.getQuery(WifiSpot.class);
                         query.whereWithinKilometers("GPS", new ParseGeoPoint(center.getLatitude(), center.getLongitude()), radio);
                         query.include("associated_place");
-                        query.setLimit(700);
+                        query.setLimit(900);
 
                         if (bLocal) query.fromLocalDatastore();
                         query.findInBackground(new FindCallback<WifiSpot>() {

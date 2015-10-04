@@ -14,14 +14,15 @@ public class parameters {
     final public static int defaultThreshold = -100; //For weacon detection
     public static final String pinWeacons = "Weacons";
     public static final String pinSapo = "SAPO2";
+    //SAPO
     final static int LogFileSize = 100; //in kilobytes, after that, new is started
     public static Integer hitRepetitions = 20; //number of HitSapo in SAPO for considering a SSID important
     public static int minTimeForUpdates = 60 * 1; //in mins
+    //WIFI
     public static int nHitsForLogIn = 3; //recommend 3. Number of hits for declaring the login in a spot
     public static long timeBetweenFlightQueries = (long) (2 * 60 * 1000);//in milliseconds, to verify if there are changes in gates, ets
-    public static double radioSpotsQuery = 1; //Determines how many spots to load, (kilometers around user's position
+    public static double radioSpotsQuery = 50; //Determines how many spots to load, (kilometers around user's position
     public static boolean isSapoActive = false;
-
 
     public enum CardType {COMPANY, SCHEDULE, LINKEDIN, NEWS, FLIGHTS}
 
@@ -65,7 +66,6 @@ public class parameters {
 
         return ex;
     }
-
 
     public enum typeOfWeacon {
         accounting, airport, amusement_park, aquarium, art_gallery, atm, bakery,
