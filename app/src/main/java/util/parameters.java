@@ -18,7 +18,7 @@ public class parameters {
     public static Integer hitRepetitions = 20; //number of HitSapo in SAPO for considering a SSID important
     public static int minTimeForUpdates = 60 * 1; //in mins
     public static int nHitsForLogIn = 3; //recommend 3. Number of hits for declaring the login in a spot
-    public static long timeBetweenFlightQueries = (long) (0.3 * 60 * 1000);//in milliseconds, to verify if there are changes in gates, ets
+    public static long timeBetweenFlightQueries = (long) (2 * 60 * 1000);//in milliseconds, to verify if there are changes in gates, ets
     public static double radioSpotsQuery = 1; //Determines how many spots to load, (kilometers around user's position
     public static boolean isSapoActive = false;
 

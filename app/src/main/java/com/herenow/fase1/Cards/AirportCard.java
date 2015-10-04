@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import com.herenow.fase1.FlightData;
 import com.herenow.fase1.CardData.GoogleFlight;
+import com.herenow.fase1.GetFlightInfo;
 import com.herenow.fase1.R;
 import com.herenow.fase1.TimerService;
 import com.herenow.fase1.services.FlightsVigilant;
@@ -343,7 +344,8 @@ public class AirportCard extends CardWithList implements OnTaskCompleted {
                     Toast.makeText(getContext(), "Getting info for " + getObjectId() + "\nAlerts Activated.", Toast.LENGTH_SHORT).show();
                     myLog.add("asgink google for flight for first time: " + getObjectId());
                     mSelectedFlight = ((DepartureObject) object).flight;
-                    GetInfoFlightFromGoogle(getObjectId()); //First retrieving from google
+//                    GetInfoFlightFromGoogle(getObjectId()); //First retrieving from google
+                    GetFlightInfo geto = new GetFlightInfo(getObjectId(), mSelectedFlight.remoteCity, AirportCard.this);
                 }
             });
 

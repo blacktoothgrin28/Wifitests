@@ -69,8 +69,9 @@ public class TimerService extends Service {
                 // recreate new
                 mTimer = new Timer();
             }
-            // schedule task
-            mTimer.scheduleAtFixedRate(new TimeDisplayTimerTask(), 2000, NOTIFY_INTERVAL);
+            // schedule task.
+            //Todo no es de lo mejor porque a veces se retrasa ( y luego recupera)
+            mTimer.scheduleAtFixedRate(new TimeDisplayTimerTask(), 2000, parameters.timeBetweenFlightQueries);
         } catch (Exception e) {
             myLog.add("on create" + e.getLocalizedMessage(), tag);
         }
@@ -104,7 +105,6 @@ public class TimerService extends Service {
     private void stopTheService() {
         myLog.add("stoping ht service in a methjod", tag);
         this.stopSelf();
-
     }
 
 
@@ -147,13 +147,17 @@ public class TimerService extends Service {
 
                 @Override
                 public void run() {
-                    (new readGoogleFlight(th)).execute(new String[]{mCode});
+                    GetFlightInfo geto = new GetFlightInfo(mCode,mRemoteCity , th);
+//                    (new readGoogleFlight(th)).execute(new String[]{mCode});
                 }
             });
         }
 
         @Override
         public void OnTaskCompleted(ArrayList elements) {
+            String notiTitle;
+            String content;
+
             mOldGoogle = mCurrentGoogle;
             mCurrentGoogle = (GoogleFlight) elements.get(0);
 
@@ -166,14 +170,12 @@ public class TimerService extends Service {
                 TimerService.this.stopTheService();
             }
 
-            String notiTitle;
-            String content;
             if (mCurrentGoogle.hasChanged(mOldGoogle)) {
-                myLog.add("has changed: " + mCurrentGoogle.changesText, tag);
+                myLog.add("***has changed: " + mCurrentGoogle.changesText, tag);
                 if (mCurrentGoogle.hasDepartedOrLanded()) {//todo implement
                     myLog.add("stopping the service", tag);
-                    mTimer.cancel();
                     TimerService.this.stopTheService();
+
                 } else {
                     notiTitle = mCurrentGoogle.changeSummarized;
                     content = mCurrentGoogle.getSummary(AirportCard.TypeOfCard.departure);
@@ -182,13 +184,13 @@ public class TimerService extends Service {
 
                     //Notification
                     sendNotificationFlight(notiTitle, content);
+                    //todo remove
+                    TimerService.this.stopTheService();
                 }
             } else {
-                myLog.add("Hasn't changed ", tag);
+//                myLog.add("Hasn't changed ", tag);
             }
         }
-
-
     }
 
     class readGoogleFlight extends AsyncTask<String, Void, GoogleFlight> {
