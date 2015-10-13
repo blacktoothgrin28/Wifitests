@@ -106,13 +106,8 @@ public class LinkedinCard extends CardWithList implements OnTaskCompleted {
     public View setupChildView(int childPosition, ListObject object, View convertView, ViewGroup parent) {
 
         try {
-            //Setup the ui elements inside the item
-
-            TextView title = (TextView) convertView.findViewById(R.id.news_title);
-            TextView content = (TextView) convertView.findViewById(R.id.news_content);
-
-            TextView source = (TextView) convertView.findViewById(R.id.news_source);
-            TextView date = (TextView) convertView.findViewById(R.id.news_date);
+            TextView title = (TextView) convertView.findViewById(R.id.name);
+            TextView content = (TextView) convertView.findViewById(R.id.position);
 
             ImageView ivImage = (ImageView) convertView.findViewById(R.id.news_image);
 
@@ -120,8 +115,6 @@ public class LinkedinCard extends CardWithList implements OnTaskCompleted {
             Employee emp = (Employee) object;
             title.setText(emp.name + " " + emp.lastName);
             content.setText(emp.position);
-            source.setText("");
-            date.setText("");
 
             if (emp.urlImage != null && !emp.urlImage.equals("")) {
                 Picasso.with(mContext).load(emp.urlImage)//Todo si es que tiene url
@@ -131,7 +124,7 @@ public class LinkedinCard extends CardWithList implements OnTaskCompleted {
             }
 
         } catch (Exception e) {
-            myLog.add("errror item news : " + e.getMessage());
+            myLog.add("errror item perfiles: " + e.getMessage());
         }
 
         return convertView;
@@ -139,12 +132,12 @@ public class LinkedinCard extends CardWithList implements OnTaskCompleted {
 
     @Override
     public int getChildLayoutId() {
-        return R.layout.news_inner_main;
+        return R.layout.linkedin2_inner_main;
     }
 
     @Override
     public void OnTaskCompleted(ArrayList elements) {
-        myLog.add("ontaskcompleted:" + elements.size() + " neews");
+        myLog.add("ontaskcompleted:" + elements.size() + " perfiles");
         //Select three news with exact name
         mEmployeesToShow = elements;
         super.init();
@@ -157,10 +150,6 @@ public class LinkedinCard extends CardWithList implements OnTaskCompleted {
         mCardViewNews = cardViewNews;
     }
 
-    public void updateNews(ArrayList<String> news) {
-
-
-    }
 
     // -------------------------------------------------------------
     // Employee Object

@@ -11,6 +11,7 @@ import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.widget.Toast;
 
 import com.herenow.fase1.Sapo.SAPO2;
 
@@ -44,7 +45,6 @@ public class WifiObserverService extends Service {
         myLog.add("Starting service ", tag);
 
         try {
-//            mContext = context;
             mContext = getApplicationContext();
             mainWifi = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
             receiverWifi = new WifiReceiver();
@@ -52,7 +52,9 @@ public class WifiObserverService extends Service {
             intentFilter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
             intentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
             mContext.registerReceiver(receiverWifi, intentFilter);
+            Toast.makeText(mContext,"Detection ON",Toast.LENGTH_LONG).show();
         } catch (Exception e) {
+            Toast.makeText(mContext,"Not posstible to activate detection ",Toast.LENGTH_LONG).show();
             myLog.add("error starign " + e.getLocalizedMessage());
         }
 
@@ -64,9 +66,11 @@ public class WifiObserverService extends Service {
     public void onDestroy() {
         myLog.add("Destroying", tag);
         try {
+            Toast.makeText(mContext,"Detection OFF",Toast.LENGTH_LONG).show();
             unregisterReceiver(receiverWifi);
             super.onDestroy();
         } catch (Exception e) {
+            Toast.makeText(mContext,"Not possible to turn off detection",Toast.LENGTH_LONG).show();
             myLog.add("error destroying: " + e.getLocalizedMessage());
         }
     }

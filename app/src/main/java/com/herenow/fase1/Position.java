@@ -83,7 +83,7 @@ public class Position implements GoogleApiClient.ConnectionCallbacks, GoogleApiC
 
         if (connectionReason == REASON.GetWeacons) {
             gps = new GPSCoordinates(mLastLocation);
-            ParseActions.getSpots(bFromLocalParse, parameters.radioSpotsQuery, gps);
+            ParseActions.getSpots(bFromLocalParse, parameters.radioSpotsQuery, gps, context);
 //            SAPO.downloadSPOTSFromParse();
 //            SAPO.downloadHitsFromParse();
         } else if (connectionReason == REASON.SaveSAPOssidswithLocation) {

@@ -1,6 +1,8 @@
 package parse;
 
+import android.content.Context;
 import android.net.wifi.ScanResult;
+import android.widget.Toast;
 
 import com.herenow.fase1.Activities.MainActivity;
 import com.herenow.fase1.Activities.ParseCallback;
@@ -33,8 +35,9 @@ public abstract class ParseActions {
      * @param bLocal if should be queried in local database
      * @param radio  kms
      * @param center center of queried area
+     * @param context
      */
-    public static void getSpots(final boolean bLocal, final double radio, final GPSCoordinates center) {
+    public static void getSpots(final boolean bLocal, final double radio, final GPSCoordinates center, final Context context) {
         try {
             //TODO ver si tiene sentido leer los weacons de local
             //1.Remove spots and weacons in local
@@ -64,7 +67,7 @@ public abstract class ParseActions {
                                             public void done(ParseException e) {
                                                 if (e == null) {
                                                     myLog.add("Wecaons pinned ok");
-
+                                                    Toast.makeText(context, "Weacons Loaded", Toast.LENGTH_SHORT).show();
                                                 } else {
                                                     myLog.add("---Error retrieving Weacons from web: " + e.getMessage());
                                                 }
@@ -126,8 +129,8 @@ public abstract class ParseActions {
                             //send a Notification for each one if has
                             if (Notifications.shouldBeLaunched(we)) {
                                 Notifications.sendNotification(we);
-                            }else{
-                                myLog.add("Weacon already notified: "+we.getName());
+                            } else {
+                                myLog.add("Weacon already notified: " + we.getName());
                             }
                         }
                         sb.append("**********");
@@ -226,7 +229,7 @@ public abstract class ParseActions {
 
     }
 
-    public static void ssidForcedDetection(String ssid) {
+    public static void ssidForcedDetection(String ssid, final int secWait) {
 
         myLog.add("Lanched forced ssid= " + ssid);
         //Query SSID
@@ -237,6 +240,11 @@ public abstract class ParseActions {
         qs.findInBackground(new FindCallback<WifiSpot>() {
             @Override
             public void done(List<WifiSpot> spots, ParseException e) {
+                try {
+                    Thread.sleep(1000 * secWait);
+                } catch (InterruptedException e1) {
+                    myLog.add("error waiting for launcihgn weacon");
+                }
                 WeaconParse we = spots.get(0).getWeacon();
                 Notifications.sendNotification(we);
             }

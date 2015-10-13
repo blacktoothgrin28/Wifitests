@@ -2,36 +2,34 @@ package com.herenow.fase1.Activities;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.BitmapFactory;
-import android.net.wifi.WifiConfiguration;
-import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
+import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.herenow.fase1.Notifications.Notifications;
 import com.herenow.fase1.Position;
 import com.herenow.fase1.R;
-import com.herenow.fase1.TimerService;
 import com.herenow.fase1.Wifi.LocationAsker;
-import com.herenow.fase1.Wifi.WifiBoss;
 import com.herenow.fase1.Wifi.WifiUpdater;
 import com.herenow.fase1.WifiObserverService;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
 
-import java.util.List;
+import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import parse.ParseActions;
-import parse.WeaconParse;
 import util.GPSCoordinates;
 import util.myLog;
 import util.parameters;
@@ -43,9 +41,9 @@ public class MainActivity extends ActionBarActivity {
 
     public static Position mPos; //WARN. Lo he hecho static para poder usarlo en SAPO
 
-
     //Demo
     public static boolean demoMode;
+
     private static TextView tv;
     private Intent intentAddWeacon;
     private Intent intentCards;
@@ -57,17 +55,62 @@ public class MainActivity extends ActionBarActivity {
     private int im = 1;
     private long newTime, oldTime;
     private String msg = "";
-
-
     Intent intentWifiObs;
 
-    //    private boolean isSapoActive = true; //TODO activate /deactivate sapo remotely
-//    private WifiBoss wifiBoss;
 
+    private Switch swDetection;// start or stot wifiservice detection
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        myLog.add("++++++++++++++++ on save");
+    }
+
+    private Spinner spinner;
+    private ArrayList<String> lista;
+    private ArrayList<String> listaObj;
+    //    private boolean isSapoActive = true; //TODO activate /deactivate sapo remotely
+
+    @Override
+    public void onActivityReenter(int resultCode, Intent data) {
+        super.onActivityReenter(resultCode, data);
+        myLog.add("++++++++++++++++ on activity reenter");
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        myLog.add("++++++++++++++++ On Start");
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        myLog.add("++++++++++++++++ on restarrt");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        myLog.add("++++++++++++++++ on destroy");
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        myLog.add("++++++++++++++++ on stop");
+    }
+
+    @Override
+    protected void onPause() {
+        myLog.add("++++++++++++++++ on Pause");
+        super.onPause();
+    }
 
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
+        myLog.add("++++++++++++++++ On create");
         setContentView(R.layout.activity_main);
 
         WriteUnhandledErrors(true);
@@ -83,9 +126,6 @@ public class MainActivity extends ActionBarActivity {
 
         //Wifi
 //        wifiBoss = new WifiBoss(this); //HERE THE DIFFERENCE USING SERVICE OR NOT
-        Context mContext = getApplicationContext();
-        intentWifiObs = new Intent(mContext, WifiObserverService.class);
-        mContext.startService(intentWifiObs);
 
 
 //        //Force
@@ -97,6 +137,14 @@ public class MainActivity extends ActionBarActivity {
 //        intentFilter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
 //        intentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
 //        registerReceiver(receiverWifi, intentFilter);
+    }
+
+    //    private WifiBoss wifiBoss;
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        myLog.add("++++++++++++++++ Retornando a la Main");
     }
 
     private void ForcedWeaconDetection() {
@@ -112,8 +160,6 @@ public class MainActivity extends ActionBarActivity {
     private void initializeViews() {
         mySwitch = (Switch) findViewById(R.id.sw_demo);
         mySwitch.setChecked(false);
-        tv = (TextView) findViewById(R.id.tv_demoStatus);
-        tv.setText("demo OFF");
         mySwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView,
@@ -122,10 +168,71 @@ public class MainActivity extends ActionBarActivity {
                 modeChange(isChecked);
             }
         });
+
+        swDetection = (Switch) findViewById(R.id.sw_detection);
+        swDetection.setChecked(false);
+        swDetection.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    //startWifiService();
+                    Context mContext = getApplicationContext();
+                    mContext.startService(new Intent(mContext, WifiObserverService.class));
+                } else {
+                    //stopWifiService();
+                    Context mContext = getApplicationContext();
+                    mContext.stopService(new Intent(mContext, WifiObserverService.class));
+                }
+            }
+        });
+
+        //SPINNER
+        spinner = (Spinner) this.findViewById(R.id.spinner_weacon);
+        lista = new ArrayList<String>();
+        listaObj = new ArrayList<String>();
+
+        listasAdd("Choose", "");
+        listasAdd("Creapolis", "esade");
+        listasAdd("AIA", "AIA");
+        listasAdd("El Prat", "WiFi");
+        listasAdd("Monasterio", "wifip224");
+//        listasAdd("Cafeteria", "wifip224");
+//        listasAdd("Juan", "wifip224");
+
+
+        ArrayAdapter<String> adaptador = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, lista);
+        adaptador.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adaptador);
+
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (position > 0) {
+                    String selected = parent.getItemAtPosition(position).toString();
+                    String ssid = listaObj.get(position);
+                    Toast.makeText(parent.getContext(), "Seleccionado: " + selected + " | " + ssid, Toast.LENGTH_SHORT).show();
+
+                    ParseActions.ssidForcedDetection(ssid, 3);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> arg0) {
+            }
+        });
+
+
+        //TEXTVIEW
+        tv = (TextView) findViewById(R.id.tv_demoStatus);
+        tv.setText("demo OFF");
         //check the current state before we display the screen
         demoMode = mySwitch.isChecked();
     }
 
+    private void listasAdd(String label, String ssid) {
+        lista.add(label);
+        listaObj.add(ssid);
+    }
 
 
     /**
@@ -138,7 +245,7 @@ public class MainActivity extends ActionBarActivity {
         (new LocationAsker()).DoSomethingWithPosition(new LocationCallback() {
             @Override
             public void LocationReceived(GPSCoordinates gps) {
-                ParseActions.getSpots(bLocal, radio, gps);
+                ParseActions.getSpots(bLocal, radio, gps, getApplicationContext());
             }
         }, this);
     }
@@ -194,7 +301,7 @@ public class MainActivity extends ActionBarActivity {
 
     private void modeChange(boolean Demo) {
         //Force
-        ParseActions.ssidForcedDetection("piripiri");
+//        ParseActions.ssidForcedDetection("piripiri");
 
 //        t = new Timer();
 //        wu = new WifiUpdater((TextView) findViewById(R.id.tv_demoStatus), this, Demo);
@@ -241,8 +348,6 @@ public class MainActivity extends ActionBarActivity {
      * @param view
      */
     public void clickConnect(View view) {
-
-        getApplicationContext().stopService(intentWifiObs);
 
         //This is for connecting programatelly
 //        String networkSSID = "piripiri";
@@ -296,6 +401,29 @@ public class MainActivity extends ActionBarActivity {
 
 //        intentAddWeacon = new Intent(this, AddWeaconActivity.class);
 //        startActivity(intentAddWeacon);
+    }
+
+    public void launchAll(View view) {
+        final Timer t;
+        t = new Timer();
+        t.schedule(new TimerTask() {
+            public int i = 0;
+
+            @Override
+
+            public void run() {
+                if (i < listaObj.size()) {
+                    String ssid = listaObj.get(i);
+                    ParseActions.ssidForcedDetection(ssid, 0);
+                    i++;
+                } else {
+                    t.cancel();
+                }
+            }
+        }, 3000, 4000);
+//        for(String ssid :listaObj){
+//            Pars
+//        }
     }
 
 //    class WifiReceiver extends BroadcastReceiver {

@@ -70,8 +70,7 @@ public class TimerService extends Service {
                 mTimer = new Timer();
             }
             // schedule task.
-            //Todo no es de lo mejor porque a veces se retrasa ( y luego recupera)
-            mTimer.scheduleAtFixedRate(new TimeDisplayTimerTask(), 2000, parameters.timeBetweenFlightQueries);
+            mTimer.schedule(new TimeDisplayTimerTask(), 2000, parameters.timeBetweenFlightQueries);
         } catch (Exception e) {
             myLog.add("on create" + e.getLocalizedMessage(), tag);
         }
@@ -84,9 +83,7 @@ public class TimerService extends Service {
             mRemoteCity = intent.getStringExtra("remoteCity");
             mCode = intent.getStringExtra("code");
             boolean bMainTh = (Looper.getMainLooper().getThread() == Thread.currentThread());
-            myLog.add("[startcomm] Runnin in UI thread=" + bMainTh);
-
-
+            myLog.add("[startcomm] Runnin in UI thread=" + bMainTh,tag);
         } catch (Exception e) {
             myLog.add("errr en handler: " + e.getLocalizedMessage(), tag);
         }

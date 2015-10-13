@@ -125,7 +125,7 @@ public class CardsActivityFragment extends Fragment {
         myLog.add("VAMOS leer pagina de radar24");
 //        browser.loadUrl("http://flightradar24.com/airport/bcn/departures");
         url = "http://flightradar24.com/airport/" + airportCode.toLowerCase() + "/" + AirportCard.nameOfType(typeOfCard);
-        myLog.add("RADAR 24 url:"+url);
+        myLog.add("RADAR 24 url:" + url);
         browser.loadUrl(url);
     }
 
@@ -190,8 +190,9 @@ public class CardsActivityFragment extends Fragment {
                 try {
                     ParseObject po = datos.get(0);
                     CompanyData companyData = new CompanyData(po);
-                    initAirportCard(mTypeAirportCard, companyData.getAirportCode());
-//                    initAirportCard(mTypeOfAirportCard,companyData.getAirportCode()); //todo see how to pass the type of card from notification
+
+                    if (companyData.isAirport())
+                        initAirportCard(mTypeAirportCard, companyData.getAirportCode());
 
                     initCompanyCard(companyData);
                     initNewsCard(companyData.getNameClean());

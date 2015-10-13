@@ -38,8 +38,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="top|right"
-            android:onClick="clickAddWeacon"
-            android:text="Trigger W"
+            android:onClick="launchAll"
+            android:text="All"
             android:visibility="visible" />
     </FrameLayout>
 
@@ -57,7 +57,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal|bottom"
         android:onClick="clickCards"
-        android:text="CARDS" />
+        android:text="CARDS"
+        android:visibility="invisible" />
 
     <Switch
         android:id="@+id/sw_demo"
@@ -65,6 +66,19 @@
         android:layout_height="wrap_content"
         android:layout_gravity="left|center_vertical"
         android:text="Demo Mode" />
+
+    <Switch
+        android:id="@+id/sw_detection"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="Detection " />
+
+    <Spinner
+        android:layout_width="178dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/spinner_weacon"
+        android:layout_gravity="left|bottom" />
 
 </FrameLayout>
 

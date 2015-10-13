@@ -31,21 +31,24 @@ import util.myLog;
 public abstract class Notifications {
     private static final String NOTIFICATION_DELETED_ACTION = "NOTIFICATION_DELETED";
     public static HashMap<String, WeaconParse> weaconsLaunchedTable; //For not relaunche the same weacon {obid, WeaconParse}
-    private static ArrayList<WeaconParse> showedNotifications;
+    private static ArrayList<WeaconParse> showedNotifications; //list of weacosn currently showed in a notification
     private static NotificationManager mNotificationManager;
     private static Activity acti;
     private static int mIdSingle, mIdGroup;
     private static int currentId = 1;
+    static String tag = "noti";
+
+
     private final static BroadcastReceiver receiverDeleteNotification = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             try {
-                myLog.add("<<<<<<<<<<<<Has borrado una notif>>>>");
+                myLog.add("<<<<<<<<<<<<Has borrado una notif>>>>", tag);
                 currentId = currentId + 2;
                 showedNotifications = new ArrayList<>();
 
             } catch (Exception e) {
-                myLog.add("---ERROR<<<<<<<<<<<<Has borrado una notif>>>>" + e.getMessage());
+                myLog.add("---ERROR<<<<<<<<<<<<Has borrado una notif>>>>" + e.getMessage(), tag);
             }
             context.unregisterReceiver(this);
         }
@@ -57,6 +60,7 @@ public abstract class Notifications {
         acti = act;
         weaconsLaunchedTable = new HashMap<>();
         showedNotifications = new ArrayList<>(); //Weacons showed in notification
+        myLog.add("showedNotif created in initialization", tag);
         mNotificationManager = (NotificationManager) act.getSystemService(Context.NOTIFICATION_SERVICE);
 
     }
@@ -74,16 +78,20 @@ public abstract class Notifications {
             pendingDeleteIntent = PendingIntent.getBroadcast(acti.getBaseContext(), 0, intent, 0);
 
             //TODO put in parse that this weacon was notified
+            if (showedNotifications == null) {
+                showedNotifications = new ArrayList<>();
+                myLog.add("***hemos debido crear denuevo la showednotifications");
+            }
+
             if (showedNotifications.size() == 0) {
                 sendNewNotification(we);
             } else {
                 updateNotification(we);
             }
 
-
             weaconsLaunchedTable.put(we.getObjectId(), we);
         } catch (Exception e) {
-            myLog.add("---ERROR in sendNotification: " + e.getMessage());
+            myLog.add("---ERROR in sendNotification: " + e.getMessage(),tag);
         }
 
     }
@@ -103,23 +111,17 @@ public abstract class Notifications {
                 .putExtra("wName", we.getName())
                 .putExtra("wUrl", we.getUrl())
                 .putExtra("wLogo", we.getLogoRounded())
-                .putExtra("wComapanyDataObId", we.getCompanyDataObjectId());
-
-        Intent arrivalsIntent = new Intent(resultIntent);
-
-        resultIntent.putExtra("typeOfAiportCard", "Departures");
-        arrivalsIntent.putExtra("typeOfAiportCard", "Arrivals");
+                .putExtra("wComapanyDataObId", we.getCompanyDataObjectId())
+                .putExtra("wCards", we.getCards())
+                .putExtra("typeOfAiportCard", "Departures");
 
         stackBuilder = TaskStackBuilder.create(acti.getBaseContext());
         stackBuilder.addParentStack(CardsActivity.class);
         stackBuilder.addNextIntent(resultIntent);
         resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT); //Todo solve the stack for going back from cards
 
-        PendingIntent pendingArrivals = PendingIntent.getActivity(acti.getBaseContext(), 1, arrivalsIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         NotificationCompat.Action myAction = new NotificationCompat.Action(R.drawable.ic_silence, "Turn Off", resultPendingIntent);//TODO to create the silence intent
-        NotificationCompat.Action DepartureAction = new NotificationCompat.Action(R.drawable.ic_flight_takeoff_white_24dp, "Departures", resultPendingIntent);
-        NotificationCompat.Action ArrivalAction = new NotificationCompat.Action(R.drawable.ic_flight_land_white_24dp, "Arrivals", pendingArrivals);
         notif = new NotificationCompat.Builder(acti)
                 .setSmallIcon(R.drawable.ic_stat_name_hn)
                 .setLargeIcon(we.getLogoRounded())
@@ -130,16 +132,21 @@ public abstract class Notifications {
                 .setLights(0xE6D820, 300, 100)
                 .setTicker("Weacon detected\n" + we.getName())
                 .setDeleteIntent(pendingDeleteIntent)
-                .addAction(myAction)
-                .addAction(DepartureAction)
-                .addAction(ArrivalAction);
+                .addAction(myAction);
+
+        //Airport Buttons
+        if (we.isAirport()) {
+            Intent arrivalsIntent = new Intent(resultIntent);
+            arrivalsIntent.putExtra("typeOfAiportCard", "Arrivals");
+            PendingIntent pendingArrivals = PendingIntent.getActivity(acti.getBaseContext(), 1, arrivalsIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+            NotificationCompat.Action DepartureAction = new NotificationCompat.Action(R.drawable.ic_flight_takeoff_white_24dp, "Departures", resultPendingIntent);
+            NotificationCompat.Action ArrivalAction = new NotificationCompat.Action(R.drawable.ic_flight_land_white_24dp, "Arrivals", pendingArrivals);
+            notif.addAction(DepartureAction)
+                    .addAction(ArrivalAction);
+        }
 
         NotificationCompat.BigTextStyle bigTextStyle = new NotificationCompat.BigTextStyle();
-
-        //Airport buttons
-//        if(we.isAirport()) {
-//            notif = addAirportActions(notif,we, stackBuilder);
-//        }
 
         bigTextStyle.setBigContentTitle(we.getName());
         bigTextStyle.bigText(we.getMessage());

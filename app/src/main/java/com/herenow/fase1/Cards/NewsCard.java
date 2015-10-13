@@ -189,11 +189,8 @@ public class NewsCard extends CardWithList implements OnTaskCompleted {
     public View setupChildView(int childPosition, ListObject object, View convertView, ViewGroup parent) {
 
         try {
-            //Setup the ui elements inside the item
-
-            TextView title = (TextView) convertView.findViewById(R.id.news_title);
-            TextView content = (TextView) convertView.findViewById(R.id.news_content);
-
+            TextView title = (TextView) convertView.findViewById(R.id.name);
+            TextView content = (TextView) convertView.findViewById(R.id.position);
             TextView source = (TextView) convertView.findViewById(R.id.news_source);
             TextView date = (TextView) convertView.findViewById(R.id.news_date);
 
@@ -234,18 +231,18 @@ public class NewsCard extends CardWithList implements OnTaskCompleted {
         maxNews = 4;
         mNewsToShow = new ArrayList<>();
         for (Object ob : news) {
-            Noticia not = (Noticia) ob;
             if (mNewsToShow.size() == maxNews) break;
+            Noticia not = (Noticia) ob;
             if (not.isExact) {
                 mNewsToShow.add(not);
             }
         }
         //Complete with the other news
         for (Object ob : news) {
+            if (mNewsToShow.size() == maxNews) break;
             Noticia not = (Noticia) ob;
             if (!not.isExact) {
                 mNewsToShow.add(not);
-                if (mNewsToShow.size() == maxNews) break;
             }
         }
 
@@ -262,10 +259,6 @@ public class NewsCard extends CardWithList implements OnTaskCompleted {
         mCardViewNews = cardViewNews;
     }
 
-    public void updateNews(ArrayList<String> news) {
-
-
-    }
 
     // -------------------------------------------------------------
     // News Object
@@ -304,7 +297,7 @@ public class NewsCard extends CardWithList implements OnTaskCompleted {
             setOnItemClickListener(new OnItemClickListener() {
                 @Override
                 public void onItemClick(LinearListView parent, View view, int position, ListObject object) {
-                    Toast.makeText(getContext(), "Click on " + getObjectId(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Opening the Article..." , Toast.LENGTH_SHORT).show();
 
                     Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(getObjectId()));
                     mContext.startActivity(browserIntent);

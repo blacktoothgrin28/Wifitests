@@ -11,43 +11,18 @@
 
 
     <LinearLayout
-        android:layout_width="89dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal|center_vertical"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:layout_margin="4dp">
 
         <ImageView
             android:id="@+id/news_image"
             android:layout_width="70dp"
             android:layout_height="70dp"
-            android:layout_marginTop="3dp"
             android:background="#acd6ff" />
 
-        <TextView
-            android:id="@+id/news_source"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:layout_below="@+id/name"
-            android:gravity="center_horizontal"
-            android:layout_marginEnd="2dp"
-            android:layout_marginRight="2dp"
-            android:text="EL PAIS el mejor periosdio"
-            android:textAlignment="center"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textSize="11dp" />
-
-        <TextView
-            android:id="@+id/news_date"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignTop="@+id/news_source"
-            android:text="23 de Enero"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textSize="10dp" />
 
     </LinearLayout>
 
@@ -55,7 +30,9 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
-        android:minHeight="100dp">
+        android:gravity="center_vertical"
+        android:layout_marginLeft="4dp"
+        android:minHeight="50dp">
 
         <TextView
             android:id="@+id/name"
@@ -66,7 +43,7 @@
             android:layout_alignParentTop="true"
             android:textColor="@android:color/black"
             android:textSize="15sp"
-            tools:text="Mujeres que mandan en el mundo: una radiografía del poder" />
+            tools:text="José Luis Pereira" />
 
 
         <TextView
@@ -77,7 +54,7 @@
             android:textColor="@color/demo_card_weather_temperature_color"
             android:textSize="12sp"
             android:textStyle="italic"
-            tools:text="... el finsico Antoni treias , de aplicaicnoes en informatica acanzada, una empresa expecializada en inteliganeica artificial con fofo..."
+            tools:text="Manager de la callampa"
             android:layout_below="@+id/name"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"

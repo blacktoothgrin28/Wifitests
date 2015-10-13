@@ -29,6 +29,8 @@ import util.myLog;
 @ParseClassName("Weacon")
 public class WeaconParse extends ParseObject {
 
+    private String[] cards;
+
     public WeaconParse() {
     }
 
@@ -81,6 +83,14 @@ public class WeaconParse extends ParseObject {
         return url;
     }
 
+    public String[] getCards() {
+
+        List<Object> al = getList("cards");
+        cards = new String[al.size()];
+        al.toArray(cards);
+        return cards;
+    }
+
     public Bitmap getLogoRounded() {
         Bitmap bm = getLogo();
         Bitmap logoRounded = drawableToBitmap(new RoundImage(bm));
@@ -110,8 +120,9 @@ public class WeaconParse extends ParseObject {
         ParseObject po = getParseObject("CardCompany");
         return po.getObjectId();
     }
+
     public void setCompanyDataObjectId(String value) {
-      put("CardCompany", value);
+        put("CardCompany", value);
     }
 
     public String getImageParseUrl() {
@@ -187,7 +198,6 @@ public class WeaconParse extends ParseObject {
     }
 
     public boolean isAirport() {
-
         return getType().equals("airport");
     }
 
