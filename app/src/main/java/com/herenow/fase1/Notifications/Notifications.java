@@ -14,9 +14,8 @@ import android.graphics.BitmapFactory;
 import android.support.v4.app.NotificationCompat;
 
 import com.herenow.fase1.Activities.CardsActivity;
-import com.herenow.fase1.Activities.MainActivity;
 import com.herenow.fase1.Activities.WeaconListActivity;
-import com.herenow.fase1.Cards.AirportCard;
+import com.herenow.fase1.CardsActivityAer;
 import com.herenow.fase1.R;
 
 import java.util.ArrayList;
@@ -107,16 +106,20 @@ public abstract class Notifications {
 
         acti.registerReceiver(receiverDeleteNotification, new IntentFilter(NOTIFICATION_DELETED_ACTION));
 
-        resultIntent = new Intent(acti.getBaseContext(), CardsActivity.class)
-                .putExtra("wName", we.getName())
+//        resultIntent = new Intent(acti.getBaseContext(), WeaconListActivity.class)
+        resultIntent = new Intent(acti.getBaseContext(), CardsActivityAer.class)
+//        resultIntent = new Intent(acti.getBaseContext(), CardsActivity.class)
                 .putExtra("wUrl", we.getUrl())
+                .putExtra("wName", we.getName())
                 .putExtra("wLogo", we.getLogoRounded())
                 .putExtra("wComapanyDataObId", we.getCompanyDataObjectId())
                 .putExtra("wCards", we.getCards())
                 .putExtra("typeOfAiportCard", "Departures");
 
         stackBuilder = TaskStackBuilder.create(acti.getBaseContext());
-        stackBuilder.addParentStack(CardsActivity.class);
+        stackBuilder.addParentStack(CardsActivityAer.class);
+//        stackBuilder.addParentStack(CardsActivity.class);
+//        stackBuilder.addParentStack(WeaconListActivity.class);
         stackBuilder.addNextIntent(resultIntent);
         resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT); //Todo solve the stack for going back from cards
 
@@ -157,34 +160,6 @@ public abstract class Notifications {
         mNotificationManager.notify(mIdSingle, notif.build());
     }
 
-    private static NotificationCompat.Builder addAirportActions(NotificationCompat.Builder notif, WeaconParse we, TaskStackBuilder stackBuilder) {
-
-        //todo make the buttons work in the notification
-        PendingIntent pendingIntent;
-
-        //Departure
-        Intent intent = new Intent(acti.getBaseContext(), CardsActivity.class);
-        intent.putExtra("wName", we.getName());
-        intent.putExtra("wUrl", we.getUrl());
-        intent.putExtra("wLogo", we.getLogoRounded());
-        intent.putExtra("typeOfFlight", AirportCard.TypeOfCard.departure);
-
-
-//        stackBuilder.addParentStack(MainActivity.class);
-        stackBuilder.addNextIntent(intent);
-
-        pendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
-//        notif.setContentIntent(pendingIntent);
-
-        NotificationCompat.Action departureAction = new NotificationCompat.Action(R.drawable.ic_flight_takeoff_white_24dp, "Departures", pendingIntent);
-        NotificationCompat.Action arrivalAction = new NotificationCompat.Action(R.drawable.ic_flight_land_white_24dp, "Arrivals", pendingIntent);
-
-        notif.addAction(departureAction);
-        notif.addAction(arrivalAction);
-
-        return notif;
-    }
-
     private static void updateNotification(WeaconParse we) {
 
         Intent resultIntent;
@@ -220,6 +195,7 @@ public abstract class Notifications {
         resultIntent.putExtra("wName", we.getName());
         resultIntent.putExtra("wUrl", we.getUrl());
         resultIntent.putExtra("wLogo", we.getLogoRounded());
+
         stackBuilder = TaskStackBuilder.create(acti.getBaseContext());
         stackBuilder.addParentStack(WeaconListActivity.class);
         stackBuilder.addNextIntent(resultIntent);

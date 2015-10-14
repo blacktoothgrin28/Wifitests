@@ -1,7 +1,7 @@
 <fragment xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/fragment"
-    android:name="com.herenow.fase1.Activities.CardsActivityFragment"
+    android:name="com.herenow.fase1.CardsActivityAerFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:layout="@layout/activity_cards" />
+    tools:layout="@layout/fragment_cards_activity_aer" />

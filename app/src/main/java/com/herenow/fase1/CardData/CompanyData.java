@@ -183,6 +183,7 @@ public class CompanyData {
         if (founders.length == 1) {
             sbFoundation.append(" by " + founders[0] + ".");
         } else if (founders.length > 1) {
+            sbFoundation.append(" by ");
             for (int i = 0; i < founders.length - 1; i++) {
                 sbFoundation.append(founders[i]).append(", ");
             }

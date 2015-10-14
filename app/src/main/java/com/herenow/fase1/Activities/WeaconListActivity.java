@@ -1,6 +1,7 @@
 package com.herenow.fase1.Activities;
 
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -19,6 +20,7 @@ import java.util.List;
 import parse.WeaconParse;
 import util.DividerItemDecoration;
 import util.WeaconAdapter;
+import util.myLog;
 
 
 public class WeaconListActivity extends ActionBarActivity {
@@ -30,47 +32,61 @@ public class WeaconListActivity extends ActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_weacon_list);
+        try {
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.activity_weacon_list);
 //                trans_left_in, R.anim.trans_left_out);
 
-        mRecyclerView = new RecyclerView(this);
-        mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-        mRecyclerView.hasFixedSize();
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mRecyclerView.addItemDecoration(new DividerItemDecoration(getResources().getDrawable(R.drawable.abc_list_divider_mtrl_alpha)));
+            mRecyclerView = new RecyclerView(this);
+            mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+            mRecyclerView.hasFixedSize();
+            mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+            mRecyclerView.addItemDecoration(new DividerItemDecoration(getResources().getDrawable(R.drawable.abc_list_divider_mtrl_alpha)));
 
 
-        //Fill the list for the example
+            //Fill the list for the example
 //        Collection<Weacon> intermediate = MainActivity.weaconsTable.values();
 //        for (Object obj : intermediate.toArray()) {
 //            Weacon wec = (Weacon) obj;
 ////            weaconItemList.add(new WeaconItem(wec.getName(), wec.getMessage(), wec.getImagePath().toString(), wec.getUrl()));
 //            weaconItemList.add(wec);
 //        }
-        //Fill the list with launched
-        Collection<WeaconParse> intermediate = Notifications.weaconsLaunchedTable.values();
-        for (Object obj : intermediate.toArray()) {
-            WeaconParse wec = (WeaconParse) obj;
-            weaconItemList.add(wec); //To the showed list.
-        }
-
-        adapter = new WeaconAdapter(this, weaconItemList);
-        adapter.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                WeaconParse we = (WeaconParse) v.getTag();
-
-                intentWeb = new Intent(WeaconListActivity.this, BrowserActivity.class);
-                intentWeb.putExtra("wName", we.getName());
-                intentWeb.putExtra("wUrl", we.getUrl());
-                intentWeb.putExtra("wLogo", we.getLogoRounded());
-
-                WeaconListActivity.this.startActivity(intentWeb);
+            //Fill the list with launched
+            Collection<WeaconParse> intermediate = Notifications.weaconsLaunchedTable.values();
+            for (Object obj : intermediate.toArray()) {
+                WeaconParse we = (WeaconParse) obj;
+                weaconItemList.add(we); //To the showed list.
             }
-        });
 
-        mRecyclerView.setAdapter(adapter);
+            adapter = new WeaconAdapter(this, weaconItemList);
+            adapter.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    WeaconParse we = (WeaconParse) v.getTag();
+
+    //                intentWeb = new Intent(WeaconListActivity.this, BrowserActivity.class);
+    //                intentWeb.putExtra("wName", we.getName());
+    //                intentWeb.putExtra("wUrl", we.getUrl());
+    //                intentWeb.putExtra("wLogo", we.getLogoRounded());
+    //
+    //                WeaconListActivity.this.startActivity(intentWeb);
+
+                    Intent resultIntent = new Intent(WeaconListActivity.this, CardsActivity.class)
+                            .putExtra("wUrl", we.getUrl())
+                            .putExtra("wName", we.getName())
+                            .putExtra("wLogo", we.getLogoRounded())
+                            .putExtra("wComapanyDataObId", we.getCompanyDataObjectId())
+                            .putExtra("wCards", we.getCards())
+                            .putExtra("typeOfAiportCard", "Departures");
+
+                    WeaconListActivity.this.startActivity(resultIntent);
+                }
+            });
+
+            mRecyclerView.setAdapter(adapter);
+        } catch (Resources.NotFoundException e) {
+            myLog.add("`[[[[[[[[[[Huston la hemos cagao+"+e.getLocalizedMessage());
+        }
     }
 
     @Override

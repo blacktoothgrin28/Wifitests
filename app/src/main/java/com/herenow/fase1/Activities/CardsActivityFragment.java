@@ -94,7 +94,7 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
     private void initCards() {
         try {
 
-            if (hashTypes.containsKey("Schedule")) initScheduleCard();
+//            if (hashTypes.containsKey("Schedule")) initScheduleCard();
 
         } catch (Exception e) {
             myLog.add("---error init cards: " + e.getMessage());
@@ -221,20 +221,23 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
                     //COMPANY
                     if (hashTypes.containsKey("Company")) initCompanyCard(companyData);
 
+                    //SCHEDULE  TODO read the schedule from parse
+                    if (hashTypes.containsKey("Schedule"))
+                        initScheduleCard();
+
                     //AIRPORT
-                    if (companyData.isAirport() || hashTypes.containsKey("Airport"))
+                    if (companyData.isAirport() || hashTypes.containsKey("Airport")) {
                         initAirportCard(mTypeAirportCard, companyData.getAirportCode());
+                    }
 
                     //NEWS
                     if (hashTypes.containsKey("News")) initNewsCard(companyData.getNameClean());
 
                     //LINKEDIN
-                    if (hashTypes.containsKey("Linkedin"))
+                    if (hashTypes.containsKey("Linkedin")) {
                         initLinkedinCard(companyData.getLinkedinUrl());
+                    }
 
-                    //SCHEDULE  TODO read the schedule from parse
-//                    if (hashTypes.containsKey("Schedule"))
-//                        initScheduleCard();
 
                 } catch (Exception e) {
                     e.printStackTrace();
