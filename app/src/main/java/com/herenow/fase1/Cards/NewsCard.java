@@ -13,6 +13,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.herenow.fase1.Activities.CardsActivityFragment;
+import com.herenow.fase1.Activities.cardLoadedListener;
 import com.herenow.fase1.CardData.Noticia;
 import com.herenow.fase1.R;
 import com.squareup.picasso.Picasso;
@@ -47,11 +49,11 @@ import static com.herenow.fase1.Cards.NewsCard.ProcessHtmlNews;
 public class NewsCard extends CardWithList implements OnTaskCompleted {
 
     private String mCompanyName;
-    //    private ArrayList<Noticia> mNews;
     private ArrayList<Noticia> mNewsToShow;
     private String siteUrl;
-    private CardViewNative mCardViewNews;
+    //    private CardViewNative mCardViewNews;
     private int maxNews;
+    private cardLoadedListener listener;
 
     public NewsCard(Context context, String companyName) {
         super(context);
@@ -227,36 +229,43 @@ public class NewsCard extends CardWithList implements OnTaskCompleted {
     public void OnTaskCompleted(ArrayList news) {
         myLog.add("ontaskcompleted:" + news.size() + " neews");
 
-        //Select maxNews news with exact name
-        maxNews = 4;
-        mNewsToShow = new ArrayList<>();
-        for (Object ob : news) {
-            if (mNewsToShow.size() == maxNews) break;
-            Noticia not = (Noticia) ob;
-            if (not.isExact) {
-                mNewsToShow.add(not);
+        try {
+            //Select maxNews news with exact name
+            maxNews = 4;
+            mNewsToShow = new ArrayList<>();
+            for (Object ob : news) {
+                if (mNewsToShow.size() == maxNews) break;
+                Noticia not = (Noticia) ob;
+                if (not.isExact) {
+                    mNewsToShow.add(not);
+                }
             }
-        }
-        //Complete with the other news
-        for (Object ob : news) {
-            if (mNewsToShow.size() == maxNews) break;
-            Noticia not = (Noticia) ob;
-            if (!not.isExact) {
-                mNewsToShow.add(not);
+            //Complete with the other news
+            for (Object ob : news) {
+                if (mNewsToShow.size() == maxNews) break;
+                Noticia not = (Noticia) ob;
+                if (!not.isExact) {
+                    mNewsToShow.add(not);
+                }
             }
+            myLog.add("ontaskcompleted: tenemos :" + mNewsToShow.size() + " noticias para mostrar");
+
+            super.init();
+
+            listener.OnCardReady(this,R.layout.native_cardwithlist_layout);
+
+        } catch (Exception e) {
+            listener.OnCardErrorLoadingData(e);
         }
-
-
-        myLog.add("ontaskcompleted: tenemos :" + mNewsToShow.size() + " noticias para mostrar");
-
-        super.init();
-
-
-        mCardViewNews.setCard(this);
+//        mCardViewNews.setCard(this);
     }
 
-    public void setView(CardViewNative cardViewNews) {
-        mCardViewNews = cardViewNews;
+//    public void setView(CardViewNative cardViewNews) {
+//        mCardViewNews = cardViewNews;
+//    }
+
+    public void setListener(cardLoadedListener listener) {
+        this.listener = listener;
     }
 
 
@@ -297,7 +306,7 @@ public class NewsCard extends CardWithList implements OnTaskCompleted {
             setOnItemClickListener(new OnItemClickListener() {
                 @Override
                 public void onItemClick(LinearListView parent, View view, int position, ListObject object) {
-                    Toast.makeText(getContext(), "Opening the Article..." , Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Opening the Article...", Toast.LENGTH_SHORT).show();
 
                     Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(getObjectId()));
                     mContext.startActivity(browserIntent);

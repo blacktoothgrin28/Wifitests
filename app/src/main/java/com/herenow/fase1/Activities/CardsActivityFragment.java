@@ -1,15 +1,20 @@
 package com.herenow.fase1.Activities;
 
+import android.app.Application;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import com.herenow.fase1.CardData.CompanyData;
+import com.herenow.fase1.CardViewNative2;
 import com.herenow.fase1.FlightData;
 import com.herenow.fase1.Cards.AirportCard;
 import com.herenow.fase1.Cards.CompanyCard;
@@ -27,6 +32,7 @@ import org.jsoup.select.Elements;
 import java.util.ArrayList;
 import java.util.List;
 
+import it.gmariotti.cardslib.library.internal.Card;
 import it.gmariotti.cardslib.library.view.CardViewNative;
 import parse.ParseActions;
 import util.myLog;
@@ -34,12 +40,10 @@ import util.parameters;
 
 import static com.google.android.gms.internal.zzhl.runOnUiThread;
 
-//import com.herenow.fase1.Cards.MaterialLargeImageCard;
-
 /**
  * A placeholder fragment containing a simple view.
  */
-public class CardsActivityFragment extends Fragment {
+public class CardsActivityFragment extends Fragment implements cardLoadedListener {
     AirportCard airportCard;
     ScheduleCard scheduleCard;
     private boolean injectJavaScript;
@@ -53,7 +57,6 @@ public class CardsActivityFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        myLog.add("Fragment creatred");
         injectJavaScript = true;
         initCards();
     }
@@ -82,7 +85,8 @@ public class CardsActivityFragment extends Fragment {
 
         }
 
-        return inflater.inflate(R.layout.demo_fragment_cardwithlist_card, container, false);
+//        return inflater.inflate(R.layout.demo_fragment_cardwithlist_card, container, false);
+        return inflater.inflate(R.layout.fragment_cards_blank, container, false);
     }
 
     private void initCards() {
@@ -92,7 +96,7 @@ public class CardsActivityFragment extends Fragment {
 //            initNewsCard(companyData.getNameClean());
 //            initLinkedinCard(companyData.getLinkedinUrl());
 
-            initScheduleCard();
+//            initScheduleCard();
 
         } catch (Exception e) {
             myLog.add("---error init cards: " + e.getMessage());
@@ -152,21 +156,44 @@ public class CardsActivityFragment extends Fragment {
     private void initNewsCard(String nameCleanCompany) {
         // News Card
         NewsCard newsCard = new NewsCard(getActivity(), nameCleanCompany);
-        CardViewNative cardViewNews = (CardViewNative) getActivity().findViewById(R.id.card_view_news);
-        newsCard.setView(cardViewNews);
+//        CardViewNative cardViewNews = (CardViewNative) getActivity().findViewById(R.id.card_view_news);
+//        newsCard.setView(cardViewNews);
+        newsCard.setListener(this);
         newsCard.init();
     }
 
-    private void initCompanyCard(final CompanyData companyCard) {
-        // Company Card
-        CompanyData companyData = companyCard;
+    private void initCompanyCard(final CompanyData companyData) {
+        int cardLayout = R.layout.company_card;
         CompanyCard companyCardtest = CompanyCard.with(getActivity())
                 .setData(companyData)
                 .useDrawableUrl(companyData.getMainImageUrl())
                 .build();
+        addCardToFragment(cardLayout, companyCardtest);
+    }
 
-        CardViewNative cardViewCompany = (CardViewNative) getActivity().findViewById(R.id.card_view_company);
-        cardViewCompany.setCard(companyCardtest);
+    private void addCardToFragment(int cardLayout, Card card) {
+        CardViewNative2 cardView = new CardViewNative2(getActivity(), cardLayout);
+
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        params.leftMargin = 12;
+        params.rightMargin = 12;
+        params.topMargin = 12;
+
+        cardView.setLayoutParams(params);
+
+        //EmptyView
+        View emptyView = new View(getActivity());
+        params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 12);
+        emptyView.setLayoutParams(params);
+
+        LinearLayout ll = (LinearLayout) getActivity().findViewById(R.id.linear_layout_cards);
+
+        ll.addView(cardView);
+        ll.addView(emptyView);
+
+        //todo add animation
+        cardView.setCard(card);
     }
 
     @Override
@@ -196,7 +223,7 @@ public class CardsActivityFragment extends Fragment {
 
                     initCompanyCard(companyData);
                     initNewsCard(companyData.getNameClean());
-                    initLinkedinCard(companyData.getLinkedinUrl());
+//                    initLinkedinCard(companyData.getLinkedinUrl());
                 } catch (Exception e) {
                     e.printStackTrace();
                     myLog.add("error aquí." + e.getLocalizedMessage());
@@ -208,6 +235,24 @@ public class CardsActivityFragment extends Fragment {
 
             }
         });
+
+    }
+
+    @Override
+    public void OnCardReady(Card card, int cardLayout) {
+        try {
+            myLog.add("***se ha terminado de cargar una card: " + card.getTitle());
+
+            addCardToFragment(cardLayout, card);
+        } catch (Exception e) {
+            myLog.add("error en oncardready " + e.getLocalizedMessage());
+        }
+
+    }
+
+    @Override
+    public void OnCardErrorLoadingData(Exception e) {
+        myLog.add("error en onreading a card:" + e.getLocalizedMessage());
 
     }
 
