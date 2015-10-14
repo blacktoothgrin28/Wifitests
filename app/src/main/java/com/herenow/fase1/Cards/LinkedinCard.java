@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.herenow.fase1.Activities.cardLoadedListener;
 import com.herenow.fase1.R;
 import com.squareup.picasso.Picasso;
 
@@ -40,7 +41,8 @@ public class LinkedinCard extends CardWithList implements OnTaskCompleted {
 
     private String mCompanyLinkedinUrl;
     private ArrayList<ListObject> mEmployeesToShow;
-    private CardViewNative mCardViewNews;
+    private cardLoadedListener listener;
+//    private CardViewNative mCardViewNews;
 
     public LinkedinCard(Context context, String companyLinkedinUrl) {
         super(context);
@@ -137,18 +139,25 @@ public class LinkedinCard extends CardWithList implements OnTaskCompleted {
 
     @Override
     public void OnTaskCompleted(ArrayList elements) {
-        myLog.add("ontaskcompleted:" + elements.size() + " perfiles");
-        //Select three news with exact name
-        mEmployeesToShow = elements;
-        super.init();
+        try {
+            myLog.add("ontaskcompleted:" + elements.size() + " perfiles");
+            //Select three news with exact name
+            mEmployeesToShow = elements;
+            super.init();
 
+            listener.OnCardReady(this, R.layout.native_cardwithlist_layout);
+        } catch (Exception e) {
+            listener.OnCardErrorLoadingData(e);
+        }
 
-        mCardViewNews.setCard(this);
+//        mCardViewNews.setCard(this);
     }
-
-    public void setView(CardViewNative cardViewNews) {
-        mCardViewNews = cardViewNews;
+    public void setListener(cardLoadedListener listener) {
+        this.listener = listener;
     }
+//    public void setView(CardViewNative cardViewNews) {
+//        mCardViewNews = cardViewNews;
+//    }
 
 
     // -------------------------------------------------------------

@@ -123,6 +123,12 @@ public class MainActivity extends ActionBarActivity {
 
         //PARSE
         ParseUserLogIn();
+        findViewById(R.id.container).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, AddWeaconActivity.class));
+            }
+        });
 
         //Wifi
 //        wifiBoss = new WifiBoss(this); //HERE THE DIFFERENCE USING SERVICE OR NOT

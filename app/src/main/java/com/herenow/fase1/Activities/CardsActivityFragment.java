@@ -30,6 +30,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import it.gmariotti.cardslib.library.internal.Card;
@@ -50,6 +51,8 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
 
 
     private String url;
+    private String[] cardsType;
+    private HashMap<String, Integer> hashTypes;
 
     public CardsActivityFragment() {
     }
@@ -84,7 +87,6 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
             myLog.addError(this.getClass(), e);
 
         }
-
 //        return inflater.inflate(R.layout.demo_fragment_cardwithlist_card, container, false);
         return inflater.inflate(R.layout.fragment_cards_blank, container, false);
     }
@@ -92,11 +94,7 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
     private void initCards() {
         try {
 
-//            initCompanyCard(parameters.getExampleCompanyCard());
-//            initNewsCard(companyData.getNameClean());
-//            initLinkedinCard(companyData.getLinkedinUrl());
-
-//            initScheduleCard();
+            if (hashTypes.containsKey("Schedule")) initScheduleCard();
 
         } catch (Exception e) {
             myLog.add("---error init cards: " + e.getMessage());
@@ -112,7 +110,6 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
 
 
         final WebView browser = (WebView) getActivity().findViewById(R.id.wbChanta);
-        //TODO quita la carga de imagenes:
         browser.getSettings().setLoadsImagesAutomatically(false);
         browser.getSettings().setJavaScriptEnabled(true);
         browser.addJavascriptInterface(new MyJavaScriptInterface(), "HTMLOUT");
@@ -139,8 +136,10 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
         scheduleCard.setData(parameters.getExampleScheduleData());//it has 11 items
         scheduleCard.init();
 
-        CardViewNative cardViewSchedule = (CardViewNative) getActivity().findViewById(R.id.card_view_schedule);
-        cardViewSchedule.setCard(scheduleCard);
+        addCardToFragment(R.layout.native_cardwithlist_layout, scheduleCard);
+//        CardViewNative cardViewSchedule = (CardViewNative) getActivity().findViewById(R.id.card_view_schedule);
+//        cardViewSchedule.setCard(scheduleCard);
+
     }
 
     private void initLinkedinCard(String linkedinUrl) {
@@ -148,8 +147,9 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
 //            //Linkedin card
         // todo change format of linkedin card
         LinkedinCard linkedinCard = new LinkedinCard(getActivity(), linkedinUrl);
-        CardViewNative cvLinkedin = (CardViewNative) getActivity().findViewById(R.id.card_view_linkedin);
-        linkedinCard.setView(cvLinkedin);
+//        CardViewNative cvLinkedin = (CardViewNative) getActivity().findViewById(R.id.card_view_linkedin);
+//        linkedinCard.setView(cvLinkedin);
+        linkedinCard.setListener(this);
         linkedinCard.init();
     }
 
@@ -184,7 +184,7 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
 
         //EmptyView
         View emptyView = new View(getActivity());
-        params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 12);
+        params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, parameters.spaceBetweenCards);
         emptyView.setLayoutParams(params);
 
         LinearLayout ll = (LinearLayout) getActivity().findViewById(R.id.linear_layout_cards);
@@ -218,12 +218,24 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
                     ParseObject po = datos.get(0);
                     CompanyData companyData = new CompanyData(po);
 
-                    if (companyData.isAirport())
+                    //COMPANY
+                    if (hashTypes.containsKey("Company")) initCompanyCard(companyData);
+
+                    //AIRPORT
+                    if (companyData.isAirport() || hashTypes.containsKey("Airport"))
                         initAirportCard(mTypeAirportCard, companyData.getAirportCode());
 
-                    initCompanyCard(companyData);
-                    initNewsCard(companyData.getNameClean());
-//                    initLinkedinCard(companyData.getLinkedinUrl());
+                    //NEWS
+                    if (hashTypes.containsKey("News")) initNewsCard(companyData.getNameClean());
+
+                    //LINKEDIN
+                    if (hashTypes.containsKey("Linkedin"))
+                        initLinkedinCard(companyData.getLinkedinUrl());
+
+                    //SCHEDULE  TODO read the schedule from parse
+//                    if (hashTypes.containsKey("Schedule"))
+//                        initScheduleCard();
+
                 } catch (Exception e) {
                     e.printStackTrace();
                     myLog.add("error aquí." + e.getLocalizedMessage());
@@ -235,19 +247,33 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
 
             }
         });
-
     }
 
+    /**
+     * When a card that need to wait for data is ready,
+     *
+     * @param card
+     * @param cardLayout
+     */
     @Override
     public void OnCardReady(Card card, int cardLayout) {
         try {
-            myLog.add("***se ha terminado de cargar una card: " + card.getTitle());
+            myLog.add("***se ha terminado de cargar una card: " + card.getCardHeader().getTitle());
 
             addCardToFragment(cardLayout, card);
         } catch (Exception e) {
             myLog.add("error en oncardready " + e.getLocalizedMessage());
         }
 
+    }
+
+    public void setCardsType(String[] cardsType) {
+        hashTypes = new HashMap<>();
+        Integer i = 1;
+        for (String cardType : cardsType) {
+            hashTypes.put(cardType, i);
+            i++;
+        }
     }
 
     @Override

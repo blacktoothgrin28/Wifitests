@@ -24,7 +24,7 @@ public class parameters {
     public static long timeBetweenFlightQueries = (long) (2 * 60 * 1000);//in milliseconds, to verify if there are changes in gates, ets
     public static double radioSpotsQuery = 50; //Determines how many spots to load, (kilometers around user's position
     public static boolean isSapoActive = false;
-
+    public static int spaceBetweenCards = 30; //in pixels
 
 
     public enum CardType {COMPANY, SCHEDULE, LINKEDIN, NEWS, FLIGHTS}

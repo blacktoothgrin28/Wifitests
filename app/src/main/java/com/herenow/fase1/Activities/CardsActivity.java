@@ -2,11 +2,13 @@ package com.herenow.fase1.Activities;
 
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.herenow.fase1.CardData.CompanyData;
 import com.herenow.fase1.Cards.AirportCard;
@@ -20,10 +22,6 @@ import util.myLog;
 
 public class CardsActivity extends ActionBarActivity {
 
-    private Bitmap wLogo;
-    private String wName;
-    private String wUrl;
-    private String wCompanyDataObId;
     private CompanyData mCompanyData;
 
     @Override
@@ -33,10 +31,11 @@ public class CardsActivity extends ActionBarActivity {
 
         try {
             Bundle b = getIntent().getExtras();
-            wName = b.getString("wName");
-            wUrl = b.getString("wUrl");
-            wLogo = (Bitmap) b.get("wLogo");
-            wCompanyDataObId = b.getString("wComapanyDataObId");
+//            Bitmap wLogo = (Bitmap) b.get("wLogo");
+//            String wUrl = b.getString("wUrl");
+            String wName = b.getString("wName");
+            String wCompanyDataObId = b.getString("wComapanyDataObId");
+            String[] wCards = b.getStringArray("wCards");
 
             setTitle(wName);
 
@@ -45,7 +44,6 @@ public class CardsActivity extends ActionBarActivity {
             try {
 
                 depOrArr = b.getString("typeOfAiportCard");
-                myLog.add("CARDACTIVITY hemos recibido el typo de carta " + depOrArr);
                 if (depOrArr.equals("Arrivals")) {
                     mTypeAirportCard = AirportCard.TypeOfCard.arrival;
                 } else {
@@ -58,6 +56,7 @@ public class CardsActivity extends ActionBarActivity {
             //Pass some data to the fragment:
             CardsActivityFragment rf = (CardsActivityFragment) getSupportFragmentManager().findFragmentById(R.id.cards_fragment);
             if (rf != null) {
+                rf.setCardsType(wCards);
                 rf.setCardData(wCompanyDataObId, mTypeAirportCard);
             }
 
