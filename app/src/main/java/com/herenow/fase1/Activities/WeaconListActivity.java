@@ -35,7 +35,6 @@ public class WeaconListActivity extends ActionBarActivity {
         try {
             super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_weacon_list);
-//                trans_left_in, R.anim.trans_left_out);
 
             mRecyclerView = new RecyclerView(this);
             mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
@@ -64,20 +63,15 @@ public class WeaconListActivity extends ActionBarActivity {
                 public void onClick(View v) {
                     WeaconParse we = (WeaconParse) v.getTag();
 
-    //                intentWeb = new Intent(WeaconListActivity.this, BrowserActivity.class);
-    //                intentWeb.putExtra("wName", we.getName());
-    //                intentWeb.putExtra("wUrl", we.getUrl());
-    //                intentWeb.putExtra("wLogo", we.getLogoRounded());
-    //
-    //                WeaconListActivity.this.startActivity(intentWeb);
+                    //                intentWeb = new Intent(WeaconListActivity.this, BrowserActivity.class);
+                    //                intentWeb.putExtra("wName", we.getName());
+                    //                intentWeb.putExtra("wUrl", we.getUrl());
+                    //                intentWeb.putExtra("wLogo", we.getLogoRounded());
+                    //
+                    //                WeaconListActivity.this.startActivity(intentWeb);
 
-                    Intent resultIntent = new Intent(WeaconListActivity.this, CardsActivityOld.class)
-                            .putExtra("wUrl", we.getUrl())
-                            .putExtra("wName", we.getName())
-                            .putExtra("wLogo", we.getLogoRounded())
-                            .putExtra("wComapanyDataObId", we.getCompanyDataObjectId())
-                            .putExtra("wCards", we.getCards())
-                            .putExtra("typeOfAiportCard", "Departures");
+                    Intent resultIntent;
+                    resultIntent = getIntent(we);
 
                     WeaconListActivity.this.startActivity(resultIntent);
                 }
@@ -85,8 +79,30 @@ public class WeaconListActivity extends ActionBarActivity {
 
             mRecyclerView.setAdapter(adapter);
         } catch (Resources.NotFoundException e) {
-            myLog.add("`[[[[[[[[[[Huston la hemos cagao+"+e.getLocalizedMessage());
+            myLog.add("`[[[[[[[[[[Huston la hemos cagao+" + e.getLocalizedMessage());
         }
+    }
+
+    private Intent getIntent(WeaconParse we) {
+        Intent intent;
+        Class<?> cls;
+
+        if (we.isBrowser()) {
+            intent = new Intent(WeaconListActivity.this, BrowserActivity.class)
+                    .putExtra("wUrl", we.getUrl());
+        } else {
+            intent = new Intent(WeaconListActivity.this, CardsActivityOld.class)
+                    .putExtra("wComapanyDataObId", we.getCompanyDataObjectId())
+                    .putExtra("wCards", we.getCards())
+                    .putExtra("typeOfAiportCard", "Departures");
+        }
+
+        //In common
+        intent
+                .putExtra("wName", we.getName())
+                .putExtra("wLogo", we.getLogoRounded());
+
+        return intent;
     }
 
     @Override

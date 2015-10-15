@@ -121,7 +121,7 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
         scheduleCard.setData(parameters.getExampleScheduleData());//it has 11 items
         scheduleCard.init();
 
-        addCardToFragment(R.layout.native_cardwithlist_layout, scheduleCard);
+        addCardToFragment(R.layout.native_cardwithlist_layout2, scheduleCard);
 //        CardViewNative cardViewSchedule = (CardViewNative) getActivity().findViewById(R.id.card_view_schedule);
 //        cardViewSchedule.setCard(scheduleCard);
 

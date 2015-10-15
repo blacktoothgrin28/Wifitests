@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import it.gmariotti.cardslib.library.internal.CardArrayAdapter;
 import parse.ParseActions;
 import util.GPSCoordinates;
 import util.myLog;
@@ -41,16 +42,13 @@ public class MainActivity extends ActionBarActivity {
 
     public static Position mPos; //WARN. Lo he hecho static para poder usarlo en SAPO
 
-    //Demo
-    public static boolean demoMode;
-
     private static TextView tv;
     Intent intentWifiObs;
     private Intent intentAddWeacon;
     private Intent intentCards;
     private WifiUpdater wu;
     private Timer t;
-    private Switch mySwitch;
+    //    private Switch mySwitch;
     //Todo solve reporting time between scannings
     //Report on screen
     private int im = 1;
@@ -134,8 +132,8 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
 
         WriteUnhandledErrors(true);
-        myLog.initialize("/WCLOG/rt.txt"); //Log in a file on thephone
-        Notifications.Initialize(this); //TODO: Really neededto initialize?
+        myLog.initialize("/WCLOG/rt.txt"); //Log in a file on the phone
+        Notifications.Initialize(this); //TODO: Really needed to initialize?
 
         retrieveSpotsAround(false, parameters.radioSpotsQuery);
 
@@ -143,26 +141,7 @@ public class MainActivity extends ActionBarActivity {
 
         //PARSE
         ParseUserLogIn();
-        findViewById(R.id.container).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, AddWeaconActivity.class));
-            }
-        });
 
-        //Wifi
-//        wifiBoss = new WifiBoss(this); //HERE THE DIFFERENCE USING SERVICE OR NOT
-
-
-//        //Force
-//        ParseActions.ssidForcedDetection("piripiri");
-//
-//        mainWifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-//        receiverWifi = new WifiReceiver();
-//        IntentFilter intentFilter = new IntentFilter();
-//        intentFilter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
-//        intentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
-//        registerReceiver(receiverWifi, intentFilter);
     }
 
     @Override
@@ -171,27 +150,7 @@ public class MainActivity extends ActionBarActivity {
         myLog.add("++++++++++++++++ Retornando a la Main");
     }
 
-    private void ForcedWeaconDetection() {
-//        WeaconParse we = new WeaconParse("Weacon de test(Airport)", "", "phone", "", "", "This is a weacon made only for test. It's harcoded."
-//                , "airport", 0, 0, 3, false, ParseUser.getCurrentUser(), BitmapFactory.decodeResource(getResources(),
-//                R.drawable.ic_stat_name_hn));
-//        we.setCompanyDataObjectId("D92eRp51KD"); //El prat
-//        we.setObjectId("psnoc");
-
-
-    }
-
     private void initializeViews() {
-        mySwitch = (Switch) findViewById(R.id.sw_demo);
-        mySwitch.setChecked(false);
-        mySwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView,
-                                         boolean isChecked) {
-                demoMode = isChecked;
-                modeChange(isChecked);
-            }
-        });
 
         swDetection = (Switch) findViewById(R.id.sw_detection);
         swDetection.setChecked(false);
@@ -250,7 +209,6 @@ public class MainActivity extends ActionBarActivity {
         tv = (TextView) findViewById(R.id.tv_demoStatus);
         tv.setText("demo OFF");
         //check the current state before we display the screen
-        demoMode = mySwitch.isChecked();
     }
 
 //    /**
@@ -299,27 +257,6 @@ public class MainActivity extends ActionBarActivity {
         } else {
             myLog.add("Ya tenia user,");
         }
-    }
-
-    private void modeChange(boolean Demo) {
-        //Force
-//        ParseActions.ssidForcedDetection("piripiri");
-
-//        t = new Timer();
-//        wu = new WifiUpdater((TextView) findViewById(R.id.tv_demoStatus), this, Demo);
-//
-//        if (Demo) {
-//            tv.setText("demo ON");
-//        } else {
-//            tv.setText("demo OFF");
-//        }
-//        t.schedule(new TimerTask() {
-//            @Override
-//            public void run() {
-//                runOnUiThread(wu);
-//            }
-//        }, 4000, 3000);
-
     }
 
     @Override
@@ -397,12 +334,9 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void clickAddWeacon(View view) {
-//        ParseActions.ssidForcedDetection("piripiri");
 
-        ForcedWeaconDetection();
-
-//        intentAddWeacon = new Intent(this, AddWeaconActivity.class);
-//        startActivity(intentAddWeacon);
+        intentAddWeacon = new Intent(this, AddWeaconActivity.class);
+        startActivity(intentAddWeacon);
     }
 
     public void launchAll(View view) {
@@ -412,20 +346,19 @@ public class MainActivity extends ActionBarActivity {
             public int i = 0;
 
             @Override
-
             public void run() {
                 if (i < listaObj.size()) {
+                    myLog.add("**LAnzando automaticamente: " + lista.get(i));
                     String ssid = listaObj.get(i);
-                    ParseActions.ssidForcedDetection(ssid, 0);
+                    ParseActions.ssidForcedDetection(ssid, 1);
                     i++;
                 } else {
                     t.cancel();
                 }
             }
         }, 3000, 4000);
-//        for(String ssid :listaObj){
-//            Pars
-//        }
+
+
     }
 
 //    class WifiReceiver extends BroadcastReceiver {

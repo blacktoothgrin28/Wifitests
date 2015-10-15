@@ -58,7 +58,8 @@ public class parameters {
         ex.addItem("Welcome", "", 9, 15, "Reception", "http://www.aia.es");
         ex.addItem("Challenges in near horizon", "Moe Szyslak", 9, 30, "Room A", "http://www.aia.es");
         ex.addItem("Beyond the Musgo", "José Mota", 10, 30, "Room A", "http://www.aia.es");
-        ex.addItem("Power of Imagination", "Sponge Bob", 11, 30, "Creativity room", "http://www.aia.es");
+        ex.addItem("Power of Imagination", "Sponge Bob", 11, 30, "Creativity room",
+                "http://www.aia.es","http://www.robotictechnologyinc.com/images/upload/file/Presentation%20Technology%20Innovation.pdf");
         ex.addItem("Coffee break dance", "", 12, 15, "Reception", "http://www.aia.es");
         ex.addItem("Riding over your problems", "Little Pony", 12, 45, "Room B", "http://www.aia.es");
         ex.addItem("LUNCH", "", 12, 45, "Reception", "http://www.aia.es");

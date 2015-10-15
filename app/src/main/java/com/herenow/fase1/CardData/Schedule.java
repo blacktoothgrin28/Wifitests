@@ -33,6 +33,9 @@ public class Schedule {
     public void addItem(String title, String speaker, int h, int min, String place, String url) {
         addItem(new ScheduleItem(title, speaker, h, min, place, url));
     }
+    public void addItem(String title, String speaker, int h, int min, String place, String url, String fileUrl) {
+        addItem(new ScheduleItem(title, speaker, h, min, place, url,fileUrl));
+    }
 
     public ArrayList<ScheduleItem> getData() {
         return schedule;
@@ -47,7 +50,6 @@ public class Schedule {
         return format.format(date.getTime());
     }
 
-
     public class ScheduleItem {
         private final String place;
         private final String speaker;
@@ -55,6 +57,7 @@ public class Schedule {
         String title, hour, urlImage;
         int h, min;
         private int position;
+        String fileUrl;
 //        private Calendar date;
 
         public ScheduleItem(String title, String speaker, int h, int min, String place, String url) {
@@ -64,6 +67,11 @@ public class Schedule {
             this.h = h;
             this.min = min;
             this.place = place;
+        }
+
+        public ScheduleItem(String title, String speaker, int h, int min, String place, String url, String fileUrl) {
+            this( title,  speaker,  h,  min,  place,  url);
+            this.fileUrl=fileUrl;
         }
 
         public String getPlace() {
@@ -137,6 +145,10 @@ public class Schedule {
                 end = schedule.get(position + 1).getStartInMilli();
             }
             return end;
+        }
+
+        public String getUrlFile() {
+            return fileUrl;
         }
     }
 }

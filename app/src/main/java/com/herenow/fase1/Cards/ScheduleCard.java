@@ -1,7 +1,11 @@
 package com.herenow.fase1.Cards;
 
+import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Environment;
 import android.provider.CalendarContract;
 import android.view.View;
 import android.view.ViewGroup;
@@ -78,17 +82,37 @@ public class ScheduleCard extends CardWithList {
 
         //Add an object to the list
         for (Schedule.ScheduleItem it : mScheduleData.getData()) {
-            ScheduleObject so = new ScheduleObject(mParentCard, it);
+            final ScheduleObject so = new ScheduleObject(mParentCard, it);
+
+            //Example onSwipe
+            so.setOnItemSwipeListener(new OnItemSwipeListener() {
+                @Override
+                public void onItemSwipe(ListObject object, boolean dismissRight) {
+                    Toast.makeText(getContext(), "Swiped on " + object.getObjectId() + "\ndismissed:" + dismissRight, Toast.LENGTH_SHORT).show();
+
+                    DownloadManager.Request request = new DownloadManager.Request(Uri.parse(so.fileUrl));
+                    request.setDescription("Some descrition");
+                    request.setTitle("Some title");
+                    // in order for this if to run, you must use the android 3.2 to compile your app
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                        request.allowScanningByMediaScanner();
+                                request.setTitle("Scheduled presention")
+                                .setDescription(so.title)
+                                .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+                    }
+                    request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "name-of-the-file.ext");
+
+                    // get download service and enqueue file
+                    DownloadManager manager = (DownloadManager) mContext.getSystemService(Context.DOWNLOAD_SERVICE);
+                    manager.enqueue(request);
+
+                }
+            });
+
+
             mObjects.add(so);
         }
 
-        //Example onSwipe
-        /*w2.setOnItemSwipeListener(new OnItemSwipeListener() {
-            @Override
-            public void onItemSwipe(ListObject object,boolean dismissRight) {
-                Toast.makeText(getContext(), "Swipe on " + object.getObjectId(), Toast.LENGTH_SHORT).show();
-            }
-        });*/
 
         return mObjects;
     }
@@ -129,6 +153,7 @@ public class ScheduleCard extends CardWithList {
         int h, min;
         private String speaker, description = "";
         private long startInMilli, endInMilli;
+        public String fileUrl;
 
 
         public ScheduleObject(Card parentCard) {
@@ -148,6 +173,7 @@ public class ScheduleCard extends CardWithList {
             url = it.getUrl();
             startInMilli = it.getStartInMilli();
             endInMilli = it.getEndInMilli();
+            fileUrl = it.getUrlFile();
             init();
 
         }

@@ -54,7 +54,8 @@ public class LinkedinCard extends CardWithList implements OnTaskCompleted {
     protected CardHeader initCardHeader() {
 
         //Add Header
-        CardHeader header = new CardHeader(getContext(), R.layout.carddemo_googlenowweather_inner_header);
+//        CardHeader header = new CardHeader(getContext(), R.layout.carddemo_googlenowweather_inner_header);
+        CardHeader header = new CardHeader(getContext(), R.layout.listcard_inner_header);
         //Todo change the news header style
         header.setTitle("Who works here?"); //todo should use R.string.
         return header;
@@ -145,7 +146,7 @@ public class LinkedinCard extends CardWithList implements OnTaskCompleted {
             mEmployeesToShow = elements;
             super.init();
 
-            listener.OnCardReady(this, R.layout.native_cardwithlist_layout);
+            listener.OnCardReady(this, R.layout.native_cardwithlist_layout2);
         } catch (Exception e) {
             listener.OnCardErrorLoadingData(e);
         }
