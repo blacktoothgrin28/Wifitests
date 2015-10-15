@@ -79,7 +79,7 @@ public abstract class Notifications {
             //TODO put in parse that this weacon was notified
             if (showedNotifications == null) {
                 showedNotifications = new ArrayList<>();
-                myLog.add("***hemos debido crear denuevo la showednotifications");
+                myLog.add("***hemos debido crear denuevo la showednotifications",tag);
             }
 
             if (showedNotifications.size() == 0) {
