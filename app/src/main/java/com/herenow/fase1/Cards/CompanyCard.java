@@ -560,7 +560,9 @@ public class CompanyCard extends BaseMaterialCard {
 
                 mCompanyData.getLogo();
 
-                Bitmap bmImage = BitmapFactory.decodeResource(mContext.getResources(), mCompanyData.getLogoResId());//Todo get the image from other source
+
+//                Bitmap bmImage = BitmapFactory.decodeResource(mContext.getResources(), mCompanyData.getLogoResId());
+                Bitmap bmImage=mCompanyData.getLogo();
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();//Todo protect in the case there is no image
                 bmImage.compress(Bitmap.CompressFormat.JPEG, 80, baos);
                 byte[] b = baos.toByteArray();

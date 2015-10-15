@@ -29,16 +29,19 @@ import util.parameters;
  */
 public abstract class ParseActions {
 
+    private static Context mContext;
+
     /***
      * get wifispots from parse in a area and pin them the object includes the weacon
      *
-     * @param bLocal if should be queried in local database
-     * @param radio  kms
-     * @param center center of queried area
+     * @param bLocal  if should be queried in local database
+     * @param radio   kms
+     * @param center  center of queried area
      * @param context
      */
     public static void getSpots(final boolean bLocal, final double radio, final GPSCoordinates center, final Context context) {
         try {
+            mContext = context;
             //TODO ver si tiene sentido leer los weacons de local
             //1.Remove spots and weacons in local
             myLog.add("retrieving SSIDS from local:" + bLocal + " user: " + ParseUser.getCurrentUser());
@@ -112,7 +115,7 @@ public abstract class ParseActions {
             public void done(List<WifiSpot> spots, ParseException e) {
                 if (e == null) {
                     int n = spots.size();
-                    LogInManagement.ReportDetectedSpots(spots);
+                    LogInManagement.ReportDetectedSpots(spots,mContext);
                     if (n == 0) {
                         myLog.add("MegaQuery no match", "WE");
                     } else { //There are matches
@@ -240,12 +243,19 @@ public abstract class ParseActions {
         qs.findInBackground(new FindCallback<WifiSpot>() {
             @Override
             public void done(List<WifiSpot> spots, ParseException e) {
-                try {
-                    Thread.sleep(1000 * secWait);
-                    WeaconParse we = spots.get(0).getWeacon();
-                    Notifications.sendNotification(we);
-                } catch (InterruptedException e1) {
-                    myLog.add("error waiting for launcihgn weacon");
+                if (e == null) {
+
+                    try {
+                        Thread.sleep(1000 * secWait);
+                        myLog.add("***FORCESD se an recuperado:"+spots.size());
+                        WeaconParse we = spots.get(0).getWeacon();
+                        Notifications.sendNotification(we);
+                    } catch (Exception e1) {
+                        myLog.add("error waiting for launcihgn weacon"+e1);
+                    }
+                }else{
+                    myLog.add("***ERROR PARSE FORCESD  error waiting for launcihgn weacon"+e);
+
                 }
             }
         });

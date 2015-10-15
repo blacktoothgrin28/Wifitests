@@ -19,6 +19,7 @@ import com.herenow.fase1.Notifications.Notifications;
 import com.herenow.fase1.Position;
 import com.herenow.fase1.R;
 import com.herenow.fase1.Wifi.LocationAsker;
+import com.herenow.fase1.Wifi.LogInManagement;
 import com.herenow.fase1.Wifi.WifiUpdater;
 import com.herenow.fase1.MyServices.WifiObserverService;
 import com.parse.LogInCallback;
@@ -51,9 +52,6 @@ public class MainActivity extends ActionBarActivity {
     //    private Switch mySwitch;
     //Todo solve reporting time between scannings
     //Report on screen
-    private int im = 1;
-    private long newTime, oldTime;
-    private String msg = "";
     private Switch swDetection;// start or stot wifiservice detection
     private Spinner spinner;
     private ArrayList<String> lista;
@@ -65,7 +63,7 @@ public class MainActivity extends ActionBarActivity {
      * @param s text to print
      */
     public static void writeOnScreen(String s) {
-        tv.setText(s);
+        tv.append("\n" + s);
     }
     //    private boolean isSapoActive = true; //TODO activate /deactivate sapo remotely
 
@@ -359,6 +357,10 @@ public class MainActivity extends ActionBarActivity {
         }, 3000, 4000);
 
 
+    }
+
+    public void onClickSubscribe(View view) {
+        LogInManagement.subscribeAChannel("wifiUniqueName", this.getApplicationContext());
     }
 
 //    class WifiReceiver extends BroadcastReceiver {

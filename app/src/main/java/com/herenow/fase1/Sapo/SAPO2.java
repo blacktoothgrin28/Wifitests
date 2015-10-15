@@ -73,7 +73,7 @@ public abstract class SAPO2 {
 
             if (bingo) {
                 toBeSaved = sr;
-                MainActivity.mPos.connect(Position.REASON.SaveSAPO2SPOTS);
+                MainActivity.mPos.connect(Position.REASON.SaveSAPO2SPOTS);//TODO do it with callback, as the rest
             } else {
                 oldSpots = newSpots;
             }

@@ -41,6 +41,17 @@
             android:onClick="launchAll"
             android:text="All"
             android:visibility="visible" />
+
+        <Button
+            style="?android:attr/buttonStyleSmall"
+            android:id="@+id/btSubscribe"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal|bottom"
+            android:gravity="top"
+            android:onClick="onClickSubscribe"
+            android:text="Subscribe"
+            android:visibility="visible" />
     </FrameLayout>
 
     <TextView

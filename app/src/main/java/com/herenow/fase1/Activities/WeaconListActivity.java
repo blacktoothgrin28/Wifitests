@@ -72,7 +72,6 @@ public class WeaconListActivity extends ActionBarActivity {
 
                     Intent resultIntent;
                     resultIntent = getIntent(we);
-
                     WeaconListActivity.this.startActivity(resultIntent);
                 }
             });
@@ -85,7 +84,6 @@ public class WeaconListActivity extends ActionBarActivity {
 
     private Intent getIntent(WeaconParse we) {
         Intent intent;
-        Class<?> cls;
 
         if (we.isBrowser()) {
             intent = new Intent(WeaconListActivity.this, BrowserActivity.class)
