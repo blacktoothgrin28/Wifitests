@@ -1,4 +1,4 @@
-package com.herenow.fase1.services;
+package com.herenow.fase1.MyServices;
 
 import android.app.Service;
 import android.content.BroadcastReceiver;

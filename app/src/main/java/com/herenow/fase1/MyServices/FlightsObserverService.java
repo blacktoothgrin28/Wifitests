@@ -1,4 +1,4 @@
-package com.herenow.fase1.services;
+package com.herenow.fase1.MyServices;
 
 import android.app.Notification;
 import android.app.NotificationManager;

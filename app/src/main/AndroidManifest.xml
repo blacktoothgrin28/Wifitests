@@ -95,10 +95,10 @@
         <!-- <meta-data android:name="com.parse.push.notification_icon" android:resource="@drawable/push_icon"/> -->
 
         <service
-            android:name=".services.WifiObserverService"
+            android:name=".MyServices.WifiObserverService"
             android:exported="false" />
         <service
-            android:name=".services.FlightsObserverService"
+            android:name=".MyServices.FlightsObserverService"
             android:exported="false" />
 
         <!-- PArse push staff -->

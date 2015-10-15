@@ -20,7 +20,7 @@ import com.herenow.fase1.Position;
 import com.herenow.fase1.R;
 import com.herenow.fase1.Wifi.LocationAsker;
 import com.herenow.fase1.Wifi.WifiUpdater;
-import com.herenow.fase1.services.WifiObserverService;
+import com.herenow.fase1.MyServices.WifiObserverService;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;

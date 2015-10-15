@@ -19,7 +19,7 @@ import com.herenow.fase1.Cards.Components.CardViewNative2;
 import com.herenow.fase1.FlightData;
 import com.herenow.fase1.GetFlightInfo;
 import com.herenow.fase1.R;
-import com.herenow.fase1.services.FlightsObserverService;
+import com.herenow.fase1.MyServices.FlightsObserverService;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
