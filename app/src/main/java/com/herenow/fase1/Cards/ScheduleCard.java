@@ -91,16 +91,14 @@ public class ScheduleCard extends CardWithList {
                     Toast.makeText(getContext(), "Swiped on " + object.getObjectId() + "\ndismissed:" + dismissRight, Toast.LENGTH_SHORT).show();
 
                     DownloadManager.Request request = new DownloadManager.Request(Uri.parse(so.fileUrl));
-                    request.setDescription("Some descrition");
-                    request.setTitle("Some title");
                     // in order for this if to run, you must use the android 3.2 to compile your app
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
                         request.allowScanningByMediaScanner();
-                                request.setTitle("Scheduled presention")
+                                request.setTitle("Scheduled presentation")
                                 .setDescription(so.title)
                                 .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
                     }
-                    request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "name-of-the-file.ext");
+                    request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, so.title+".pdf");//TODO consider other file formats
 
                     // get download service and enqueue file
                     DownloadManager manager = (DownloadManager) mContext.getSystemService(Context.DOWNLOAD_SERVICE);

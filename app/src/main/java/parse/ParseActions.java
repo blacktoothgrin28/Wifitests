@@ -242,11 +242,11 @@ public abstract class ParseActions {
             public void done(List<WifiSpot> spots, ParseException e) {
                 try {
                     Thread.sleep(1000 * secWait);
+                    WeaconParse we = spots.get(0).getWeacon();
+                    Notifications.sendNotification(we);
                 } catch (InterruptedException e1) {
                     myLog.add("error waiting for launcihgn weacon");
                 }
-                WeaconParse we = spots.get(0).getWeacon();
-                Notifications.sendNotification(we);
             }
         });
     }
