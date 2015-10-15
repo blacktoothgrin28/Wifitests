@@ -85,9 +85,13 @@ public class WeaconParse extends ParseObject {
 
     public String[] getCards() {
 
-        List<Object> al = getList("cards");
-        cards = new String[al.size()];
-        al.toArray(cards);
+        try {
+            List<Object> al = getList("cards");
+            cards = new String[al.size()];
+            al.toArray(cards);
+        } catch (Exception e) {
+            myLog.add("--error: ther is no definition of cards in parse: "+e.getLocalizedMessage());
+        }
         return cards;
     }
 
