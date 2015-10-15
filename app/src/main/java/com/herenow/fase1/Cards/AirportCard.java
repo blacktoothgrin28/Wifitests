@@ -13,12 +13,13 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.herenow.fase1.FlightData;
+import com.herenow.fase1.Activities.cardLoadedListener;
 import com.herenow.fase1.CardData.GoogleFlight;
+import com.herenow.fase1.Cards.Components.CardViewNative2;
+import com.herenow.fase1.FlightData;
 import com.herenow.fase1.GetFlightInfo;
 import com.herenow.fase1.R;
-import com.herenow.fase1.TimerService;
-import com.herenow.fase1.services.FlightsVigilant;
+import com.herenow.fase1.services.FlightsObserverService;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -34,7 +35,6 @@ import it.gmariotti.cardslib.library.internal.Card;
 import it.gmariotti.cardslib.library.internal.CardHeader;
 import it.gmariotti.cardslib.library.prototypes.CardWithList;
 import it.gmariotti.cardslib.library.prototypes.LinearListView;
-import it.gmariotti.cardslib.library.view.CardViewNative;
 import util.OnTaskCompleted;
 import util.myLog;
 
@@ -49,12 +49,12 @@ public class AirportCard extends CardWithList implements OnTaskCompleted {
     private final NotificationManager mNotificationManager;
     private final TypeOfCard mTypeOfCard;
     private List<ListObject> mObjects;
-    private CardViewNative mCardViewAir;
     private GoogleFlight mCurrentGoogle, mOldGoogle;
     private FlightData mSelectedFlight;
     private String mAirportCode = "Airport code";
-
-    public enum TypeOfCard {departure, arrival}
+    private CardViewNative2 mCardViewAir;
+    private cardLoadedListener listener;
+//    private cardLoadedListener listener;
 
     public AirportCard(Context context, TypeOfCard typeOfCard, String airportCode) {
         super(context);
@@ -64,6 +64,16 @@ public class AirportCard extends CardWithList implements OnTaskCompleted {
         mNotificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
     }
 
+    public static String nameOfType(TypeOfCard toc) {
+        String st;
+        if (toc == TypeOfCard.departure) {
+            st = "departures";
+        } else {
+            st = "arrivals";
+        }
+        return st;
+
+    }
 
     @Override
     protected CardHeader initCardHeader() {
@@ -76,6 +86,10 @@ public class AirportCard extends CardWithList implements OnTaskCompleted {
             header.setTitle("Arrivals " + mAirportCode.toUpperCase());
         }
         return header;
+    }
+
+    public void setListener(cardLoadedListener listener) {
+        this.listener = listener;
     }
 
     @Override
@@ -158,25 +172,15 @@ public class AirportCard extends CardWithList implements OnTaskCompleted {
         return convertView;
     }
 
-    public static String nameOfType(TypeOfCard toc) {
-        String st;
-        if (toc == TypeOfCard.departure) {
-            st = "departures";
-        } else {
-            st = "arrivals";
-        }
-        return st;
-
-    }
-
     @Override
     public void init() {
         super.init();
-        mCardViewAir.setCard(this);
-    }
-
-    public void setView(CardViewNative cardViewAir) {
-        mCardViewAir = cardViewAir;
+//        mCardViewAir.setCard(this);
+        try {
+            listener.OnCardReady(this, R.layout.native_cardwithlist_layout);
+        } catch (Exception e) {
+            listener.OnCardErrorLoadingData(e);
+        }
     }
 
     @Override
@@ -190,6 +194,9 @@ public class AirportCard extends CardWithList implements OnTaskCompleted {
         return innerLayout;
     }
 
+//    public void setView(CardViewNative2 cardViewAir) {
+//        mCardViewAir = cardViewAir;
+//    }
 
     public void setData(ArrayList<FlightData> departures) {
         mObjects = new ArrayList<>();
@@ -220,24 +227,12 @@ public class AirportCard extends CardWithList implements OnTaskCompleted {
 
 
         //Aquí lanzamos el intentservice para preguntar a google periodicamente
-//        Intent intent = new Intent(mContext, FlightsVigilant.class);
-        Intent intent = new Intent(mContext, TimerService.class);
+        Intent intent = new Intent(mContext, FlightsObserverService.class);
 
         intent.putExtra("remoteCity", mCurrentGoogle.remoteCity);
         intent.putExtra("code", mCurrentGoogle.code);
-        myLog.add("+++++++++++++hemos añadido al intent: " + mCurrentGoogle.remoteCity + " | " + mCurrentGoogle.code)
-        ;
+        myLog.add("++++++++hemos añadido al intent: " + mCurrentGoogle.remoteCity + " | " + mCurrentGoogle.code);
         mContext.startService(intent);
-
-        //Start asking google flight periodically
-//        Timer t = new Timer();
-//        t.schedule(new TimerTask() {
-//            @Override
-//            public void run() {
-//                myLog.add("-----timer execution");
-//                GetInfoFlightFromGoogleSync(mCurrentGoogle.code); //repeated
-//            }
-//        }, 10000, parameters.timeBetweenFlightQueries);
 
     }
 
@@ -315,6 +310,8 @@ public class AirportCard extends CardWithList implements OnTaskCompleted {
     private void GetInfoFlightFromGoogle(String flightCode) {
         (new readGoogleFlight(this)).execute(new String[]{flightCode});
     }
+
+    public enum TypeOfCard {departure, arrival}
 
     class DepartureObject extends CardWithList.DefaultListObject {
 

@@ -52,7 +52,7 @@
                 android:value=".Activities.MainActivity" />
         </activity>
         <activity
-            android:name=".Activities.CardsActivity"
+            android:name=".Activities.CardsActivityOld"
             android:label="@string/title_activity_cards"
             android:parentActivityName=".Activities.WeaconListActivity" >
             <meta-data
@@ -95,10 +95,10 @@
         <!-- <meta-data android:name="com.parse.push.notification_icon" android:resource="@drawable/push_icon"/> -->
 
         <service
-            android:name=".WifiObserverService"
+            android:name=".services.WifiObserverService"
             android:exported="false" />
         <service
-            android:name=".TimerService"
+            android:name=".services.FlightsObserverService"
             android:exported="false" />
 
         <!-- PArse push staff -->
@@ -132,7 +132,7 @@
         </receiver>
 
         <activity
-            android:name=".CardsActivityAer"
+            android:name=".Activities.CardsActivity"
             android:label="@string/title_activity_cards_activity_aer"
             android:parentActivityName=".Activities.WeaconListActivity" >
             <meta-data

@@ -1,9 +1,7 @@
 package com.herenow.fase1.Activities;
 
-import android.app.Application;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,13 +12,13 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import com.herenow.fase1.CardData.CompanyData;
-import com.herenow.fase1.CardViewNative2;
-import com.herenow.fase1.FlightData;
 import com.herenow.fase1.Cards.AirportCard;
 import com.herenow.fase1.Cards.CompanyCard;
+import com.herenow.fase1.Cards.Components.CardViewNative2;
 import com.herenow.fase1.Cards.LinkedinCard;
 import com.herenow.fase1.Cards.NewsCard;
 import com.herenow.fase1.Cards.ScheduleCard;
+import com.herenow.fase1.FlightData;
 import com.herenow.fase1.R;
 import com.parse.ParseObject;
 
@@ -34,7 +32,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import it.gmariotti.cardslib.library.internal.Card;
-import it.gmariotti.cardslib.library.view.CardViewNative;
 import parse.ParseActions;
 import util.myLog;
 import util.parameters;
@@ -48,10 +45,7 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
     AirportCard airportCard;
     ScheduleCard scheduleCard;
     private boolean injectJavaScript;
-
-
     private String url;
-    private String[] cardsType;
     private HashMap<String, Integer> hashTypes;
 
     public CardsActivityFragment() {
@@ -61,7 +55,6 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         injectJavaScript = true;
-        initCards();
     }
 
     @Override
@@ -87,27 +80,19 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
             myLog.addError(this.getClass(), e);
 
         }
-//        return inflater.inflate(R.layout.demo_fragment_cardwithlist_card, container, false);
+//        return inflater.inflate(R.layout.fragment_cards_static, container, false);
         return inflater.inflate(R.layout.fragment_cards_blank, container, false);
     }
 
-    private void initCards() {
-        try {
-
-//            if (hashTypes.containsKey("Schedule")) initScheduleCard();
-
-        } catch (Exception e) {
-            myLog.add("---error init cards: " + e.getMessage());
-        }
-    }
 
     private void initAirportCard(AirportCard.TypeOfCard typeOfCard, String airportCode) {
 
-
         airportCard = new AirportCard(getActivity(), typeOfCard, airportCode);//departure just for test
-        CardViewNative cardViewAirport = (CardViewNative) getActivity().findViewById(R.id.card_view_airport);
-        airportCard.setView(cardViewAirport);
+        airportCard.setListener(this);
+//        CardViewNative cardViewAirport = (CardViewNative) getActivity().findViewById(R.id.card_view_airport);
+//        airportCard.setView(cardViewAirport);
 
+//        addCardToFragment(R.layout.native_cardwithlist_layout, airportCard);
 
         final WebView browser = (WebView) getActivity().findViewById(R.id.wbChanta);
         browser.getSettings().setLoadsImagesAutomatically(false);
@@ -210,46 +195,53 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
 
 
     public void setCardData(final String wCompanyDataObId, final AirportCard.TypeOfCard mTypeAirportCard) {
-        ParseActions.getCompanyData(wCompanyDataObId, new ParseCallback() {
-            @Override
-            public void DatafromParseReceived(List<ParseObject> datos) {
-                myLog.add("etntramos en el callback. datossize=" + datos.size());
-                try {
-                    ParseObject po = datos.get(0);
-                    CompanyData companyData = new CompanyData(po);
+        if (wCompanyDataObId != null) {
 
-                    //COMPANY
-                    if (hashTypes.containsKey("Company")) initCompanyCard(companyData);
+            ParseActions.getCompanyData(wCompanyDataObId, new ParseCallback() {
+                @Override
+                public void DatafromParseReceived(List<ParseObject> datos) {
+                    myLog.add("etntramos en el callback. datossize=" + datos.size());
+                    try {
+                        ParseObject po = datos.get(0);
+                        CompanyData companyData = new CompanyData(po);
 
-                    //SCHEDULE  TODO read the schedule from parse
-                    if (hashTypes.containsKey("Schedule"))
-                        initScheduleCard();
+                        //COMPANY
+                        if (hashTypes.containsKey("Company")) initCompanyCard(companyData);
 
-                    //AIRPORT
-                    if (companyData.isAirport() || hashTypes.containsKey("Airport")) {
-                        initAirportCard(mTypeAirportCard, companyData.getAirportCode());
+                        //SCHEDULE  TODO read the schedule from parse
+                        if (hashTypes.containsKey("Schedule"))
+                            initScheduleCard();
+
+                        //AIRPORT
+                        if (companyData.isAirport() || hashTypes.containsKey("Airport")) {
+                            initAirportCard(mTypeAirportCard, companyData.getAirportCode());
+                        }
+
+                        //NEWS
+                        if (hashTypes.containsKey("News")) initNewsCard(companyData.getNameClean());
+
+                        //LINKEDIN
+                        if (hashTypes.containsKey("Linkedin")) {
+                            initLinkedinCard(companyData.getLinkedinUrl());
+                        }
+
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        myLog.add("error aquí." + e.getLocalizedMessage());
                     }
-
-                    //NEWS
-                    if (hashTypes.containsKey("News")) initNewsCard(companyData.getNameClean());
-
-                    //LINKEDIN
-                    if (hashTypes.containsKey("Linkedin")) {
-                        initLinkedinCard(companyData.getLinkedinUrl());
-                    }
-
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    myLog.add("error aquí." + e.getLocalizedMessage());
                 }
-            }
 
-            @Override
-            public void OnError(Exception e) {
+                @Override
+                public void OnError(Exception e) {
 
-            }
-        });
+                }
+            });
+
+        } else {
+            myLog.add("-__No tiene cardObjectId");
+
+        }
     }
 
     /**

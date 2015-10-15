@@ -20,7 +20,7 @@ import com.herenow.fase1.Position;
 import com.herenow.fase1.R;
 import com.herenow.fase1.Wifi.LocationAsker;
 import com.herenow.fase1.Wifi.WifiUpdater;
-import com.herenow.fase1.WifiObserverService;
+import com.herenow.fase1.services.WifiObserverService;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
@@ -45,6 +45,7 @@ public class MainActivity extends ActionBarActivity {
     public static boolean demoMode;
 
     private static TextView tv;
+    Intent intentWifiObs;
     private Intent intentAddWeacon;
     private Intent intentCards;
     private WifiUpdater wu;
@@ -55,21 +56,38 @@ public class MainActivity extends ActionBarActivity {
     private int im = 1;
     private long newTime, oldTime;
     private String msg = "";
-    Intent intentWifiObs;
-
-
     private Switch swDetection;// start or stot wifiservice detection
+    private Spinner spinner;
+    private ArrayList<String> lista;
+    private ArrayList<String> listaObj;
+
+    /***
+     * Write in the main activity
+     *
+     * @param s text to print
+     */
+    public static void writeOnScreen(String s) {
+        tv.setText(s);
+    }
+    //    private boolean isSapoActive = true; //TODO activate /deactivate sapo remotely
+
+    public static void reportScanning(int found, int total) {
+//        oldTime = newTime;
+//        newTime = System.currentTimeMillis();
+//        long diff = Math.round((newTime - oldTime) / 1000);
+//        im++;
+//        msg = im + ".(" + diff + "s|found=" + found + "/" + total + ") ";
+//            tv.setText(msg);
+        tv.append("  .(" + "s|found=" + found + "/" + total + ") ");
+        //TODO restructurate notifications package
+
+    }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         myLog.add("++++++++++++++++ on save");
     }
-
-    private Spinner spinner;
-    private ArrayList<String> lista;
-    private ArrayList<String> listaObj;
-    //    private boolean isSapoActive = true; //TODO activate /deactivate sapo remotely
 
     @Override
     public void onActivityReenter(int resultCode, Intent data) {
@@ -100,6 +118,8 @@ public class MainActivity extends ActionBarActivity {
         super.onStop();
         myLog.add("++++++++++++++++ on stop");
     }
+
+    //    private WifiBoss wifiBoss;
 
     @Override
     protected void onPause() {
@@ -144,8 +164,6 @@ public class MainActivity extends ActionBarActivity {
 //        intentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
 //        registerReceiver(receiverWifi, intentFilter);
     }
-
-    //    private WifiBoss wifiBoss;
 
     @Override
     protected void onResume() {
@@ -235,11 +253,17 @@ public class MainActivity extends ActionBarActivity {
         demoMode = mySwitch.isChecked();
     }
 
+//    /**
+//     * Upload the pinned info form SAP and from Weacons
+//     */
+//    private void syncAllPinned() {
+//        SAPO2.uploadIfRequired();
+//    }
+
     private void listasAdd(String label, String ssid) {
         lista.add(label);
         listaObj.add(ssid);
     }
-
 
     /**
      * Load the spots from parse that are around from current postion
@@ -254,34 +278,6 @@ public class MainActivity extends ActionBarActivity {
                 ParseActions.getSpots(bLocal, radio, gps, getApplicationContext());
             }
         }, this);
-    }
-
-//    /**
-//     * Upload the pinned info form SAP and from Weacons
-//     */
-//    private void syncAllPinned() {
-//        SAPO2.uploadIfRequired();
-//    }
-
-    /***
-     * Write in the main activity
-     *
-     * @param s text to print
-     */
-    public static void writeOnScreen(String s) {
-        tv.setText(s);
-    }
-
-    public static void reportScanning(int found, int total) {
-//        oldTime = newTime;
-//        newTime = System.currentTimeMillis();
-//        long diff = Math.round((newTime - oldTime) / 1000);
-//        im++;
-//        msg = im + ".(" + diff + "s|found=" + found + "/" + total + ") ";
-//            tv.setText(msg);
-        tv.append("  .(" + "s|found=" + found + "/" + total + ") ");
-        //TODO restructurate notifications package
-
     }
 
     private void ParseUserLogIn() {
@@ -396,7 +392,7 @@ public class MainActivity extends ActionBarActivity {
 
     public void clickCards(View view) {
         //open the card activity
-        intentCards = new Intent(this, CardsActivity.class);
+        intentCards = new Intent(this, CardsActivityOld.class);
         startActivity(intentCards);
     }
 

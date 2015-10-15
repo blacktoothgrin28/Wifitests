@@ -1,4 +1,4 @@
-package com.herenow.fase1;
+package com.herenow.fase1.services;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -13,10 +13,11 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
-import android.widget.Toast;
 
 import com.herenow.fase1.CardData.GoogleFlight;
 import com.herenow.fase1.Cards.AirportCard;
+import com.herenow.fase1.GetFlightInfo;
+import com.herenow.fase1.R;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -24,10 +25,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -40,16 +38,14 @@ import static com.herenow.fase1.R.mipmap.ic_launcher;
 /**
  * Created by Milenko on 04/10/2015.
  */
-public class TimerService extends Service {
+public class FlightsObserverService extends Service {
     public static final long NOTIFY_INTERVAL = 10 * 1000; // 10 seconds
+    int iCounter = 0;
     private Handler mHandler = new Handler();
-
     private String tag = "vig";
-
     private GoogleFlight mOldGoogle;
     private String mCode, mRemoteCity;
     private Timer mTimer = null;
-    int iCounter = 0;
     private GoogleFlight mCurrentGoogle;
 
     @Nullable
@@ -164,14 +160,14 @@ public class TimerService extends Service {
 
             if (iCounter == 60) {
                 myLog.add("apagamos service porque no cambia, por seguridad", tag);
-                TimerService.this.stopTheService();
+                FlightsObserverService.this.stopTheService();
             }
 
             if (mCurrentGoogle.hasChanged(mOldGoogle)) {
                 myLog.add("***has changed: " + mCurrentGoogle.changesText, tag);
                 if (mCurrentGoogle.hasDepartedOrLanded()) {//todo implement
                     myLog.add("stopping the service", tag);
-                    TimerService.this.stopTheService();
+                    FlightsObserverService.this.stopTheService();
 
                 } else {
                     notiTitle = mCurrentGoogle.changeSummarized;
@@ -182,7 +178,7 @@ public class TimerService extends Service {
                     //Notification
                     sendNotificationFlight(notiTitle, content);
                     //todo remove
-                    TimerService.this.stopTheService();
+                    FlightsObserverService.this.stopTheService();
                 }
             } else {
 //                myLog.add("Hasn't changed ", tag);

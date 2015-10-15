@@ -5,10 +5,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.os.Parcel;
-import android.os.Parcelable;
 
-import com.herenow.fase1.CardData.CompanyData;
 import com.parse.ParseClassName;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -90,7 +87,7 @@ public class WeaconParse extends ParseObject {
             cards = new String[al.size()];
             al.toArray(cards);
         } catch (Exception e) {
-            myLog.add("--error: ther is no definition of cards in parse: "+e.getLocalizedMessage());
+            myLog.add("--error: ther is no definition of cards in parse: " + e.getLocalizedMessage());
         }
         return cards;
     }
@@ -120,9 +117,18 @@ public class WeaconParse extends ParseObject {
         return bm;
     }
 
+    public void setLogo(ParseFile fileLogo) {
+        put("Logo", fileLogo);
+    }
+
     public String getCompanyDataObjectId() {
+
         ParseObject po = getParseObject("CardCompany");
-        return po.getObjectId();
+        if (po == null) {
+            return null;
+        } else {
+            return po.getObjectId();
+        }
     }
 
     public void setCompanyDataObjectId(String value) {
@@ -150,10 +156,6 @@ public class WeaconParse extends ParseObject {
         return res;
     }
 
-    public void setLogo(ParseFile fileLogo) {
-        put("Logo", fileLogo);
-    }
-
     public void setMainUrl(String mainUrl) {
         put("MainUrl", mainUrl);
     }
@@ -173,10 +175,6 @@ public class WeaconParse extends ParseObject {
 
     public void setDescription(String description) {
         put("Description", description);
-    }
-
-    public void setType(String type) {
-        put("Type", type);
     }
 
     public void setAirportCode(String airportCode) {
@@ -207,5 +205,14 @@ public class WeaconParse extends ParseObject {
 
     public String getType() {
         return getString("Type");
+    }
+
+    public void setType(String type) {
+        put("Type", type);
+    }
+
+    public boolean isBrowser() {
+        String first = getCards()[0];
+        return first.equals("Browser");
     }
 }

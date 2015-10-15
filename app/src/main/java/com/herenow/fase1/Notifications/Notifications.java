@@ -11,11 +11,12 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 
+import com.herenow.fase1.Activities.BrowserActivity;
 import com.herenow.fase1.Activities.CardsActivity;
 import com.herenow.fase1.Activities.WeaconListActivity;
-import com.herenow.fase1.CardsActivityAer;
 import com.herenow.fase1.R;
 
 import java.util.ArrayList;
@@ -30,14 +31,12 @@ import util.myLog;
 public abstract class Notifications {
     private static final String NOTIFICATION_DELETED_ACTION = "NOTIFICATION_DELETED";
     public static HashMap<String, WeaconParse> weaconsLaunchedTable; //For not relaunche the same weacon {obid, WeaconParse}
+    static String tag = "noti";
     private static ArrayList<WeaconParse> showedNotifications; //list of weacosn currently showed in a notification
     private static NotificationManager mNotificationManager;
     private static Activity acti;
     private static int mIdSingle, mIdGroup;
     private static int currentId = 1;
-    static String tag = "noti";
-
-
     private final static BroadcastReceiver receiverDeleteNotification = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -47,12 +46,12 @@ public abstract class Notifications {
                 showedNotifications = new ArrayList<>();
 
             } catch (Exception e) {
-                myLog.add("---ERROR<<<<<<<<<<<<Has borrado una notif>>>>" + e.getMessage(), tag);
+                myLog.add("---ERROR<<<<<<<<<<<<Has borrado una notif>>>>" + e.getMessage());
             }
             context.unregisterReceiver(this);
         }
     };
-    private static NotificationCompat.Builder notif;
+
     private static PendingIntent pendingDeleteIntent;
 
     public static void Initialize(Activity act) {
@@ -79,7 +78,7 @@ public abstract class Notifications {
             //TODO put in parse that this weacon was notified
             if (showedNotifications == null) {
                 showedNotifications = new ArrayList<>();
-                myLog.add("***hemos debido crear denuevo la showednotifications",tag);
+                myLog.add("***hemos debido crear denuevo la showednotifications", tag);
             }
 
             if (showedNotifications.size() == 0) {
@@ -90,7 +89,7 @@ public abstract class Notifications {
 
             weaconsLaunchedTable.put(we.getObjectId(), we);
         } catch (Exception e) {
-            myLog.add("---ERROR in sendNotification: " + e.getMessage(),tag);
+            myLog.add("---ERROR in sendNotification: " + e.getMessage());
         }
 
     }
@@ -100,15 +99,22 @@ public abstract class Notifications {
         Intent resultIntent;
         TaskStackBuilder stackBuilder;
         PendingIntent resultPendingIntent;
+        NotificationCompat.Builder notification;
+        Class<?> cls;
 
         mIdSingle = currentId;
         showedNotifications.add(we);
 
         acti.registerReceiver(receiverDeleteNotification, new IntentFilter(NOTIFICATION_DELETED_ACTION));
 
-//        resultIntent = new Intent(acti.getBaseContext(), WeaconListActivity.class)
-        resultIntent = new Intent(acti.getBaseContext(), CardsActivityAer.class)
-//        resultIntent = new Intent(acti.getBaseContext(), CardsActivity.class)
+        if (we.isBrowser()) {
+            myLog.add("este weacon es de tipo browser");
+            cls = BrowserActivity.class;
+        } else {
+            cls = CardsActivity.class;
+        }
+
+        resultIntent = new Intent(acti.getBaseContext(), cls)
                 .putExtra("wUrl", we.getUrl())
                 .putExtra("wName", we.getName())
                 .putExtra("wLogo", we.getLogoRounded())
@@ -117,14 +123,33 @@ public abstract class Notifications {
                 .putExtra("typeOfAiportCard", "Departures");
 
         stackBuilder = TaskStackBuilder.create(acti.getBaseContext());
-        stackBuilder.addParentStack(CardsActivityAer.class);
-//        stackBuilder.addParentStack(CardsActivity.class);
-//        stackBuilder.addParentStack(WeaconListActivity.class);
+        stackBuilder.addParentStack(cls);
         stackBuilder.addNextIntent(resultIntent);
         resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT); //Todo solve the stack for going back from cards
 
+        notification = buildSingleNotification(we, resultIntent, resultPendingIntent);
 
-        NotificationCompat.Action myAction = new NotificationCompat.Action(R.drawable.ic_silence, "Turn Off", resultPendingIntent);//TODO to create the silence intent
+        mNotificationManager.notify(mIdSingle, notification.build());
+    }
+
+    private static void updateNotification(WeaconParse we) {
+
+        NotificationCompat.Builder notif;
+
+        mNotificationManager.cancel(mIdSingle);
+        mIdGroup = mIdSingle + 1;
+        showedNotifications.add(we);
+
+        notif = buildMultipleNotification(we);
+
+        mNotificationManager.notify(mIdGroup, notif.build());
+    }
+
+    private static NotificationCompat.Builder buildSingleNotification(WeaconParse we, Intent resultIntent, PendingIntent resultPendingIntent) {
+        NotificationCompat.Builder notif;
+
+        NotificationCompat.Action actionSilence = new NotificationCompat.Action(R.drawable.ic_silence, "Turn Off", resultPendingIntent);//TODO to create the silence intent
+
         notif = new NotificationCompat.Builder(acti)
                 .setSmallIcon(R.drawable.ic_stat_name_hn)
                 .setLargeIcon(we.getLogoRounded())
@@ -135,7 +160,7 @@ public abstract class Notifications {
                 .setLights(0xE6D820, 300, 100)
                 .setTicker("Weacon detected\n" + we.getName())
                 .setDeleteIntent(pendingDeleteIntent)
-                .addAction(myAction);
+                .addAction(actionSilence);
 
         //Airport Buttons
         if (we.isAirport()) {
@@ -157,21 +182,19 @@ public abstract class Notifications {
         notif.setStyle(bigTextStyle);
         notif.setContentIntent(resultPendingIntent);
 
-        mNotificationManager.notify(mIdSingle, notif.build());
+        return notif;
     }
 
-    private static void updateNotification(WeaconParse we) {
-
+    @NonNull
+    private static NotificationCompat.Builder buildMultipleNotification(WeaconParse we) {
         Intent resultIntent;
         TaskStackBuilder stackBuilder;
         PendingIntent resultPendingIntent;
-
-        mNotificationManager.cancel(mIdSingle);
-        mIdGroup = mIdSingle + 1;
-        showedNotifications.add(we);
         Bitmap bm = BitmapFactory.decodeResource(acti.getResources(), R.mipmap.ic_launcher);
+
         String msg = Integer.toString(showedNotifications.size()) + " weacons around you";
-        notif = new NotificationCompat.Builder(acti) //TODO put the hour in extended notification
+
+        NotificationCompat.Builder notif = new NotificationCompat.Builder(acti) //TODO put the hour in extended notification
                 .setSmallIcon(R.drawable.ic_stat_name_dup)
                 .setLargeIcon(bm)
                 .setContentTitle(msg)
@@ -202,7 +225,7 @@ public abstract class Notifications {
         resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
         notif.setContentIntent(resultPendingIntent);
 
-        mNotificationManager.notify(mIdGroup, notif.build());
+        return notif;
     }
 
 }

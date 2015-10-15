@@ -1,6 +1,5 @@
-package com.herenow.fase1;
+package com.herenow.fase1.services;
 
-import android.app.IntentService;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;

@@ -71,7 +71,7 @@ public class WeaconListActivity extends ActionBarActivity {
     //
     //                WeaconListActivity.this.startActivity(intentWeb);
 
-                    Intent resultIntent = new Intent(WeaconListActivity.this, CardsActivity.class)
+                    Intent resultIntent = new Intent(WeaconListActivity.this, CardsActivityOld.class)
                             .putExtra("wUrl", we.getUrl())
                             .putExtra("wName", we.getName())
                             .putExtra("wLogo", we.getLogoRounded())

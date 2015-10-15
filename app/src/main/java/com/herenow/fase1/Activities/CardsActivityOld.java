@@ -1,21 +1,26 @@
-package com.herenow.fase1;
+package com.herenow.fase1.Activities;
 
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.view.Menu;
+import android.view.MenuItem;
 
-import com.herenow.fase1.Activities.CardsActivityFragment;
+import com.herenow.fase1.CardData.CompanyData;
 import com.herenow.fase1.Cards.AirportCard;
+import com.herenow.fase1.R;
 
 import util.myLog;
 
-public class CardsActivityAer extends ActionBarActivity {
+public class CardsActivityOld extends ActionBarActivity {
+
+    private CompanyData mCompanyData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_cards_activity_aer);
         setContentView(R.layout.activity_cards);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
 
         try {
             Bundle b = getIntent().getExtras();
@@ -52,6 +57,38 @@ public class CardsActivityAer extends ActionBarActivity {
             myLog.add("elloooo" + e.getLocalizedMessage());
         }
 
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_test_cards, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.browserMenu) {
+            return true;
+        }
+        if (id == android.R.id.home) {
+            finish();
+            overridePendingTransition(R.transition.trans_right_in, R.transition.trans_right_out);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

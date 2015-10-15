@@ -1,4 +1,4 @@
-package com.herenow.fase1;
+package com.herenow.fase1.Cards.Components;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -6,13 +6,11 @@ import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.annotation.LayoutRes;
-import android.support.v4.app.FragmentActivity;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -28,7 +26,6 @@ import it.gmariotti.cardslib.library.internal.CardExpand;
 import it.gmariotti.cardslib.library.internal.CardHeader;
 import it.gmariotti.cardslib.library.internal.CardThumbnail;
 import it.gmariotti.cardslib.library.internal.ViewToClickToExpand;
-import it.gmariotti.cardslib.library.view.CardViewNative;
 import it.gmariotti.cardslib.library.view.ForegroundLinearLayout;
 import it.gmariotti.cardslib.library.view.base.CardViewWrapper;
 import it.gmariotti.cardslib.library.view.component.CardHeaderView;
@@ -249,32 +246,6 @@ public class CardViewNative2 extends android.support.v7.widget.CardView implemen
     //--------------------------------------------------------------------------
 
     /**
-     * Add a {@link Card}.
-     * It is very important to set all values and all components before launch this method.
-     *
-     * @param card {@link Card} model
-     */
-    @Override
-    public void setCard(Card card) {
-
-        mCard = card;
-
-        if (card != null) {
-            mCardHeader = card.getCardHeader();
-            mCardThumbnail = card.getCardThumbnail();
-            mCardExpand = card.getCardExpand();
-        }
-
-        //Retrieve all IDs
-        if (!isRecycle()) {
-            retrieveLayoutIDs();
-        }
-
-        //Build UI
-        buildUI();
-    }
-
-    /**
      * Refreshes the card content (it doesn't inflate layouts again)
      *
      * @param card
@@ -295,10 +266,6 @@ public class CardViewNative2 extends android.support.v7.widget.CardView implemen
         refreshCard(card);
         mForceReplaceInnerLayout = false;
     }
-
-    //--------------------------------------------------------------------------
-    // Setup methods
-    //--------------------------------------------------------------------------
 
     protected void buildUI() {
 
@@ -336,6 +303,9 @@ public class CardViewNative2 extends android.support.v7.widget.CardView implemen
         setupDrawableResources();
     }
 
+    //--------------------------------------------------------------------------
+    // Setup methods
+    //--------------------------------------------------------------------------
 
     /**
      * Retrieve all Layouts IDs
@@ -430,7 +400,6 @@ public class CardViewNative2 extends android.support.v7.widget.CardView implemen
         }
     }
 
-
     /**
      * Setup the Thumbnail View
      */
@@ -471,10 +440,6 @@ public class CardViewNative2 extends android.support.v7.widget.CardView implemen
             mCard.setupSupplementalActions();
     }
 
-    //--------------------------------------------------------------------------
-    // Listeners
-    //--------------------------------------------------------------------------
-
     protected void setupExpandAction() {
 
         //Config ExpandLayout and its animation
@@ -503,6 +468,10 @@ public class CardViewNative2 extends android.support.v7.widget.CardView implemen
         //Setup action and callback
         setupExpandCollapseActionListener();
     }
+
+    //--------------------------------------------------------------------------
+    // Listeners
+    //--------------------------------------------------------------------------
 
     /**
      * Setup All listeners
@@ -657,10 +626,6 @@ public class CardViewNative2 extends android.support.v7.widget.CardView implemen
         return view;
     }
 
-    //--------------------------------------------------------------------------
-    // Expandable Actions and Listeners
-    //--------------------------------------------------------------------------
-
     /**
      * Add ClickListener to expand and collapse hidden view
      */
@@ -752,137 +717,9 @@ public class CardViewNative2 extends android.support.v7.widget.CardView implemen
         }
     }
 
-    /**
-     * Listener to expand/collapse hidden Expand Layout
-     * It starts animation
-     */
-    protected class TitleViewOnLongClickListener implements OnLongClickListener {
-
-        TitleViewOnClickListener mOnClickListener;
-
-        private TitleViewOnLongClickListener(TitleViewOnClickListener onClickListener) {
-            mOnClickListener = onClickListener;
-        }
-
-        @Override
-        public boolean onLongClick(View view) {
-            if (mOnClickListener != null) {
-                mOnClickListener.onClick(view);
-                return true;
-            }
-            return false;
-        }
-    }
-
-    private class ExpandContainerHelper {
-
-        private View contentParent;
-        private Card card;
-        private boolean viewToSelect = true;
-
-        private ExpandContainerHelper(View contentParent, Card card, boolean viewToSelect) {
-            this.contentParent = contentParent;
-            this.card = card;
-            this.viewToSelect = viewToSelect;
-        }
-
-        public CardViewNative2 getCardView() {
-            return (CardViewNative2) card.getCardView();
-        }
-    }
-
-    private static class ExpandCollapseHelper {
-
-        /**
-         * Expanding animator.
-         */
-        private static void animateExpanding(final ExpandContainerHelper helper) {
-
-            if (helper.getCardView().getOnExpandListAnimatorListener() != null) {
-                //List Animator
-                helper.getCardView().getOnExpandListAnimatorListener().onExpandStart(helper.getCardView(), helper.contentParent);
-            } else {
-                //Std animator
-                helper.contentParent.setVisibility(View.VISIBLE);
-                if (helper.getCardView().mExpandAnimator != null) {
-                    helper.getCardView().mExpandAnimator.addListener(new AnimatorListenerAdapter() {
-                        @Override
-                        public void onAnimationEnd(Animator animation) {
-                            helper.card.setExpanded(true);
-                            //Callback
-                            if (helper.card.getOnExpandAnimatorEndListener() != null)
-                                helper.card.getOnExpandAnimatorEndListener().onExpandEnd(helper.card);
-                        }
-                    });
-                    helper.getCardView().mExpandAnimator.start();
-                } else {
-                    if (helper.card.getOnExpandAnimatorEndListener() != null)
-                        helper.card.getOnExpandAnimatorEndListener().onExpandEnd(helper.card);
-                    Log.w(TAG, "Does the card have the ViewToClickToExpand?");
-                }
-            }
-        }
-
-        /**
-         * Collapse animator
-         */
-        private static void animateCollapsing(final ExpandContainerHelper helper) {
-
-            if (helper.getCardView().getOnExpandListAnimatorListener() != null) {
-                //There is a List Animator.
-                helper.getCardView().getOnExpandListAnimatorListener().onCollapseStart(helper.getCardView(), helper.contentParent);
-            } else {
-                //Std animator
-                int origHeight = helper.contentParent.getHeight();
-
-                ValueAnimator animator = createSlideAnimator(helper.getCardView(), origHeight, 0);
-                animator.addListener(new Animator.AnimatorListener() {
-                    @Override
-                    public void onAnimationStart(Animator animator) {
-                    }
-
-                    @Override
-                    public void onAnimationEnd(Animator animator) {
-                        helper.contentParent.setVisibility(View.GONE);
-                        helper.card.setExpanded(false);
-                        //Callback
-                        if (helper.card.getOnCollapseAnimatorEndListener() != null)
-                            helper.card.getOnCollapseAnimatorEndListener().onCollapseEnd(helper.card);
-                    }
-
-                    @Override
-                    public void onAnimationCancel(Animator animator) {
-                    }
-
-                    @Override
-                    public void onAnimationRepeat(Animator animator) {
-                    }
-                });
-                animator.start();
-            }
-        }
-
-
-        /**
-         * Create the Slide Animator invoked when the expand/collapse button is clicked
-         */
-        protected static ValueAnimator createSlideAnimator(final CardViewNative2 cardView, int start, int end) {
-            ValueAnimator animator = ValueAnimator.ofInt(start, end);
-
-            animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                @Override
-                public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                    int value = (Integer) valueAnimator.getAnimatedValue();
-
-                    ViewGroup.LayoutParams layoutParams = cardView.mInternalExpandLayout.getLayoutParams();
-                    layoutParams.height = value;
-                    cardView.mInternalExpandLayout.setLayoutParams(layoutParams);
-                }
-            });
-            return animator;
-        }
-
-    }
+    //--------------------------------------------------------------------------
+    // Expandable Actions and Listeners
+    //--------------------------------------------------------------------------
 
     /**
      * Setup Expand View
@@ -949,45 +786,10 @@ public class CardViewNative2 extends android.support.v7.widget.CardView implemen
         }
     }
 
-    /**
-     * Listener to expand/collapse hidden Expand Layout
-     * It starts animation
-     */
-    protected class TitleViewOnClickListener implements View.OnClickListener {
-
-        ExpandContainerHelper mExpandContainerHelper;
-
-        private TitleViewOnClickListener(View contentParent, Card card) {
-            this(contentParent, card, true);
-        }
-
-        private TitleViewOnClickListener(View contentParent, Card card, boolean viewToSelect) {
-            mExpandContainerHelper = new ExpandContainerHelper(contentParent, card, viewToSelect);
-        }
-
-        @Override
-        public void onClick(View view) {
-            boolean isVisible = mExpandContainerHelper.contentParent.getVisibility() == View.VISIBLE;
-            if (isVisible) {
-                ExpandCollapseHelper.animateCollapsing(mExpandContainerHelper);
-                if (mExpandContainerHelper.viewToSelect)
-                    view.setSelected(false);
-            } else {
-                ExpandCollapseHelper.animateExpanding(mExpandContainerHelper);
-                if (mExpandContainerHelper.viewToSelect)
-                    view.setSelected(true);
-            }
-        }
-    }
-
     @Override
     protected void onSizeChanged(int xNew, int yNew, int xOld, int yOld) {
         super.onSizeChanged(xNew, yNew, xOld, yOld);
     }
-
-    // -------------------------------------------------------------
-    //  OnExpandListAnimator Interface and Listener
-    // -------------------------------------------------------------
 
     /**
      * Returns the listener invoked when expand/collpase animation starts
@@ -1009,10 +811,6 @@ public class CardViewNative2 extends android.support.v7.widget.CardView implemen
     public void setOnExpandListAnimatorListener(CardViewWrapper.OnExpandListAnimatorListener onExpandListAnimatorListener) {
         this.mOnExpandListAnimatorListener = onExpandListAnimatorListener;
     }
-
-    // -------------------------------------------------------------
-    //  ChangeBackground
-    // -------------------------------------------------------------
 
     /**
      * Changes dynamically the drawable resource to override the style of MainLayout.
@@ -1054,7 +852,7 @@ public class CardViewNative2 extends android.support.v7.widget.CardView implemen
     }
 
     // -------------------------------------------------------------
-    //  Bitmap export
+    //  OnExpandListAnimator Interface and Listener
     // -------------------------------------------------------------
 
     /**
@@ -1076,13 +874,13 @@ public class CardViewNative2 extends android.support.v7.widget.CardView implemen
         return b;
     }
 
-    //--------------------------------------------------------------------------
-    // Getters and Setters
-    //--------------------------------------------------------------------------
-
     public View getInternalOuterView() {
         return mInternalOuterView;
     }
+
+    // -------------------------------------------------------------
+    //  ChangeBackground
+    // -------------------------------------------------------------
 
     /**
      * Returns {@link Card} model
@@ -1094,6 +892,32 @@ public class CardViewNative2 extends android.support.v7.widget.CardView implemen
     }
 
     /**
+     * Add a {@link Card}.
+     * It is very important to set all values and all components before launch this method.
+     *
+     * @param card {@link Card} model
+     */
+    @Override
+    public void setCard(Card card) {
+
+        mCard = card;
+
+        if (card != null) {
+            mCardHeader = card.getCardHeader();
+            mCardThumbnail = card.getCardThumbnail();
+            mCardExpand = card.getCardExpand();
+        }
+
+        //Retrieve all IDs
+        if (!isRecycle()) {
+            retrieveLayoutIDs();
+        }
+
+        //Build UI
+        buildUI();
+    }
+
+    /**
      * Returns the view used for Header
      *
      * @return {@link CardHeaderView}
@@ -1101,6 +925,10 @@ public class CardViewNative2 extends android.support.v7.widget.CardView implemen
     public CardHeaderView getInternalHeaderLayout() {
         return mInternalHeaderLayout;
     }
+
+    // -------------------------------------------------------------
+    //  Bitmap export
+    // -------------------------------------------------------------
 
     /**
      * Returns the view used by Thumbnail
@@ -1111,6 +939,10 @@ public class CardViewNative2 extends android.support.v7.widget.CardView implemen
     public CardThumbnailView getInternalThumbnailLayout() {
         return mInternalThumbnailLayout;
     }
+
+    //--------------------------------------------------------------------------
+    // Getters and Setters
+    //--------------------------------------------------------------------------
 
     /**
      * Indicates if view can recycle ui elements.
@@ -1212,5 +1044,168 @@ public class CardViewNative2 extends android.support.v7.widget.CardView implemen
      */
     public View getInternalMainCardLayout() {
         return mInternalMainCardLayout;
+    }
+
+    private static class ExpandCollapseHelper {
+
+        /**
+         * Expanding animator.
+         */
+        private static void animateExpanding(final ExpandContainerHelper helper) {
+
+            if (helper.getCardView().getOnExpandListAnimatorListener() != null) {
+                //List Animator
+                helper.getCardView().getOnExpandListAnimatorListener().onExpandStart(helper.getCardView(), helper.contentParent);
+            } else {
+                //Std animator
+                helper.contentParent.setVisibility(View.VISIBLE);
+                if (helper.getCardView().mExpandAnimator != null) {
+                    helper.getCardView().mExpandAnimator.addListener(new AnimatorListenerAdapter() {
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            helper.card.setExpanded(true);
+                            //Callback
+                            if (helper.card.getOnExpandAnimatorEndListener() != null)
+                                helper.card.getOnExpandAnimatorEndListener().onExpandEnd(helper.card);
+                        }
+                    });
+                    helper.getCardView().mExpandAnimator.start();
+                } else {
+                    if (helper.card.getOnExpandAnimatorEndListener() != null)
+                        helper.card.getOnExpandAnimatorEndListener().onExpandEnd(helper.card);
+                    Log.w(TAG, "Does the card have the ViewToClickToExpand?");
+                }
+            }
+        }
+
+        /**
+         * Collapse animator
+         */
+        private static void animateCollapsing(final ExpandContainerHelper helper) {
+
+            if (helper.getCardView().getOnExpandListAnimatorListener() != null) {
+                //There is a List Animator.
+                helper.getCardView().getOnExpandListAnimatorListener().onCollapseStart(helper.getCardView(), helper.contentParent);
+            } else {
+                //Std animator
+                int origHeight = helper.contentParent.getHeight();
+
+                ValueAnimator animator = createSlideAnimator(helper.getCardView(), origHeight, 0);
+                animator.addListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animator) {
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animator animator) {
+                        helper.contentParent.setVisibility(View.GONE);
+                        helper.card.setExpanded(false);
+                        //Callback
+                        if (helper.card.getOnCollapseAnimatorEndListener() != null)
+                            helper.card.getOnCollapseAnimatorEndListener().onCollapseEnd(helper.card);
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animator) {
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animator animator) {
+                    }
+                });
+                animator.start();
+            }
+        }
+
+
+        /**
+         * Create the Slide Animator invoked when the expand/collapse button is clicked
+         */
+        protected static ValueAnimator createSlideAnimator(final CardViewNative2 cardView, int start, int end) {
+            ValueAnimator animator = ValueAnimator.ofInt(start, end);
+
+            animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                    int value = (Integer) valueAnimator.getAnimatedValue();
+
+                    ViewGroup.LayoutParams layoutParams = cardView.mInternalExpandLayout.getLayoutParams();
+                    layoutParams.height = value;
+                    cardView.mInternalExpandLayout.setLayoutParams(layoutParams);
+                }
+            });
+            return animator;
+        }
+
+    }
+
+    /**
+     * Listener to expand/collapse hidden Expand Layout
+     * It starts animation
+     */
+    protected class TitleViewOnLongClickListener implements OnLongClickListener {
+
+        TitleViewOnClickListener mOnClickListener;
+
+        private TitleViewOnLongClickListener(TitleViewOnClickListener onClickListener) {
+            mOnClickListener = onClickListener;
+        }
+
+        @Override
+        public boolean onLongClick(View view) {
+            if (mOnClickListener != null) {
+                mOnClickListener.onClick(view);
+                return true;
+            }
+            return false;
+        }
+    }
+
+    private class ExpandContainerHelper {
+
+        private View contentParent;
+        private Card card;
+        private boolean viewToSelect = true;
+
+        private ExpandContainerHelper(View contentParent, Card card, boolean viewToSelect) {
+            this.contentParent = contentParent;
+            this.card = card;
+            this.viewToSelect = viewToSelect;
+        }
+
+        public CardViewNative2 getCardView() {
+            return (CardViewNative2) card.getCardView();
+        }
+    }
+
+    /**
+     * Listener to expand/collapse hidden Expand Layout
+     * It starts animation
+     */
+    protected class TitleViewOnClickListener implements View.OnClickListener {
+
+        ExpandContainerHelper mExpandContainerHelper;
+
+        private TitleViewOnClickListener(View contentParent, Card card) {
+            this(contentParent, card, true);
+        }
+
+        private TitleViewOnClickListener(View contentParent, Card card, boolean viewToSelect) {
+            mExpandContainerHelper = new ExpandContainerHelper(contentParent, card, viewToSelect);
+        }
+
+        @Override
+        public void onClick(View view) {
+            boolean isVisible = mExpandContainerHelper.contentParent.getVisibility() == View.VISIBLE;
+            if (isVisible) {
+                ExpandCollapseHelper.animateCollapsing(mExpandContainerHelper);
+                if (mExpandContainerHelper.viewToSelect)
+                    view.setSelected(false);
+            } else {
+                ExpandCollapseHelper.animateExpanding(mExpandContainerHelper);
+                if (mExpandContainerHelper.viewToSelect)
+                    view.setSelected(true);
+            }
+        }
     }
 }
