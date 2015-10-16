@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.text.method.ScrollingMovementMethod;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -205,7 +206,7 @@ public class MainActivity extends ActionBarActivity {
 
         //TEXTVIEW
         tv = (TextView) findViewById(R.id.tv_demoStatus);
-        tv.setText("demo OFF");
+        tv.setMovementMethod(new ScrollingMovementMethod());
         //check the current state before we display the screen
     }
 

@@ -1,89 +1,138 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".MainActivity"
     tools:ignore="MergeRootFrame">
 
-    <Button
-        android:id="@+id/button_wifi"
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="right|bottom"
-        android:onClick="clickConnect"
-        android:text="StopService"
-        android:visibility="visible" />
 
-    <FrameLayout
-        android:layout_width="122dp"
-        android:layout_height="192dp"
-        android:layout_gravity="right|center_vertical">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center_vertical"
+        android:layout_weight="50"
+        android:orientation="vertical">
 
-        <Button
-            android:id="@+id/bt_add_weacon"
-            style="?android:attr/buttonStyleSmall"
-            android:layout_width="wrap_content"
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:gravity="center"
+            android:background="@color/button_material_dark"
+            android:text="DEMO: Control Panel"
+            android:textStyle="bold"
+            android:textColor="#ffeb37" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="right|center_vertical"
-            android:gravity="top"
-            android:onClick="clickAddWeacon"
-            android:text="Add Weacon"
-            android:visibility="visible" />
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
-        <Button
-            android:id="@+id/startSearching"
-            style="?android:attr/buttonStyleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="top|right"
-            android:onClick="launchAll"
-            android:text="All"
-            android:visibility="visible" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Launch:" />
 
-        <Button
-            style="?android:attr/buttonStyleSmall"
-            android:id="@+id/btSubscribe"
-            android:layout_width="wrap_content"
+            <Spinner
+                android:id="@+id/spinner_weacon"
+                android:layout_width="178dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left|bottom" />
+
+            <Button
+                android:id="@+id/startSearching"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:onClick="launchAll"
+                android:text="All" />
+
+            <Switch
+                android:id="@+id/sw_detection"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="Detection " />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal|bottom"
-            android:gravity="top"
-            android:onClick="onClickSubscribe"
-            android:text="Subscribe"
-            android:visibility="visible" />
-    </FrameLayout>
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Push Notif.:" />
+
+            <Button
+                android:id="@+id/btSubscribe"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal|bottom"
+                android:gravity="center"
+                android:onClick="onClickSubscribe"
+                android:text="Subscribe"
+                android:visibility="visible" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Open Activity" />
+
+            <Button
+                android:id="@+id/bt_add_weacon"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right|center_vertical"
+                android:gravity="center"
+                android:onClick="clickAddWeacon"
+                android:text="Add Weacon"
+                android:textSize="12dp"
+                android:visibility="visible" />
+
+            <Button
+                android:id="@+id/bt_lista"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal|bottom"
+                android:onClick="clickCards"
+                android:text="CARDS"
+                android:visibility="visible" />
+
+        </LinearLayout>
+
+
+    </LinearLayout>
 
     <TextView
         android:id="@+id/tv_demoStatus"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_gravity="center_horizontal|top"
-        android:text="Demo activated:" />
-
-    <Button
-        android:id="@+id/bt_lista"
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal|bottom"
-        android:onClick="clickCards"
-        android:text="CARDS"
-        android:visibility="invisible" />
+        android:layout_weight="50"
+        android:background="@color/button_material_dark"
+        android:fontFamily="@string/card_font_fontFamily_image_text_over"
+        android:scrollbars="vertical"
+        android:text="System Log"
+        android:textColor="@color/abc_primary_text_material_dark" />
 
 
-    <Switch
-        android:id="@+id/sw_detection"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="Detection " />
-
-    <Spinner
-        android:layout_width="178dp"
-        android:layout_height="wrap_content"
-        android:id="@+id/spinner_weacon"
-        android:layout_gravity="left|bottom" />
-
-</FrameLayout>
+</LinearLayout>
 
