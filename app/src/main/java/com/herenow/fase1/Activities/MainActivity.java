@@ -64,7 +64,7 @@ public class MainActivity extends ActionBarActivity {
      * @param s text to print
      */
     public static void writeOnScreen(String s) {
-        tv.append("\n" + s);
+        tv.append("\n> " + s);
     }
     //    private boolean isSapoActive = true; //TODO activate /deactivate sapo remotely
 

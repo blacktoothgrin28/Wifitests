@@ -141,7 +141,8 @@
             android:scrollbars="vertical"
             android:text="System Log"
             android:textColor="#faee03"
-            android:textSize="9dp" />
+            android:textSize="9dp"
+            android:gravity="bottom"/>
     </LinearLayout>
 
 
