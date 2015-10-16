@@ -3,6 +3,8 @@ package util;
 import android.os.Environment;
 import android.util.Log;
 
+import com.herenow.fase1.Activities.MainActivity;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -33,6 +35,12 @@ public class myLog {
     }
 
     public static void add(String text) {
+
+        try {
+            MainActivity.writeOnScreen(text);
+        } catch (Exception e) {
+
+        }
         add(text, "mhp");
     }
 
