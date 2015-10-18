@@ -9,8 +9,6 @@ import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
 
-import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -40,12 +38,14 @@ public class CompanyData {
     String memberOfGroup;
     String foundationPlace;
     String linkedinUrl;
+    String twitterUser;
     //    String skype;
     //Product[] products;
     //Client[] clients
     //    int logoResId;
     @DrawableRes
     int imageResId, logoResId;
+
     HashMap<String, String> dataTable = new HashMap();
 
     public CompanyData(String name, int imageResId, int logoResId) {
@@ -80,6 +80,7 @@ public class CompanyData {
         memberOfGroup = po.getString("MemberOfGroup");
         foundationPlace = po.getString("FoundationPlace");
         linkedinUrl = po.getString("LinkedinUrl");
+        twitterUser = po.getString("Twitter");
         typeOfBusiness = po.getString("TypeOfBusiness");
         director = po.getString("Director");
         airportCode = po.getString("AirportCode");
@@ -121,8 +122,20 @@ public class CompanyData {
         return linkedinUrl;
     }
 
+    public String getTwitterUser() {
+        return twitterUser;
+    }
+
+    public String getTwitterUser() {
+        return twitterUser;
+    }
+
     public void setLinkedinUrl(String linkedinUrl) {
         this.linkedinUrl = linkedinUrl;
+    }
+
+    public void setTwitterUser(String twitterUser) {
+        this.twitterUser = twitterUser;
     }
 
     public void setEmployeesNumber(int workers) {
@@ -210,10 +223,6 @@ public class CompanyData {
         this.foundationYear = foundationYear;
     }
 
-    public void setTypeOfBusiness(String typeOfBusiness) {
-        this.typeOfBusiness = typeOfBusiness;
-    }
-
     public void setDirector(String director) {
         this.director = director;
     }
@@ -253,6 +262,10 @@ public class CompanyData {
 
     public String getTypeOfBusiness() {
         return typeOfBusiness;
+    }
+
+    public void setTypeOfBusiness(String typeOfBusiness) {
+        this.typeOfBusiness = typeOfBusiness;
     }
 
     public static final class SetupWizard {

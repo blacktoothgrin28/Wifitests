@@ -18,6 +18,7 @@ import com.herenow.fase1.Cards.Components.CardViewNative2;
 import com.herenow.fase1.Cards.LinkedinCard;
 import com.herenow.fase1.Cards.NewsCard;
 import com.herenow.fase1.Cards.ScheduleCard;
+import com.herenow.fase1.Cards.TwitterCard;
 import com.herenow.fase1.FlightData;
 import com.herenow.fase1.R;
 import com.parse.ParseObject;
@@ -128,14 +129,16 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
     }
 
     private void initLinkedinCard(String linkedinUrl) {
-        //
-//            //Linkedin card
         // todo change format of linkedin card
         LinkedinCard linkedinCard = new LinkedinCard(getActivity(), linkedinUrl);
-//        CardViewNative cvLinkedin = (CardViewNative) getActivity().findViewById(R.id.card_view_linkedin);
-//        linkedinCard.setView(cvLinkedin);
         linkedinCard.setListener(this);
         linkedinCard.init();
+    }
+
+    private void initTwitterCard(String twitterUrl) {
+        TwitterCard twitterCard = new TwitterCard(getActivity(), twitterUrl);
+        twitterCard.setListener(this);
+        twitterCard.init();
     }
 
     private void initNewsCard(String nameCleanCompany) {
@@ -225,6 +228,10 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
                             initLinkedinCard(companyData.getLinkedinUrl());
                         }
 
+                        //TWITTER
+                        if (hashTypes.containsKey("Twitter")) {
+                            initTwitterCard(companyData.getTwitterUser());
+                        }
 
                     } catch (Exception e) {
                         e.printStackTrace();

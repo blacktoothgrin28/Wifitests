@@ -39,7 +39,6 @@ import static com.herenow.fase1.R.mipmap.ic_launcher;
  * Created by Milenko on 04/10/2015.
  */
 public class FlightsObserverService extends Service {
-    public static final long NOTIFY_INTERVAL = 10 * 1000; // 10 seconds
     int iCounter = 0;
     private Handler mHandler = new Handler();
     private String tag = "vig";
@@ -121,8 +120,8 @@ public class FlightsObserverService extends Service {
 //                .addAction(myAction);
         //todo improve the notif
         NotificationCompat.BigTextStyle bigTextStyle = new NotificationCompat.BigTextStyle();
-        bigTextStyle.setBigContentTitle("PP" + notiTitle);
-        bigTextStyle.bigText("PP" + content);
+        bigTextStyle.setBigContentTitle(notiTitle);
+        bigTextStyle.bigText(content);
 
         notif.setStyle(bigTextStyle);
 //        notif.setContentIntent(resultPendingIntent);
@@ -235,6 +234,5 @@ public class FlightsObserverService extends Service {
             }
 
         }
-
     }
 }

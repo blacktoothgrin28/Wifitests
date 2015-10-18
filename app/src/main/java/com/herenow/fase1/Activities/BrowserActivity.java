@@ -26,7 +26,7 @@ public class BrowserActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_second);
-        overridePendingTransition(R.transition.trans_left_in, R.transition.trans_left_out);
+//        overridePendingTransition(R.transition.trans_left_in, R.transition.trans_left_out);
 
 
         Bundle b = getIntent().getExtras();

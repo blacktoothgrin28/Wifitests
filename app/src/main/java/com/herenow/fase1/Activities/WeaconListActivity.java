@@ -73,6 +73,7 @@ public class WeaconListActivity extends ActionBarActivity {
                     Intent resultIntent;
                     resultIntent = getIntent(we);
                     WeaconListActivity.this.startActivity(resultIntent);
+                    overridePendingTransition(R.transition.trans_left_in, R.transition.trans_left_out);
                 }
             });
 

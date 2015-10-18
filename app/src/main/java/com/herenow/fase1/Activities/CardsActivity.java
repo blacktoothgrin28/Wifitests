@@ -14,10 +14,9 @@ public class CardsActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_cards_activity_aer);
         setContentView(R.layout.activity_cards);
-        overridePendingTransition(R.transition.trans_left_in, R.transition.trans_left_out);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+//        overridePendingTransition(R.transition.trans_left_in, R.transition.trans_left_out);
+//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         try {
             Bundle b = getIntent().getExtras();

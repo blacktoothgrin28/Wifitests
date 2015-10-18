@@ -44,6 +44,7 @@
     <file url="file://$PROJECT_DIR$/app/src/main/res/layout/news_inner_main.xml" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/res/layout/schedule_card_inner_main.xml" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/res/layout/schedule_inner_header.xml" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/layout/twitter_inner_main.xml" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/res/values-w820dp/colors.xml" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/res/values/styles_card.xml" charset="UTF-8" />
   </component>

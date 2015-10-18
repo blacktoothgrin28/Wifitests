@@ -2,18 +2,15 @@ package com.herenow.fase1.Cards;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.herenow.fase1.Activities.cardLoadedListener;
 import com.herenow.fase1.R;
-import com.squareup.picasso.Picasso;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -36,23 +33,22 @@ import util.myLog;
  */
 
 
-public class LinkedinCard extends CardWithList implements OnTaskCompleted {
-
-    private String mCompanyLinkedinUrl;
-    private ArrayList<ListObject> mEmployeesToShow;
+public class TwitterCard extends CardWithList implements OnTaskCompleted {
+    private String mCompanyTwitterUrl, mCompanyTwitterUser;
+    private ArrayList<ListObject> mTweetsToShow;
     private cardLoadedListener listener;
-//    private CardViewNative mCardViewNews;
 
-    public LinkedinCard(Context context, String companyLinkedinUrl) {
+    public TwitterCard(Context context, String companyTwitterUser) {
         super(context);
-        mCompanyLinkedinUrl = companyLinkedinUrl;
+        mCompanyTwitterUser = companyTwitterUser;
+        mCompanyTwitterUrl = "https://mobile.twitter.com/" + companyTwitterUser;
     }
 
 
     @Override
     protected CardHeader initCardHeader() {
         CardHeader header = new CardHeader(getContext(), R.layout.listcard_inner_header);
-        header.setTitle("Who works here?"); //todo should use R.string.
+        header.setTitle("Tweets @" + mCompanyTwitterUser);
         return header;
     }
 
@@ -75,8 +71,7 @@ public class LinkedinCard extends CardWithList implements OnTaskCompleted {
 
     @Override
     public void init() {
-        (new ParseURLLinkedin(this)).execute(new String[]{mCompanyLinkedinUrl});//async
-
+        (new ParseURLTwitter(this)).execute(new String[]{mCompanyTwitterUrl});//async
     }
 
     @Override
@@ -85,9 +80,9 @@ public class LinkedinCard extends CardWithList implements OnTaskCompleted {
         //Init the list
 //        List<ListObject> mObjects = new ArrayList<ListObject>();
 //
-//        ListObject lalo = mEmployeesToShow.get(1);
+//        ListObject lalo = mTweetsToShow.get(1);
 //
-//        mObjects=(ListObject)mEmployeesToShow;
+//        mObjects=(ListObject)mTweetsToShow;
         //Example onSwipe
         /*w2.setOnItemSwipeListener(new OnItemSwipeListener() {
             @Override
@@ -96,32 +91,28 @@ public class LinkedinCard extends CardWithList implements OnTaskCompleted {
             }
         });*/
 
-        return mEmployeesToShow;
+        return mTweetsToShow;
     }
 
     @Override
     public View setupChildView(int childPosition, ListObject object, View convertView, ViewGroup parent) {
 
         try {
-            TextView title = (TextView) convertView.findViewById(R.id.name);
-            TextView content = (TextView) convertView.findViewById(R.id.position);
-
-            ImageView ivImage = (ImageView) convertView.findViewById(R.id.news_image);
+            TextView name = (TextView) convertView.findViewById(R.id.name);
+            TextView alias = (TextView) convertView.findViewById(R.id.alias);
+            TextView date = (TextView) convertView.findViewById(R.id.date);
+            TextView content = (TextView) convertView.findViewById(R.id.content);
 
             //Retrieve the values from the object
-            Employee emp = (Employee) object;
-            title.setText(emp.name + " " + emp.lastName);
-            content.setText(emp.position);
+            Tweet tweet = (Tweet) object;
+            name.setText(tweet.name);
+            alias.setText(tweet.alias);
+            date.setText(tweet.date);
+            content.setText(tweet.content);
 
-            if (emp.urlImage != null && !emp.urlImage.equals("")) {
-                Picasso.with(mContext).load(emp.urlImage)//Todo si es que tiene url
-                        .error(R.drawable.abc_ic_ab_back_mtrl_am_alpha)
-                        .placeholder(R.mipmap.ic_launcher)
-                        .into(ivImage);
-            }
 
         } catch (Exception e) {
-            myLog.add("errror item perfiles: " + e.getMessage());
+            myLog.add("---Error en setup child tweets: " + e.getMessage());
         }
 
         return convertView;
@@ -129,17 +120,34 @@ public class LinkedinCard extends CardWithList implements OnTaskCompleted {
 
     @Override
     public int getChildLayoutId() {
-        return R.layout.linkedin2_inner_main;
+        return R.layout.twitter_inner_main;
     }
 
     @Override
     public void OnTaskCompleted(ArrayList elements) {
         try {
-            myLog.add("ontaskcompleted:" + elements.size() + " perfiles");
-            //Select three news with exact name
-            mEmployeesToShow = elements;
+            myLog.add("ontaskcompleted:" + elements.size() + " tweets");
+            mTweetsToShow = new ArrayList<>();
+            //Select three tweets with name of place
+            for (Object ob : elements) {
+                Tweet tw = (Tweet) ob;
+                if (tw.alias.equals("@" + mCompanyTwitterUser)) {
+                    mTweetsToShow.add(tw);
+                }
+            }
+            myLog.add("Hemos seleccionado:" + mTweetsToShow.size() + " tweets");
             super.init();
 
+            //Set a clickListener on Header Area
+            this.addPartialOnClickListener(Card.CLICK_LISTENER_HEADER_VIEW, new Card.OnCardClickListener() {
+                @Override
+                public void onClick(Card card, View view) {
+                    Toast.makeText(mContext, "Click on Header Area", Toast.LENGTH_LONG).show();
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(mCompanyTwitterUrl));
+                    mContext.startActivity(browserIntent);
+
+                }
+            });
             listener.OnCardReady(this, R.layout.native_cardwithlist_layout2);
         } catch (Exception e) {
             listener.OnCardErrorLoadingData(e);
@@ -147,6 +155,7 @@ public class LinkedinCard extends CardWithList implements OnTaskCompleted {
 
 //        mCardViewNews.setCard(this);
     }
+
     public void setListener(cardLoadedListener listener) {
         this.listener = listener;
     }
@@ -156,16 +165,13 @@ public class LinkedinCard extends CardWithList implements OnTaskCompleted {
 
 
     // -------------------------------------------------------------
-    // Employee Object
+    //  Object
     // -------------------------------------------------------------
 
-    class Employee extends CardWithList.DefaultListObject {
-        public String position = "";
-        public String url;
-        String name, lastName, urlImage;
-        Bitmap picture;
+    class Tweet extends DefaultListObject {
+        String name, alias, date, content, link;
 
-        public Employee(Card parentCard) {
+        public Tweet(Card parentCard) {
             super(parentCard);
             init();
         }
@@ -175,7 +181,7 @@ public class LinkedinCard extends CardWithList implements OnTaskCompleted {
             setOnItemClickListener(new OnItemClickListener() {
                 @Override
                 public void onItemClick(LinearListView parent, View view, int position, ListObject object) {
-                    Toast.makeText(getContext(), "Click on " + getObjectId(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Click on tweet", Toast.LENGTH_SHORT).show();
 
                     Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(getObjectId()));
                     mContext.startActivity(browserIntent);
@@ -186,7 +192,7 @@ public class LinkedinCard extends CardWithList implements OnTaskCompleted {
             setOnItemSwipeListener(new OnItemSwipeListener() {
                 @Override
                 public void onItemSwipe(ListObject object, boolean dismissRight) {
-                    Toast.makeText(getContext(), "Swipe on " + object.getObjectId(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Swiped", Toast.LENGTH_SHORT).show();
                 }
             });
         }
@@ -194,22 +200,21 @@ public class LinkedinCard extends CardWithList implements OnTaskCompleted {
 
     }
 
-    class ParseURLLinkedin extends AsyncTask<String, Void, ArrayList<Employee>> {
+    class ParseURLTwitter extends AsyncTask<String, Void, ArrayList<Tweet>> {
         private OnTaskCompleted listener;
 
-        ParseURLLinkedin(OnTaskCompleted listener) {
-            myLog.add("asignando listener en parseURLLinkeedin");
+        ParseURLTwitter(OnTaskCompleted listener) {
             this.listener = listener;
         }
 
         @Override
-        protected ArrayList<Employee> doInBackground(String... strings) {
-            ArrayList<Employee> employees = new ArrayList();
+        protected ArrayList<Tweet> doInBackground(String... strings) {
+            ArrayList<Tweet> tweets = new ArrayList();
             try {
                 Connection.Response response = Jsoup.connect(strings[0])
                         .ignoreContentType(true)
 //                        .userAgent("Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:25.0) Gecko/20100101 Firefox/25.0")
-                        .userAgent("Mozilla/5.0 (Windows NT 6.3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.85 Safari/537.36")
+//                        .userAgent("Mozilla/5.0 (Windows NT 6.3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.85 Safari/537.36")
                         .referrer("http://www.google.com")
                         .timeout(12000)
                         .followRedirects(true)
@@ -217,50 +222,43 @@ public class LinkedinCard extends CardWithList implements OnTaskCompleted {
 
                 Document doc = response.parse();
 //                Document doc = Jsoup.connect(strings[0]).get();
-
-
-                Elements employeesRaw = doc.select("div [class=company-employees module]").first().select("ol").first().select("li");
-
-                for (Element employee : employeesRaw) {
-                    employees.add(ProcessHtmlEmployee(employee));
+                Elements tweetsRaw = doc.select("div[role=row]");//.first().select("ol").first().select("li");
+//
+                for (Element tweet : tweetsRaw) {
+                    tweets.add(ProcessHtmlTweet(tweet));
                 }
 
             } catch (Throwable t) {
-                t.printStackTrace();
+                myLog.add("--Error en twitter card: " + t);
             }
-            return employees;
+            return tweets;
         }
 
-        private Employee ProcessHtmlEmployee(Element element) {
-            Employee emp = new Employee(mParentCard);
-            Element dt;
+        private Tweet ProcessHtmlTweet(Element element) {
+            Tweet tweet = new Tweet(mParentCard);
             try {
-                dt = element.select("dt").first();
-                emp.name = dt.select("span[class=given-name]").first().text();
-                emp.lastName = dt.select("span[class=family-name]").first().text();
-                emp.url = dt.select("a").attr("href");
-                if (element.select("dd").size() > 0)
-                    emp.position = element.select("dd").first().text();
-                emp.setObjectId(emp.url);
-                emp.urlImage = element.select("img").attr("data-li-lazy-load-src");
+                Element main = element.select("div [class=Tweet-text TweetText u-textBreak u-dir").first();
+                tweet.content = main.text();
+                tweet.link = main.child(0).attr("href");
+
+                Element first = element.select("div [class= u-nbfc]").first().child(0);
+                tweet.name = first.child(0).text();
+                tweet.alias = first.child(2).text();
+                tweet.date = element.select("time").first().text();
+                tweet.setObjectId(tweet.link);
 
             } catch (Exception e) {
-                myLog.add("errror capturanfo employee " + e.getMessage());
+                myLog.add("errror capturanfo tweet " + e.getMessage());
             }
 
-            return emp;
+            return tweet;
         }
-
 
         @Override
-        protected void onPostExecute(ArrayList<Employee> employees) {
-            super.onPostExecute(employees);
-//        respText.setText(s) TODO here populate the cards
-//        this.inflateCard(news);
-            listener.OnTaskCompleted(employees);
+        protected void onPostExecute(ArrayList<Tweet> tweets) {
+            super.onPostExecute(tweets);
+            listener.OnTaskCompleted(tweets);
         }
-
-
     }
 }
 

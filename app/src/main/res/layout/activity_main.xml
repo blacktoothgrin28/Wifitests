@@ -138,13 +138,12 @@
             android:layout_weight="50"
             android:background="@color/button_material_dark"
             android:fontFamily="@string/card_font_fontFamily_image_text_over"
+            android:gravity="bottom"
             android:scrollbars="vertical"
             android:text="System Log"
             android:textColor="#faee03"
-            android:textSize="9dp"
-            android:gravity="bottom"/>
+            android:textSize="9dp" />
     </LinearLayout>
-
 
 
 </LinearLayout>

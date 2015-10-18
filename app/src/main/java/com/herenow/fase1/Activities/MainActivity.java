@@ -16,13 +16,13 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.herenow.fase1.MyServices.WifiObserverService;
 import com.herenow.fase1.Notifications.Notifications;
 import com.herenow.fase1.Position;
 import com.herenow.fase1.R;
 import com.herenow.fase1.Wifi.LocationAsker;
 import com.herenow.fase1.Wifi.LogInManagement;
 import com.herenow.fase1.Wifi.WifiUpdater;
-import com.herenow.fase1.MyServices.WifiObserverService;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
@@ -31,7 +31,6 @@ import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import it.gmariotti.cardslib.library.internal.CardArrayAdapter;
 import parse.ParseActions;
 import util.GPSCoordinates;
 import util.myLog;
@@ -45,8 +44,12 @@ public class MainActivity extends ActionBarActivity {
     public static Position mPos; //WARN. Lo he hecho static para poder usarlo en SAPO
 
     private static TextView tv;
+    private static int im = 1;
+    private static long newTime = System.currentTimeMillis();
     Intent intentWifiObs;
     private Intent intentAddWeacon;
+
+
     private Intent intentCards;
     private WifiUpdater wu;
     private Timer t;
@@ -69,59 +72,12 @@ public class MainActivity extends ActionBarActivity {
     //    private boolean isSapoActive = true; //TODO activate /deactivate sapo remotely
 
     public static void reportScanning(int found, int total) {
-//        oldTime = newTime;
-//        newTime = System.currentTimeMillis();
-//        long diff = Math.round((newTime - oldTime) / 1000);
-//        im++;
-//        msg = im + ".(" + diff + "s|found=" + found + "/" + total + ") ";
-//            tv.setText(msg);
-        tv.append("  .(" + "s|found=" + found + "/" + total + ") ");
-        //TODO restructurate notifications package
+        long oldTime = newTime;
+        newTime = System.currentTimeMillis();
+        long diff = Math.round((newTime - oldTime) / 1000);
 
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        myLog.add("++++++++++++++++ on save");
-    }
-
-    @Override
-    public void onActivityReenter(int resultCode, Intent data) {
-        super.onActivityReenter(resultCode, data);
-        myLog.add("++++++++++++++++ on activity reenter");
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        myLog.add("++++++++++++++++ On Start");
-    }
-
-    @Override
-    protected void onRestart() {
-        super.onRestart();
-        myLog.add("++++++++++++++++ on restarrt");
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        myLog.add("++++++++++++++++ on destroy");
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        myLog.add("++++++++++++++++ on stop");
-    }
-
-    //    private WifiBoss wifiBoss;
-
-    @Override
-    protected void onPause() {
-        myLog.add("++++++++++++++++ on Pause");
-        super.onPause();
+        writeOnScreen("+++ " + im + "  .(" + +diff + "s|found=" + found + "/" + total + ") ");
+        im++;
     }
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -129,6 +85,11 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         myLog.add("++++++++++++++++ On create");
         setContentView(R.layout.activity_main);
+
+        if (savedInstanceState != null) {
+            String msg = savedInstanceState.getString("test");
+            myLog.add("222recuperando el bundle en oncreate: " + msg);
+        }
 
         WriteUnhandledErrors(true);
         myLog.initialize("/WCLOG/rt.txt"); //Log in a file on the phone
@@ -140,13 +101,6 @@ public class MainActivity extends ActionBarActivity {
 
         //PARSE
         ParseUserLogIn();
-
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        myLog.add("++++++++++++++++ Retornando a la Main");
     }
 
     private void initializeViews() {
