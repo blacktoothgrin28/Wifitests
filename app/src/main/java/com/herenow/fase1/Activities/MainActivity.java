@@ -132,7 +132,7 @@ public class MainActivity extends ActionBarActivity {
         listasAdd("AIA", "AIA");
         listasAdd("El Prat", "WiFi");
         listasAdd("Monasterio", "wifip224");
-//        listasAdd("Cafeteria", "wifip224");
+        listasAdd("Vermell", "HotelsantcugatP1");
 //        listasAdd("Juan", "wifip224");
 
 

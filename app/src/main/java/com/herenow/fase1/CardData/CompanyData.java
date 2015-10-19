@@ -18,9 +18,6 @@ import util.myLog;
  * Created by Milenko on 25/08/2015.
  */
 public class CompanyData {
-    private String airportCode;
-    private String logoUrl;
-    private String mainImageUrl;
     Bitmap mainImage, logo;
     String name;
     String description;
@@ -45,8 +42,10 @@ public class CompanyData {
     //    int logoResId;
     @DrawableRes
     int imageResId, logoResId;
-
     HashMap<String, String> dataTable = new HashMap();
+    private String airportCode;
+    private String logoUrl;
+    private String mainImageUrl;
 
     public CompanyData(String name, int imageResId, int logoResId) {
         this.name = name;
@@ -58,14 +57,6 @@ public class CompanyData {
         this.name = name;
         this.mainImage = mainImage;
         this.logo = logo;
-    }
-
-    public String getLogoUrl() {
-        return logoUrl;
-    }
-
-    public String getMainImageUrl() {
-        return mainImageUrl;
     }
 
     public CompanyData(ParseObject po) throws ParseException {
@@ -110,6 +101,14 @@ public class CompanyData {
         return new SetupWizard(context);
     }
 
+    public String getLogoUrl() {
+        return logoUrl;
+    }
+
+    public String getMainImageUrl() {
+        return mainImageUrl;
+    }
+
     public String getWebsite() {
         return website;
     }
@@ -122,16 +121,12 @@ public class CompanyData {
         return linkedinUrl;
     }
 
-    public String getTwitterUser() {
-        return twitterUser;
-    }
-
-    public String getTwitterUser() {
-        return twitterUser;
-    }
-
     public void setLinkedinUrl(String linkedinUrl) {
         this.linkedinUrl = linkedinUrl;
+    }
+
+    public String getTwitterUser() {
+        return twitterUser;
     }
 
     public void setTwitterUser(String twitterUser) {

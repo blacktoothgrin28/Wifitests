@@ -18,8 +18,8 @@ import com.herenow.fase1.CardData.GoogleFlight;
 import com.herenow.fase1.Cards.Components.CardViewNative2;
 import com.herenow.fase1.FlightData;
 import com.herenow.fase1.GetFlightInfo;
-import com.herenow.fase1.R;
 import com.herenow.fase1.MyServices.FlightsObserverService;
+import com.herenow.fase1.R;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -116,9 +116,9 @@ public class AirportCard extends CardWithList implements OnTaskCompleted {
         try {
             //Setup the ui elements inside the item
             TextView companyAndFlight = (TextView) convertView.findViewById(R.id.company_and_flight);
-            TextView time = (TextView) convertView.findViewById(R.id.time);
+            TextView time = (TextView) convertView.findViewById(R.id.price);
             TextView estimated = (TextView) convertView.findViewById(R.id.estimated);
-            TextView destination = (TextView) convertView.findViewById(R.id.destination);//it's origin when arrival
+            TextView destination = (TextView) convertView.findViewById(R.id.name);//it's origin when arrival
 
             if (mTypeOfCard == TypeOfCard.departure) {
 

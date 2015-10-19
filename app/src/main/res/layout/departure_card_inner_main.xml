@@ -19,21 +19,21 @@
         android:minHeight="40dp">
 
         <TextView
-            android:id="@+id/destination"
+            android:id="@+id/name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignTop="@+id/time"
+            android:layout_alignTop="@+id/price"
             android:layout_marginLeft="8dp"
             android:layout_marginStart="8dp"
-            android:layout_toEndOf="@+id/time"
-            android:layout_toRightOf="@+id/time"
+            android:layout_toEndOf="@+id/price"
+            android:layout_toRightOf="@+id/price"
             android:text="MADRID (MAD)"
             android:textColor="@color/carddemo_blackcolored_color"
             android:textSize="17sp" />
 
 
         <TextView
-            android:id="@+id/time"
+            android:id="@+id/price"
             android:layout_width="70dp"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
@@ -49,9 +49,9 @@
             android:id="@+id/company_and_flight"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/destination"
-            android:layout_alignStart="@+id/destination"
-            android:layout_below="@+id/destination"
+            android:layout_alignLeft="@+id/name"
+            android:layout_alignStart="@+id/name"
+            android:layout_below="@+id/name"
 
             android:text="Vueling VY1634"
             android:textAppearance="?android:attr/textAppearanceSmall" />
@@ -62,7 +62,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
-            android:layout_below="@+id/destination"
+            android:layout_below="@+id/name"
             android:layout_marginEnd="10dp"
             android:layout_marginRight="10dp"
             android:text="16:45"

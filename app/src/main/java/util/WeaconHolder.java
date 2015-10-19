@@ -19,7 +19,7 @@ public class WeaconHolder extends RecyclerView.ViewHolder {
     public WeaconHolder(View view) {
         super(view);
         this.thumbnail = (ImageView) view.findViewById(R.id.thumbnail);
-        this.title = (TextView) view.findViewById(R.id.destination);
+        this.title = (TextView) view.findViewById(R.id.name);
         this.description = (TextView) view.findViewById(R.id.description);
     }
 }
