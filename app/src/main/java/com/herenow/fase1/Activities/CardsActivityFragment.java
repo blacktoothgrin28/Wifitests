@@ -12,10 +12,12 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import com.herenow.fase1.CardData.CompanyData;
+import com.herenow.fase1.CardData.DayFoodMenu;
 import com.herenow.fase1.CardData.FoodMenu;
 import com.herenow.fase1.Cards.AirportCard;
 import com.herenow.fase1.Cards.CompanyCard;
 import com.herenow.fase1.Cards.Components.CardViewNative2;
+import com.herenow.fase1.Cards.DayMenuCard;
 import com.herenow.fase1.Cards.LinkedinCard;
 import com.herenow.fase1.Cards.MenuCard;
 import com.herenow.fase1.Cards.NewsCard;
@@ -49,6 +51,7 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
     AirportCard airportCard;
     ScheduleCard scheduleCard;
     MenuCard menuCard;
+    DayMenuCard dayMenuCard;
 
     private boolean injectJavaScript;
     private String url;
@@ -149,6 +152,14 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
         addCardToFragment(R.layout.native_cardwithlist_layout2, menuCard);
     }
 
+    private void initDayMenuCard(DayFoodMenu foodMenu) {
+        dayMenuCard = new DayMenuCard(getActivity());
+        dayMenuCard.setData(foodMenu);
+        dayMenuCard.init();
+
+        addCardToFragment(R.layout.native_cardwithlist_layout2, dayMenuCard);
+    }
+
     private void initLinkedinCard(String linkedinUrl) {
         // todo change format of linkedin card
         LinkedinCard linkedinCard = new LinkedinCard(getActivity(), linkedinUrl);
@@ -162,6 +173,7 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
         twitterCard.init();
     }
 
+
     private void initNewsCard(String nameCleanCompany) {
         // News Card
         NewsCard newsCard = new NewsCard(getActivity(), nameCleanCompany);
@@ -170,7 +182,6 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
         newsCard.setListener(this);
         newsCard.init();
     }
-
 
     private void addCardToFragment(int cardLayout, Card card) {
         CardViewNative2 cardView = new CardViewNative2(getActivity(), cardLayout);
@@ -229,7 +240,8 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
                         if (hashTypes.containsKey("FoodMenu"))
                             initFoodMenuCard(parameters.getSampleFoodMenu());//TODO read from parse
                         //DAYMENU
-//                        if (hashTypes.containsKey("DayMenu")) initDayMenutCard(companyData.getDayMenuId());
+                        if (hashTypes.containsKey("DayMenu"))
+                            initDayMenuCard(parameters.getSampleDayFoodMenu());//TODO read from parse
                         //CHEF
 //                        if (hashTypes.containsKey("Chef")) initChefCard(companyData.getChefRecommendation());
 

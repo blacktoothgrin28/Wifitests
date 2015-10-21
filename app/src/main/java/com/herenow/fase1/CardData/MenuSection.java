@@ -6,6 +6,7 @@ public class MenuSection {
     private final String name;
     private ArrayList<Dish> dishes;
 
+
     public MenuSection(String name) {
         this.name = name;
         dishes = new ArrayList<>();
@@ -27,6 +28,16 @@ public class MenuSection {
     public String getName() {
         return name;
     }
+
+    public ArrayList getDishesDescriptions() {
+        ArrayList dishesDescriptions = new ArrayList();
+        for (Dish dish : dishes) {
+            dishesDescriptions.add(dish.description);
+        }
+
+        return dishesDescriptions;
+    }
+
 
     public class Dish {
         public String name;

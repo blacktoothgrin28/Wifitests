@@ -23,7 +23,6 @@ import it.gmariotti.cardslib.library.internal.CardHeader;
 import it.gmariotti.cardslib.library.internal.base.BaseCard;
 import it.gmariotti.cardslib.library.prototypes.CardWithList;
 import it.gmariotti.cardslib.library.prototypes.LinearListView;
-import util.myLog;
 
 /**
  * Created by Milenko on 19/09/2015.
@@ -60,8 +59,8 @@ public class MenuCard extends CardWithList {
         header.setPopupMenuListener(new CardHeader.OnClickCardHeaderPopupMenuListener() {
             @Override
             public void onMenuItemClick(BaseCard card, MenuItem item) {
-                Toast.makeText(mContext, "Click on " + item.getTitle() + "-" +
-                        ((Card) card).getCardHeader().getTitle(), Toast.LENGTH_SHORT).show();
+//                Toast.makeText(mContext, "Click on " + item.getTitle() + "-" +
+//                        ((Card) card).getCardHeader().getTitle(), Toast.LENGTH_SHORT).show();
                 ChangeFoodMenuTo((String) item.getTitle());
             }
         });
@@ -207,7 +206,6 @@ public class MenuCard extends CardWithList {
             ingredients = dish.ingredients;
             imageUrl = dish.imageUrl;
 
-            myLog.add("** Init: " + this);
             init();
         }
 

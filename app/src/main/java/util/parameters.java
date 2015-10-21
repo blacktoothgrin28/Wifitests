@@ -1,6 +1,7 @@
 package util;
 
 import com.herenow.fase1.CardData.CompanyData;
+import com.herenow.fase1.CardData.DayFoodMenu;
 import com.herenow.fase1.CardData.FoodMenu;
 import com.herenow.fase1.CardData.MenuSection;
 import com.herenow.fase1.CardData.Schedule;
@@ -29,8 +30,22 @@ public class parameters {
 
     public static FoodMenu getSampleFoodMenu() {
         FoodMenu foodMenu = new FoodMenu("1st November 2015");
+        foodMenu.addSection(getSecAperitiv());
+        foodMenu.addSection(getSecSalad());
+        foodMenu.addSection(getSecMar());
 
-        MenuSection aperitivos = new MenuSection("Aperitivos")
+        return foodMenu;
+    }
+
+    public static DayFoodMenu getSampleDayFoodMenu() {
+        DayFoodMenu dayMenu = new DayFoodMenu("3th November, until 15:30", 10.5);
+        dayMenu.addSection(getSecSalad());
+        dayMenu.addSection(getSecMar());
+        return dayMenu;
+    }
+
+    private static MenuSection getSecAperitiv() {
+        return new MenuSection("Aperitivos")
                 .addFoodItem("Paniza", "Pan de coca con tomate, sal y aceite de oliva virgen", new String[]{"Pan",
                         "tomate", "sal", "Aceite"}, 6)
                 .addFoodItem("Delicia de Rovira", "Sobrasada de Can Rovira con miel y pan de coca con tomate", new String[]{"Pan",
@@ -39,8 +54,10 @@ public class parameters {
                         "miel", "tomate"}, 4.5)
                 .addFoodItem("Buñuelos de bacalao ", "Precio por unidad", new String[]{"Bacalao"
                 }, 3);
+    }
 
-        MenuSection ensaladas = new MenuSection("Ensaladas")
+    private static MenuSection getSecSalad() {
+        return new MenuSection("Ensaladas")
                 .addFoodItem("Oye cerdo", "Ensalada de escarola, oreja de cerdo crujiente y vinagreta de piñones", new String[]{
                         "oreja", "piñones", "Aceite"}, 12)
                 .addFoodItem("Escalera al cielo", "Láminas de bacalao con piparras, aceitunas y anchoas de La Escala", new String[]{
@@ -49,21 +66,16 @@ public class parameters {
                         "almendras"}, 19)
                 .addFoodItem("Verduras", "Verduras escalibadas con anchoas y romesco ", new String[]{"Anchoas", "romesco"
                 }, 3);
+    }
 
-        MenuSection mar = new MenuSection("Del Mar")
+    private static MenuSection getSecMar() {
+        return new MenuSection("Del Mar")
                 .addFoodItem("Pulpo suave", "Pulpo a la brasa con cremoso de patata y pimentón ", new String[]{
                         "pulpo", "patatas", "pimentón"}, 19)
                 .addFoodItem("Rape nomás", "Rape al horno de leña con patatas, jamón ibérico y refrito de ajos ", new String[]{
                         "Rape", "patatas", "jamón ibérico"}, 24)
                 .addFoodItem("Sepias matizadas", "Sepietas de la Barceloneta con sofrito de cebolla y tomate ", new String[]{
                         "Sepia", "tomate", "cebolla"}, 22);
-
-
-        foodMenu.addSection(aperitivos);
-        foodMenu.addSection(ensaladas);
-        foodMenu.addSection(mar);
-
-        return foodMenu;
     }
 
     public static CompanyData getExampleCompanyCard() {
