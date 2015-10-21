@@ -14,6 +14,7 @@ public class FoodMenu {
     public String subtitle;
     HashMap<String, MenuSection> sections;
     private Calendar date;
+    private ArrayList<String> sectionNames = new ArrayList<>();
 
     public FoodMenu(String name) {
         this.name = name;
@@ -24,10 +25,21 @@ public class FoodMenu {
 
     public void addSection(MenuSection section) {
         sections.put(section.getName(), section);
+        sectionNames.add(section.getName());//To Keep the relative order
     }
 
-    public MenuSection getDishes(String sectionName) {
+    public ArrayList<String> getSectionNames() {
+        return sectionNames;
+    }
+
+    public MenuSection getSection(String sectionName) {
         return sections.get(sectionName);
+    }
+
+    public MenuSection getSection(int item) {
+        MenuSection ms = null;
+        if (item < sections.size()) ms = (MenuSection) sections.values().toArray()[item];
+        return ms;
     }
 
     public ArrayList<MenuSection.Dish> getDishesFirstSection() {
@@ -47,6 +59,7 @@ public class FoodMenu {
     public String getName() {
         return name;
     }
+
 }
 
 

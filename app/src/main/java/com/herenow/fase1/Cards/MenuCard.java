@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -54,12 +55,28 @@ public class MenuCard extends CardWithList {
         //Add Header
         CardHeader2 header = new CardHeader2(getContext(), R.layout.schedule_inner_header);
 
-        //Add a popup menu. This method sets OverFlow button to visible
-        header.setPopupMenu(R.menu.popupmain, new CardHeader.OnClickCardHeaderPopupMenuListener() {
+        header.setButtonOverflowVisible(true);
+        //On item click
+        header.setPopupMenuListener(new CardHeader.OnClickCardHeaderPopupMenuListener() {
             @Override
             public void onMenuItemClick(BaseCard card, MenuItem item) {
-                Toast.makeText(mContext, "Click on " + item.getTitle(), Toast.LENGTH_SHORT).show();
-//            ChangeFoodMenuTo(item.getItemId()); TODO create method to change section
+                Toast.makeText(mContext, "Click on " + item.getTitle() + "-" +
+                        ((Card) card).getCardHeader().getTitle(), Toast.LENGTH_SHORT).show();
+                ChangeFoodMenuTo((String) item.getTitle());
+            }
+        });
+
+        //Add items to the menu popup
+        header.setPopupMenuPrepareListener(new CardHeader.OnPrepareCardHeaderPopupMenuListener() {
+            @Override
+            public boolean onPreparePopupMenu(BaseCard card, PopupMenu popupMenu) {
+
+                ArrayList<String> sectionsNames = mFoodMenuData.getSectionNames();
+                for (String sn : sectionsNames) {
+                    popupMenu.getMenu().add(sn);
+                }
+
+                return true;
             }
         });
 
@@ -67,6 +84,20 @@ public class MenuCard extends CardWithList {
         header.setSubTitle("Main course");
         header.setDate("Updated at " + mFoodMenuData.getName());
         return header;
+    }
+
+    private void ChangeFoodMenuTo(String sectionName) {
+        //Update the subtitle
+        ((CardHeader2) this.getCardHeader()).setSubTitle(sectionName);
+
+        //Update content
+        List<ListObject> mChildren = initChildren(sectionName);
+        if (mChildren == null)
+            mChildren = new ArrayList<ListObject>();
+        mLinearListAdapter = new LinearListAdapter(super.getContext(), mChildren);
+        mLinearListAdapter.notifyDataSetChanged();
+
+        this.notifyDataSetChanged();
     }
 
     @Override
@@ -84,19 +115,20 @@ public class MenuCard extends CardWithList {
 
     }
 
-
     @Override
     protected List<ListObject> initChildren() {
+        List<ListObject> mObjects = prepareChildren(mFoodMenuData.getSection(2));
+        return mObjects;
+    }
+
+    private List<ListObject> prepareChildren(MenuSection section) {
 
         List<ListObject> mObjects = new ArrayList<>();
+        ArrayList<MenuSection.Dish> dishes = section.getDishes();
 
-        ArrayList<MenuSection.Dish> dishes = mFoodMenuData.getDishesFirstSection();
-
-        myLog.add("La seccion elegida tiene dishes:" + dishes.size());
         //Add an object to the list
         for (MenuSection.Dish dish : dishes) {
             final FoodObject so = new FoodObject(mParentCard, dish);
-            myLog.add("este so tiene " + so);
 
             //Example onSwipe
             so.setOnItemSwipeListener(new OnItemSwipeListener() {
@@ -105,12 +137,15 @@ public class MenuCard extends CardWithList {
 //                    Toast.makeText(getContext(), "Downloading presentation\n\"" + so.title + "\" by "
 //                            + so.speaker, Toast.LENGTH_SHORT).show();
 
-
                 }
             });
             mObjects.add(so);
         }
-        myLog.add("hemos initchildren estos mObjects " + mObjects.size());
+        return mObjects;
+    }
+
+    private List<ListObject> initChildren(String sectionName) {
+        List<ListObject> mObjects = prepareChildren(mFoodMenuData.getSection(sectionName));
         return mObjects;
     }
 
