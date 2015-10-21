@@ -12,11 +12,14 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import com.herenow.fase1.CardData.CompanyData;
+import com.herenow.fase1.CardData.FoodMenu;
 import com.herenow.fase1.Cards.AirportCard;
 import com.herenow.fase1.Cards.CompanyCard;
 import com.herenow.fase1.Cards.Components.CardViewNative2;
 import com.herenow.fase1.Cards.LinkedinCard;
+import com.herenow.fase1.Cards.MenuCard;
 import com.herenow.fase1.Cards.NewsCard;
+import com.herenow.fase1.Cards.RestaurantCard;
 import com.herenow.fase1.Cards.ScheduleCard;
 import com.herenow.fase1.Cards.TwitterCard;
 import com.herenow.fase1.FlightData;
@@ -45,6 +48,8 @@ import static com.google.android.gms.internal.zzhl.runOnUiThread;
 public class CardsActivityFragment extends Fragment implements cardLoadedListener {
     AirportCard airportCard;
     ScheduleCard scheduleCard;
+    MenuCard menuCard;
+
     private boolean injectJavaScript;
     private String url;
     private HashMap<String, Integer> hashTypes;
@@ -90,10 +95,6 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
 
         airportCard = new AirportCard(getActivity(), typeOfCard, airportCode);//departure just for test
         airportCard.setListener(this);
-//        CardViewNative cardViewAirport = (CardViewNative) getActivity().findViewById(R.id.card_view_airport);
-//        airportCard.setView(cardViewAirport);
-
-//        addCardToFragment(R.layout.native_cardwithlist_layout, airportCard);
 
         final WebView browser = (WebView) getActivity().findViewById(R.id.wbChanta);
         browser.getSettings().setLoadsImagesAutomatically(false);
@@ -109,23 +110,43 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
                 injectJavaScript = false; //To avoid calling this several times
             }
         });
-        myLog.add("VAMOS leer pagina de radar24");
-//        browser.loadUrl("http://flightradar24.com/airport/bcn/departures");
         url = "http://flightradar24.com/airport/" + airportCode.toLowerCase() + "/" + AirportCard.nameOfType(typeOfCard);
         myLog.add("RADAR 24 url:" + url);
         browser.loadUrl(url);
     }
 
+    private void initCompanyCard(final CompanyData companyData) {
+        int cardLayout = R.layout.company_card;
+        CompanyCard companyCardtest = CompanyCard.with(getActivity())
+                .setData(companyData)
+                .useDrawableUrl(companyData.getMainImageUrl())
+                .build();
+        addCardToFragment(cardLayout, companyCardtest);
+    }
+
+    private void initRestaurantCard(CompanyData restaurantData) {
+        int cardLayout = R.layout.company_card;
+        RestaurantCard restaurant = RestaurantCard.with(getActivity())
+                .setData(restaurantData)
+                .useDrawableUrl(restaurantData.getMainImageUrl())
+                .build();
+        addCardToFragment(cardLayout, restaurant);
+    }
+
     private void initScheduleCard() {
-        //Schedule card
         scheduleCard = new ScheduleCard(getActivity());
         scheduleCard.setData(parameters.getExampleScheduleData());//it has 11 items
         scheduleCard.init();
 
         addCardToFragment(R.layout.native_cardwithlist_layout2, scheduleCard);
-//        CardViewNative cardViewSchedule = (CardViewNative) getActivity().findViewById(R.id.card_view_schedule);
-//        cardViewSchedule.setCard(scheduleCard);
+    }
 
+    private void initFoodMenuCard(FoodMenu foodMenu) {
+        menuCard = new MenuCard(getActivity());
+        menuCard.setData(foodMenu);
+        menuCard.init();
+
+        addCardToFragment(R.layout.native_cardwithlist_layout2, menuCard);
     }
 
     private void initLinkedinCard(String linkedinUrl) {
@@ -150,14 +171,6 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
         newsCard.init();
     }
 
-    private void initCompanyCard(final CompanyData companyData) {
-        int cardLayout = R.layout.company_card;
-        CompanyCard companyCardtest = CompanyCard.with(getActivity())
-                .setData(companyData)
-                .useDrawableUrl(companyData.getMainImageUrl())
-                .build();
-        addCardToFragment(cardLayout, companyCardtest);
-    }
 
     private void addCardToFragment(int cardLayout, Card card) {
         CardViewNative2 cardView = new CardViewNative2(getActivity(), cardLayout);
@@ -196,7 +209,6 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
         }
     }
 
-
     public void setCardData(final String wCompanyDataObId, final AirportCard.TypeOfCard mTypeAirportCard) {
         if (wCompanyDataObId != null) {
 
@@ -210,6 +222,17 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
 
                         //COMPANY
                         if (hashTypes.containsKey("Company")) initCompanyCard(companyData);
+
+                        //RESTAURANT
+                        if (hashTypes.containsKey("Restaurant")) initRestaurantCard(companyData);
+                        //FOODMENU
+                        if (hashTypes.containsKey("FoodMenu"))
+                            initFoodMenuCard(parameters.getSampleFoodMenu());//TODO read from parse
+                        //DAYMENU
+//                        if (hashTypes.containsKey("DayMenu")) initDayMenutCard(companyData.getDayMenuId());
+                        //CHEF
+//                        if (hashTypes.containsKey("Chef")) initChefCard(companyData.getChefRecommendation());
+
 
                         //SCHEDULE  TODO read the schedule from parse
                         if (hashTypes.containsKey("Schedule"))
@@ -231,6 +254,11 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
                         //TWITTER
                         if (hashTypes.containsKey("Twitter")) {
                             initTwitterCard(companyData.getTwitterUser());
+                        }
+
+                        //TRIPADVISOR
+                        if (hashTypes.containsKey("TripAdvisor")) {
+//                            initTripAdvisorCard(companyData.getTripAdvisor());
                         }
 
                     } catch (Exception e) {

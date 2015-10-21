@@ -142,19 +142,7 @@ public class RestaurantCard extends BaseMaterialCard {
             TextView mTitleView = (TextView) view.findViewById(it.gmariotti.cardslib.library.cards.R.id.card_main_inner_simple_subtitle);
             if (mTitleView != null)
                 mTitleView.setText(mSubTitle);
-
-//            //Here look for the view to click (la lupa)
-//            ImageButton mib = (ImageButton) view.findViewById(R.id.ic1);
-//            if (mib != null){
-//                    ViewToClickToExpand viewToClickToExpand =
-//                        ViewToClickToExpand.builder()
-//                                .setupView(mib);
-//                setViewToClickToExpand(viewToClickToExpand);
-//            }
-
-
         }
-
 
         if (view != null) {
             TextView mTitleView = (TextView) view.findViewById(it.gmariotti.cardslib.library.R.id.card_main_inner_simple_title);
@@ -349,14 +337,7 @@ public class RestaurantCard extends BaseMaterialCard {
         public SetupWizard setData(CompanyData companyData) {
             mCompanyData = companyData;
             mTextOverImage = mCompanyData.getName();
-
             iconUrl = companyData.getLogoUrl();
-//            mDrawableCardIcon = mCompanyData.getLogoResId();
-//            mDrawableCardThumbnail = mCompanyData.getImageResId();
-//            mExternalCardThumbnail=new Fondo(mCompanyData.getMainImage());
-//            mLogo = mCompanyData.getLogo(   );
-//            mMainImage = mCompanyData.getMainImage();
-
 
             return this;
         }
@@ -402,12 +383,6 @@ public class RestaurantCard extends BaseMaterialCard {
             return this;
         }
 
-//        public SetupWizard setupSupplementalActions(@LayoutRes int layoutId, ArrayList<BaseSupplementalAction> actions) {
-//            mSupplementalActionLayoutId = layoutId;
-//            mActions = actions;
-//            return this;
-//        }
-
         public RestaurantCard build() {
             return build(new RestaurantCard(mContext));
         }
@@ -421,11 +396,7 @@ public class RestaurantCard extends BaseMaterialCard {
             }
             card.setTextOverImage(mTextOverImage);
             card.setTextOverImageResId(mTextOverImageResId);
-
-//            card.setDrawableIconIdCardThumbnail(mDrawableCardIcon);
             card.setUrlCardIcon(iconUrl);
-
-//            card.ico(mDrawableCardIcon);
 
             if (mTitle != null)
                 card.setTitle(mTitle.toString());
@@ -434,12 +405,12 @@ public class RestaurantCard extends BaseMaterialCard {
             //Barra de botones mhp
             mSupplementalActionLayoutId = R.layout.restaurant_button_bar;
             mActions = setActions();
-
             if (mActions != null) {
                 for (BaseSupplementalAction ac : mActions)
                     card.addSupplementalAction(ac);
             }
             card.setLayout_supplemental_actions_id(mSupplementalActionLayoutId);
+
             card.build();
 
             ViewToClickToExpand viewToClickToExpand2 = ViewToClickToExpand.builder().enableForExpandAction();
@@ -447,8 +418,8 @@ public class RestaurantCard extends BaseMaterialCard {
 
             CustomExpandCard expand = new CustomExpandCard(mContext);
             expand.setLemma(mCompanyData.getLemma());
-            expand.setBullets(mCompanyData.getExtraInfo());
-            expand.setDescription(mCompanyData.getDescription());
+            expand.setBullets(mCompanyData.getHorario());
+            expand.setDescription("");
             card.addCardExpand(expand);
 
             return card;
@@ -462,7 +433,7 @@ public class RestaurantCard extends BaseMaterialCard {
             ArrayList<BaseSupplementalAction> actions = new ArrayList<BaseSupplementalAction>();
 
             ////MORE button
-            TextSupplementalAction moreAction = new TextSupplementalAction(mContext, R.id.bt_more);
+            TextSupplementalAction moreAction = new TextSupplementalAction(mContext, R.id.bt_horario);
             moreAction.setOnActionClickListener(new BaseSupplementalAction.OnActionClickListener() {
                 @Override
                 public void onClick(Card card, View view) {
@@ -483,7 +454,7 @@ public class RestaurantCard extends BaseMaterialCard {
 
 
             //Call waitress
-            IconSupplementalAction actionCallWaitress = new IconSupplementalAction(mContext, R.id.bt_waitress);
+            IconSupplementalAction actionCallWaitress = new IconSupplementalAction(mContext, R.id.bt_add_contact);
             actionCallWaitress.setOnActionClickListener(new BaseSupplementalAction.OnActionClickListener() {
                 @Override
                 public void onClick(Card card, View view) {
@@ -515,32 +486,29 @@ public class RestaurantCard extends BaseMaterialCard {
             return actions;
         }
 
-        private void killBill() {
-            if (tableNumber != -1) {
-                tableNumber = askTableNumber();
-            }
-            Toast.makeText(mContext, "Paying with paypal \nfor table " + tableNumber, Toast.LENGTH_SHORT).show();
-        }
-
-        private int askTableNumber() {
+        private void askTableNumberIfNeeded() {
+            if (tableNumber == -1) {
+//                tableNumber = askTableNumberIfNeeded();
 //            Intent i = new Intent(this, TableNumberActivity.class);
 //            startActivityForResult(mContext,i,1);
 //            startActivityForResult(i, 1);
+                //TODo recover the number
+            }
 
-            return 21;
+        }
+
+        private void killBill() {
+            askTableNumberIfNeeded();
+            Toast.makeText(mContext, "Paying with paypal \nfor table " + tableNumber, Toast.LENGTH_SHORT).show();
         }
 
         private void checkPlease() {
-            if (tableNumber != -1) {
-                tableNumber = askTableNumber();
-            }
+            askTableNumberIfNeeded();
             Toast.makeText(mContext, "Bringing the check \nfor table " + tableNumber, Toast.LENGTH_SHORT).show();
         }
 
         private void callWaitress() {
-            if (tableNumber != -1) {
-                tableNumber = askTableNumber();
-            }
+            askTableNumberIfNeeded();
             Toast.makeText(mContext, "Calling waitress \nfor table " + tableNumber, Toast.LENGTH_SHORT).show();
         }
 

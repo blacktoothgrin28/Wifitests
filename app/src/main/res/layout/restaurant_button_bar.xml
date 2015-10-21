@@ -26,7 +26,7 @@
     android:paddingStart="8dp">
 
     <TextView
-        android:id="@+id/bt_more"
+        android:id="@+id/bt_horario"
         style="@style/card.native.actions"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -34,18 +34,18 @@
         android:layout_alignParentStart="true"
         android:layout_gravity="left"
         android:background="?android:selectableItemBackground"
-        android:text="MORE" />
+        android:text="HORARIO" />
 
     <ImageButton
         android:id="@+id/bt_web"
         style="@style/card.native.actions.button"
-        android:layout_toLeftOf="@+id/bt_waitress"
+        android:layout_toLeftOf="@+id/bt_add_contact"
         android:background="?android:selectableItemBackground"
         android:scaleType="fitCenter"
         android:src="@drawable/ic_world" />
 
     <ImageButton
-        android:id="@+id/bt_waitress"
+        android:id="@+id/bt_add_contact"
         style="@style/card.native.actions.button"
         android:layout_toLeftOf="@+id/bt_check"
         android:background="?android:selectableItemBackground"

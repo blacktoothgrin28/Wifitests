@@ -247,7 +247,7 @@ public abstract class ParseActions {
 
                     try {
                         Thread.sleep(1000 * secWait);
-                        myLog.add("***FORCESD se an recuperado:"+spots.size());
+                        myLog.add("***FORCED se an recuperado:" + spots.size());
                         WeaconParse we = spots.get(0).getWeacon();
                         Notifications.sendNotification(we);
                     } catch (Exception e1) {

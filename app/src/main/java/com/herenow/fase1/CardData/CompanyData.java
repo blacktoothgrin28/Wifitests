@@ -46,6 +46,7 @@ public class CompanyData {
     private String airportCode;
     private String logoUrl;
     private String mainImageUrl;
+    private String horario;
 
     public CompanyData(String name, int imageResId, int logoResId) {
         this.name = name;
@@ -66,6 +67,7 @@ public class CompanyData {
         email = po.getString("Email");
         website = po.getString("Website");
         lemma = po.getString("Lemma");
+        horario = po.getString("Horario");
         foundationYear = po.getString("FoundationYear");
         headQuarters = po.getString("Headquarters");
         memberOfGroup = po.getString("MemberOfGroup");
@@ -76,8 +78,9 @@ public class CompanyData {
         director = po.getString("Director");
         airportCode = po.getString("AirportCode");
 //        subsidiaries=po.getString("Subsidiaries"); todo include subsidiaries
-
-        nEmployees = (int) po.getNumber("Employees");
+        if (po.getNumber("Employees") != null) {
+            nEmployees = (int) po.getNumber("Employees");
+        }
 
         //Images
         ParseFile parseFile = po.getParseFile("Logo");
@@ -89,12 +92,11 @@ public class CompanyData {
         mainImageUrl = parseFile.getUrl();
 //            bitmapdata = parseFile.getData();
 //            mainImage = BitmapFactory.decodeByteArray(bitmapdata, 0, bitmapdata.length);
-
-        List<Object> al = po.getList("Founders");
-        founders = new String[al.size()];
-        al.toArray(founders);
-
-
+        if (po.getList("Founders") != null) {
+            List<Object> al = po.getList("Founders");
+            founders = new String[al.size()];
+            al.toArray(founders);
+        }
     }
 
     public static SetupWizard with(Context context) {
@@ -261,6 +263,10 @@ public class CompanyData {
 
     public void setTypeOfBusiness(String typeOfBusiness) {
         this.typeOfBusiness = typeOfBusiness;
+    }
+
+    public String getHorario() {
+        return horario;
     }
 
     public static final class SetupWizard {

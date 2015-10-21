@@ -1,7 +1,6 @@
 package com.herenow.fase1.Cards;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,10 +8,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.herenow.fase1.CardData.FoodMenu;
+import com.herenow.fase1.CardData.MenuSection;
 import com.herenow.fase1.Cards.Components.CardHeader2;
 import com.herenow.fase1.R;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -21,6 +22,7 @@ import it.gmariotti.cardslib.library.internal.CardHeader;
 import it.gmariotti.cardslib.library.internal.base.BaseCard;
 import it.gmariotti.cardslib.library.prototypes.CardWithList;
 import it.gmariotti.cardslib.library.prototypes.LinearListView;
+import util.myLog;
 
 /**
  * Created by Milenko on 19/09/2015.
@@ -57,13 +59,13 @@ public class MenuCard extends CardWithList {
             @Override
             public void onMenuItemClick(BaseCard card, MenuItem item) {
                 Toast.makeText(mContext, "Click on " + item.getTitle(), Toast.LENGTH_SHORT).show();
-//            ChangeFoodMenuTo(item.getItemId()); TODO create method to change menu
+//            ChangeFoodMenuTo(item.getItemId()); TODO create method to change section
             }
         });
 
-        header.setTitle("Menu"); //should use R.string.
+        header.setTitle("Menu");
         header.setSubTitle("Main course");
-        header.setDate("Upadated at " + mFoodMenuData.getDateString());
+        header.setDate("Updated at " + mFoodMenuData.getName());
         return header;
     }
 
@@ -86,12 +88,15 @@ public class MenuCard extends CardWithList {
     @Override
     protected List<ListObject> initChildren() {
 
-        //Init the list
         List<ListObject> mObjects = new ArrayList<>();
 
+        ArrayList<MenuSection.Dish> dishes = mFoodMenuData.getDishesFirstSection();
+
+        myLog.add("La seccion elegida tiene dishes:" + dishes.size());
         //Add an object to the list
-        for (FoodMenu.FoodItem it : mFoodMenuData.getData()) {
-            final FoodObject so = new FoodObject(mParentCard, it);
+        for (MenuSection.Dish dish : dishes) {
+            final FoodObject so = new FoodObject(mParentCard, dish);
+            myLog.add("este so tiene " + so);
 
             //Example onSwipe
             so.setOnItemSwipeListener(new OnItemSwipeListener() {
@@ -105,6 +110,7 @@ public class MenuCard extends CardWithList {
             });
             mObjects.add(so);
         }
+        myLog.add("hemos initchildren estos mObjects " + mObjects.size());
         return mObjects;
     }
 
@@ -132,7 +138,7 @@ public class MenuCard extends CardWithList {
 
     @Override
     public int getChildLayoutId() {
-        return R.layout.schedule_card_inner_main;
+        return R.layout.food_card_inner_main;
     }
 
 
@@ -141,17 +147,16 @@ public class MenuCard extends CardWithList {
     // -------------------------------------------------------------
 
     private void ShowFoodPicture(FoodObject object) {
-        Bitmap image = object.getImage();
+        String imageUrl = object.getImageUrl();
         //TODO shows an activity with picture and description of the food
     }
 
     class FoodObject extends DefaultListObject {
 
-        private String description = "";
-        private int name;
-        private int price;
-        private String ingredients;
-        private Bitmap image;
+        private String name, description = "";
+        private double price;
+        private String[] ingredients;
+        private String imageUrl;
 
 
         public FoodObject(Card parentCard) {
@@ -159,21 +164,16 @@ public class MenuCard extends CardWithList {
             init();
         }
 
-        public FoodObject(Card parentcard, FoodMenu.FoodItem it) {
+        public FoodObject(Card parentcard, MenuSection.Dish dish) {
             super(parentcard);
-//            title = it.getTitle();
-//            hour = it.getHour();
-//            min = it.getMin();
-//            h = it.getH();
-//            location = it.getPlace();
-//            speaker = it.getSpeaker();
-//            description = it.getDescription();
-//            url = it.getUrl();
-//            startInMilli = it.getStartInMilli();
-//            endInMilli = it.getEndInMilli();
-//            fileUrl = it.getUrlFile();
-            init();
+            name = dish.name;
+            description = dish.description;
+            price = dish.price;
+            ingredients = dish.ingredients;
+            imageUrl = dish.imageUrl;
 
+            myLog.add("** Init: " + this);
+            init();
         }
 
         private void init() {
@@ -197,12 +197,9 @@ public class MenuCard extends CardWithList {
             });
         }
 
-        public int getName() {
-            return name;
-        }
 
         public String getPrice() {
-            return Long.toString(price);
+            return Double.toString(price);
         }
 
         public String getDescription() {
@@ -210,12 +207,33 @@ public class MenuCard extends CardWithList {
         }
 
         public String getIngredients() {
-            return ingredients;
+            StringBuilder sb = new StringBuilder();
+
+            for (int i = 0; i < ingredients.length - 1; i++) {
+                sb.append(ingredients[i] + ", ");
+            }
+            sb.append(ingredients[ingredients.length - 1]);
+
+            return sb.toString();
         }
 
-        public Bitmap getImage() {
-            //TODO put image
-            return image;
+        public String getImageUrl() {
+            return imageUrl;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        @Override
+        public String toString() {
+            return "FoodObject{" +
+                    "name='" + name + '\'' +
+                    ", description='" + description + '\'' +
+                    ", price=" + price +
+                    ", ingredients=" + Arrays.toString(ingredients) +
+                    ", imageUrl='" + imageUrl + '\'' +
+                    '}';
         }
     }
 

@@ -353,14 +353,7 @@ public class CompanyCard extends BaseMaterialCard {
         public SetupWizard setData(CompanyData companyData) {
             mCompanyData = companyData;
             mTextOverImage = mCompanyData.getName();
-
             iconUrl = companyData.getLogoUrl();
-//            mDrawableCardIcon = mCompanyData.getLogoResId();
-//            mDrawableCardThumbnail = mCompanyData.getImageResId();
-//            mExternalCardThumbnail=new Fondo(mCompanyData.getMainImage());
-//            mLogo = mCompanyData.getLogo(   );
-//            mMainImage = mCompanyData.getMainImage();
-
 
             return this;
         }
@@ -484,7 +477,7 @@ public class CompanyCard extends BaseMaterialCard {
             });
             actions.add(actionHttp);
             ////AddContact button
-            IconSupplementalAction actionAddContact = new IconSupplementalAction(mContext, R.id.bt_waitress);
+            IconSupplementalAction actionAddContact = new IconSupplementalAction(mContext, R.id.bt_add_contact);
             actionAddContact.setOnActionClickListener(new BaseSupplementalAction.OnActionClickListener() {
                 @Override
                 public void onClick(Card card, View view) {
