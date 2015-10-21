@@ -5,6 +5,8 @@
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/herenow/fase1/Activities/CardsActivityFragment.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/herenow/fase1/Activities/MainActivity.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/herenow/fase1/Cards/AirportCard.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/herenow/fase1/Cards/ChefCard.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/herenow/fase1/Cards/ChefCard.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/herenow/fase1/Cards/CompanyCard.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/herenow/fase1/Cards/DayMenuCard.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/herenow/fase1/Cards/MenuCard.java" charset="UTF-8" />
@@ -35,6 +37,7 @@
     <file url="file://$PROJECT_DIR$/app/src/main/res/layout/carddemo_extras_base_withlist_empty.xml" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/res/layout/carddemo_googlenowweather_inner_header.xml" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/res/layout/carddemo_googlenowweather_inner_main.xml" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/layout/chef_card_inner_main.xml" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/res/layout/company_button_bar.xml" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/res/layout/company_expand.xml" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/res/layout/day_food_card_inner_main.xml" charset="UTF-8" />

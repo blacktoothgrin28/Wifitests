@@ -11,10 +11,12 @@ import android.webkit.WebViewClient;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
+import com.herenow.fase1.CardData.ChefData;
 import com.herenow.fase1.CardData.CompanyData;
 import com.herenow.fase1.CardData.DayFoodMenu;
 import com.herenow.fase1.CardData.FoodMenu;
 import com.herenow.fase1.Cards.AirportCard;
+import com.herenow.fase1.Cards.ChefCard;
 import com.herenow.fase1.Cards.CompanyCard;
 import com.herenow.fase1.Cards.Components.CardViewNative2;
 import com.herenow.fase1.Cards.DayMenuCard;
@@ -52,6 +54,7 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
     ScheduleCard scheduleCard;
     MenuCard menuCard;
     DayMenuCard dayMenuCard;
+     ChefCard chefCard;
 
     private boolean injectJavaScript;
     private String url;
@@ -160,6 +163,14 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
         addCardToFragment(R.layout.native_cardwithlist_layout2, dayMenuCard);
     }
 
+    private void initChefCard(ChefData chefData) {
+        chefCard = new ChefCard(getActivity());
+        chefCard.setData(chefData);
+        chefCard.init();
+
+        addCardToFragment(R.layout.native_cardwithlist_layout2, chefCard);
+    }
+
     private void initLinkedinCard(String linkedinUrl) {
         // todo change format of linkedin card
         LinkedinCard linkedinCard = new LinkedinCard(getActivity(), linkedinUrl);
@@ -167,12 +178,12 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
         linkedinCard.init();
     }
 
+
     private void initTwitterCard(String twitterUrl) {
         TwitterCard twitterCard = new TwitterCard(getActivity(), twitterUrl);
         twitterCard.setListener(this);
         twitterCard.init();
     }
-
 
     private void initNewsCard(String nameCleanCompany) {
         // News Card
@@ -243,7 +254,8 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
                         if (hashTypes.containsKey("DayMenu"))
                             initDayMenuCard(parameters.getSampleDayFoodMenu());//TODO read from parse
                         //CHEF
-//                        if (hashTypes.containsKey("Chef")) initChefCard(companyData.getChefRecommendation());
+                        if (hashTypes.containsKey("Chef"))
+                            initChefCard(parameters.getExampleChef());
 
 
                         //SCHEDULE  TODO read the schedule from parse

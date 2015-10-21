@@ -1,5 +1,6 @@
 package util;
 
+import com.herenow.fase1.CardData.ChefData;
 import com.herenow.fase1.CardData.CompanyData;
 import com.herenow.fase1.CardData.DayFoodMenu;
 import com.herenow.fase1.CardData.FoodMenu;
@@ -118,6 +119,13 @@ public class parameters {
         ex.addItem("Next stupid events", "The Master", 17, 0, "Plenaty Room", "http://www.aia.es");
 
         return ex;
+    }
+
+    public static ChefData getExampleChef() {
+        ChefData chef = new ChefData("Gnocchi Vermell", "http://d3rsl50p8hwbdu.cloudfront.net/square_374_1541.jpg");
+        chef.setDescription("This braised rabbit is a refreshing take on a classic Italian cacciatore dish. " +
+                "The addition of chanterelle mushrooms and green olives lends brighter notes to the dish.");
+        return chef;
     }
 
     public enum CardType {COMPANY, SCHEDULE, LINKEDIN, NEWS, FLIGHTS}
