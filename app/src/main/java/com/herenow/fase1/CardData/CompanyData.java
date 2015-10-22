@@ -47,6 +47,7 @@ public class CompanyData {
     private String logoUrl;
     private String mainImageUrl;
     private String horario;
+    private String tripAdvisorUrl;
 
     public CompanyData(String name, int imageResId, int logoResId) {
         this.name = name;
@@ -72,8 +73,11 @@ public class CompanyData {
         headQuarters = po.getString("Headquarters");
         memberOfGroup = po.getString("MemberOfGroup");
         foundationPlace = po.getString("FoundationPlace");
+
         linkedinUrl = po.getString("LinkedinUrl");
         twitterUser = po.getString("Twitter");
+        tripAdvisorUrl = po.getString("TripAdvisor");
+
         typeOfBusiness = po.getString("TypeOfBusiness");
         director = po.getString("Director");
         airportCode = po.getString("AirportCode");
@@ -267,6 +271,10 @@ public class CompanyData {
 
     public String getHorario() {
         return horario;
+    }
+
+    public String getTripAdvisorUrl() {
+        return tripAdvisorUrl;
     }
 
     public static final class SetupWizard {

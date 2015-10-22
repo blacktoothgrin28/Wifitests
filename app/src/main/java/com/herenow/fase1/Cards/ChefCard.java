@@ -11,6 +11,7 @@ import com.herenow.fase1.CardData.ChefData;
 import com.herenow.fase1.CardData.MenuSection;
 import com.herenow.fase1.Cards.Components.CardHeader2;
 import com.herenow.fase1.R;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -104,12 +105,19 @@ public class ChefCard extends CardWithList {
         name.setText(reco.getName());
         description.setText(reco.getDescription());
 
+        if (reco.imageUrl!= null && !reco.imageUrl.equals("")) {
+            Picasso.with(mContext).load(reco.imageUrl)
+                    .error(R.drawable.abc_ic_ab_back_mtrl_am_alpha)
+                    .placeholder(R.mipmap.ic_launcher)
+                    .into(imageView);
+        }
+
         return convertView;
     }
 
     @Override
     public int getChildLayoutId() {
-        return R.layout.day_food_card_inner_main;
+        return R.layout.chef_card_inner_main;
     }
 
 

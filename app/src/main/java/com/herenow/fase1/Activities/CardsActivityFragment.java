@@ -25,6 +25,7 @@ import com.herenow.fase1.Cards.MenuCard;
 import com.herenow.fase1.Cards.NewsCard;
 import com.herenow.fase1.Cards.RestaurantCard;
 import com.herenow.fase1.Cards.ScheduleCard;
+import com.herenow.fase1.Cards.TripAdvisorCard;
 import com.herenow.fase1.Cards.TwitterCard;
 import com.herenow.fase1.FlightData;
 import com.herenow.fase1.R;
@@ -41,6 +42,7 @@ import java.util.List;
 
 import it.gmariotti.cardslib.library.internal.Card;
 import parse.ParseActions;
+import util.dataExamples;
 import util.myLog;
 import util.parameters;
 
@@ -141,7 +143,7 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
 
     private void initScheduleCard() {
         scheduleCard = new ScheduleCard(getActivity());
-        scheduleCard.setData(parameters.getExampleScheduleData());//it has 11 items
+        scheduleCard.setData(dataExamples.getExampleScheduleData());//it has 11 items
         scheduleCard.init();
 
         addCardToFragment(R.layout.native_cardwithlist_layout2, scheduleCard);
@@ -178,6 +180,11 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
         linkedinCard.init();
     }
 
+    private void initTripAdvisorCard(String tripAdvisorUrl) {
+        TripAdvisorCard tripAdvisorCard = new TripAdvisorCard(getActivity(), tripAdvisorUrl);
+        tripAdvisorCard.setListener(this);
+        tripAdvisorCard.init();
+    }
 
     private void initTwitterCard(String twitterUrl) {
         TwitterCard twitterCard = new TwitterCard(getActivity(), twitterUrl);
@@ -249,13 +256,13 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
                         if (hashTypes.containsKey("Restaurant")) initRestaurantCard(companyData);
                         //FOODMENU
                         if (hashTypes.containsKey("FoodMenu"))
-                            initFoodMenuCard(parameters.getSampleFoodMenu());//TODO read from parse
+                            initFoodMenuCard(dataExamples.getSampleFoodMenu());//TODO read from parse
                         //DAYMENU
                         if (hashTypes.containsKey("DayMenu"))
-                            initDayMenuCard(parameters.getSampleDayFoodMenu());//TODO read from parse
+                            initDayMenuCard(dataExamples.getSampleDayFoodMenu());//TODO read from parse
                         //CHEF
                         if (hashTypes.containsKey("Chef"))
-                            initChefCard(parameters.getExampleChef());
+                            initChefCard(dataExamples.getExampleChef());
 
 
                         //SCHEDULE  TODO read the schedule from parse
@@ -282,7 +289,7 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
 
                         //TRIPADVISOR
                         if (hashTypes.containsKey("TripAdvisor")) {
-//                            initTripAdvisorCard(companyData.getTripAdvisor());
+                            initTripAdvisorCard(companyData.getTripAdvisorUrl());
                         }
 
                     } catch (Exception e) {

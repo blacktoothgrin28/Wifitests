@@ -156,7 +156,7 @@ public class LinkedinCard extends CardWithList implements OnTaskCompleted {
 
 
     // -------------------------------------------------------------
-    // Employee Object
+    // CommentObject Object
     // -------------------------------------------------------------
 
     class Employee extends CardWithList.DefaultListObject {

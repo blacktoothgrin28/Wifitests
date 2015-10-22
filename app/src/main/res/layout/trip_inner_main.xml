@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginLeft="8dp"
+    android:layout_marginRight="8dp"
+    android:background="@drawable/demo_item_selector">
+
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="4dp"
+        android:gravity="center_vertical"
+        android:minHeight="50dp"
+        android:orientation="vertical"
+        android:padding="6dp">
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:layout_marginRight="6dp"
+            android:textColor="@android:color/black"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            tools:text="Lo mejor dentro de lo medio" />
+
+        <TextView
+            android:id="@+id/comment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:textColor="@color/demo_card_weather_temperature_color"
+            android:textSize="14sp"
+            android:textStyle="italic"
+            tools:text="&quot;Es un restaurant estupendo, con toda esa comida y tenedores. Aunque  creo que faltaban tenedores, es algo que siempre hecho de menos en un lugar de categoría internacional&quot;" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="4dp">
+
+            <ImageView
+                android:id="@+id/stars"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/ic_star_3"
+                android:minHeight="15dp"
+                android:minWidth="25dp"
+
+                />
+
+            <TextView
+                android:id="@+id/date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@+id/user1"
+                android:layout_marginRight="4dp"
+                android:layout_toLeftOf="@id/user1"
+
+                android:textColor="#9d9db6"
+                android:textSize="12sp"
+                tools:text="4 Junio de 2015," />
+
+            <TextView
+                android:id="@id/user1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_gravity="right"
+                android:layout_marginRight="6dp"
+                android:textColor="@android:color/black"
+                android:textSize="15sp"
+                tools:text="José Luis Pereira" />
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

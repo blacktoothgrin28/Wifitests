@@ -6,7 +6,6 @@
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/herenow/fase1/Activities/MainActivity.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/herenow/fase1/Cards/AirportCard.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/herenow/fase1/Cards/ChefCard.java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/app/src/main/java/com/herenow/fase1/Cards/ChefCard.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/herenow/fase1/Cards/CompanyCard.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/herenow/fase1/Cards/DayMenuCard.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/herenow/fase1/Cards/MenuCard.java" charset="UTF-8" />
@@ -58,5 +57,6 @@
     <file url="file://$PROJECT_DIR$/app/src/main/res/menu/popupmain.xml" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/res/values-w820dp/colors.xml" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/res/values/styles_card.xml" charset="UTF-8" />
+    <file url="PROJECT" charset="UTF-8" />
   </component>
 </project>
