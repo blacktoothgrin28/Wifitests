@@ -180,8 +180,12 @@ public class TripAdvisorCard extends CardWithList implements OnTaskCompleted {
                         .execute();
 
                 Document doc = response.parse();
-//                Document doc = Jsoup.connect(strings[0]).get();
 
+                String ranking = doc.select("div.slim_ranking").first().text();
+                myLog.add("ranonkig dull" + ranking);
+                String grade = doc.select("img[property=ratingValue]").first().attr("content");
+
+                mTripData = new TripData(KeepFirstWords(ranking, 4), grade);
 
                 Elements commentsRaw = doc.select("div.reviewSelector");
 
@@ -195,16 +199,36 @@ public class TripAdvisorCard extends CardWithList implements OnTaskCompleted {
             return comments;
         }
 
+        private String TrimFirstWord(String s) {
+            int i = s.indexOf(" ");
+            return s.substring(i + 1);
+        }
+
+        private String TrimFirstWords(String s, int n) {
+            String sa = s;
+            for (int i = 0; i < n; i++) {
+                String sol = TrimFirstWord(sa);
+                sa = sol;
+            }
+            return sa;
+        }
+
         private CommentObject ProcessHtmlComment(Element element) {
             CommentObject comment = new CommentObject(mParentCard);
-            Element dt;
+
+
             try {
-                comment.title = element.select("span[class=taLnk]").text();
-//                comment.title = element.select("span.taLnk").text();
+//                comment.title = element.select("span[class=taLnk]").text();//coge solo el primer
+                comment.title = element.select("div.quote").text();
                 comment.comment = element.select("div.entry").text();
-                comment.date = element.select("span.ratingDate").text();//TODO quitar las dos primeras palabras (buscar la posicion del segundo espacio
-                comment.starNumber = Integer.parseInt(element.select("span[class=rate sprite-rating_s rating_s]").first().child(0).attr("alt").substring(0,1));
                 comment.user = element.select("div.username").text();
+
+                String dateLong = element.select("span.ratingDate").text();
+                comment.date = TrimFirstWords(dateLong, 2);
+
+                String porportion = element.select("span[class=rate sprite-rating_s rating_s]").first().child(0).attr("alt");
+                comment.starNumber = Integer.parseInt(porportion.substring(0, 1));
+
 
             } catch (Exception e) {
                 myLog.add("errror capturanfo comments" + e.getMessage());
@@ -224,6 +248,19 @@ public class TripAdvisorCard extends CardWithList implements OnTaskCompleted {
 
 
     }
+
+    private String KeepFirstWords(String s, int i) {
+        String[] res = s.split(" ");
+        StringBuilder sb = new StringBuilder(res[0]);
+
+        for (int j = 1; j < i; j++) {
+            myLog.add("j=" + j + " " + res[j]);
+            sb.append(" " + res[j]);
+        }
+
+        return sb.toString();
+    }
+
 
     // -------------------------------------------------------------
     // Object
