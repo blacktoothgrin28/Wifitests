@@ -133,6 +133,7 @@ public class MainActivity extends ActionBarActivity {
         listasAdd("El Prat", "WiFi");
         listasAdd("Monasterio", "wifip224");
         listasAdd("Vermell", "HotelsantcugatP1");
+        listasAdd("ZARA", "WLAN_11F8");
 //        listasAdd("Juan", "wifip224");
 
 

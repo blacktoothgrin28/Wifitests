@@ -146,17 +146,6 @@ public class CompanyCard extends BaseMaterialCard {
             TextView mTitleView = (TextView) view.findViewById(it.gmariotti.cardslib.library.cards.R.id.card_main_inner_simple_subtitle);
             if (mTitleView != null)
                 mTitleView.setText(mSubTitle);
-
-//            //Here look for the view to click (la lupa)
-//            ImageButton mib = (ImageButton) view.findViewById(R.id.ic1);
-//            if (mib != null){
-//                    ViewToClickToExpand viewToClickToExpand =
-//                        ViewToClickToExpand.builder()
-//                                .setupView(mib);
-//                setViewToClickToExpand(viewToClickToExpand);
-//            }
-
-
         }
 
 

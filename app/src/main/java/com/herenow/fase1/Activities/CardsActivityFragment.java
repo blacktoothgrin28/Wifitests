@@ -1,5 +1,6 @@
 package com.herenow.fase1.Activities;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -8,6 +9,7 @@ import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
@@ -24,12 +26,14 @@ import com.herenow.fase1.Cards.LinkedinCard;
 import com.herenow.fase1.Cards.MenuCard;
 import com.herenow.fase1.Cards.NewsCard;
 import com.herenow.fase1.Cards.RestaurantCard;
+import com.herenow.fase1.Cards.RetailCard;
 import com.herenow.fase1.Cards.ScheduleCard;
 import com.herenow.fase1.Cards.TripAdvisorCard;
 import com.herenow.fase1.Cards.TwitterCard;
 import com.herenow.fase1.FlightData;
 import com.herenow.fase1.R;
 import com.parse.ParseObject;
+import com.squareup.picasso.Picasso;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -41,6 +45,9 @@ import java.util.HashMap;
 import java.util.List;
 
 import it.gmariotti.cardslib.library.internal.Card;
+import it.gmariotti.cardslib.library.internal.CardExpand;
+import it.gmariotti.cardslib.library.internal.CardHeader;
+import it.gmariotti.cardslib.library.internal.ViewToClickToExpand;
 import parse.ParseActions;
 import util.dataExamples;
 import util.myLog;
@@ -56,7 +63,7 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
     ScheduleCard scheduleCard;
     MenuCard menuCard;
     DayMenuCard dayMenuCard;
-     ChefCard chefCard;
+    ChefCard chefCard;
 
     private boolean injectJavaScript;
     private String url;
@@ -132,6 +139,15 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
         addCardToFragment(cardLayout, companyCardtest);
     }
 
+    private void initRetailCard(CompanyData companyData) {
+        int cardLayout = R.layout.retail_card;
+        RetailCard retailCard = RetailCard.with(getActivity())
+                .setData(companyData)
+                .useDrawableUrl(companyData.getMainImageUrl())
+                .build();
+        addCardToFragment(cardLayout, retailCard);
+    }
+
     private void initRestaurantCard(CompanyData restaurantData) {
         int cardLayout = R.layout.company_card;
         RestaurantCard restaurant = RestaurantCard.with(getActivity())
@@ -201,6 +217,36 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
         newsCard.init();
     }
 
+    /**
+     * This method builds a card with a collpse/expand section inside
+     *
+     * @param imageUrl
+     */
+    private void init_custom_card_expand_inside(String imageUrl) {
+        try {
+            int cardLayout = R.layout.carddemo_example_native_expandinside_card_layout;
+            //Create a Card
+            Card couponCard = new Card(getActivity());
+
+            //Create a CardHeader
+            CardHeader header = new CardHeader(getActivity());
+
+            //Set the header title
+            header.setTitle("A discount for you");//TODO improve the header
+            //Add Header to card
+            couponCard.addCardHeader(header);
+
+            //This provides a simple (and useless) expand area
+            CardExpandInside expand = new CardExpandInside(getActivity(), imageUrl);
+            couponCard.addCardExpand(expand);
+
+            addCardToFragment(cardLayout, couponCard);
+
+        } catch (Exception e) {
+            myLog.add("XXX errer en init" + e.getLocalizedMessage());
+        }
+    }
+
     private void addCardToFragment(int cardLayout, Card card) {
         CardViewNative2 cardView = new CardViewNative2(getActivity(), cardLayout);
 
@@ -221,6 +267,31 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
 
         ll.addView(cardView);
         ll.addView(emptyView);
+
+        //Case of image expandcard:
+        if (cardLayout == R.layout.carddemo_example_native_expandinside_card_layout) {
+            myLog.add("Addcard2fragment. tipo imageexpand");
+
+            ViewToClickToExpand viewToClickToExpand =
+                    ViewToClickToExpand.builder()
+                            .highlightView(false)
+                            .setupView(cardView);
+            card.setViewToClickToExpand(viewToClickToExpand);
+
+            card.setOnExpandAnimatorEndListener(new Card.OnExpandAnimatorEndListener() {
+                @Override
+                public void onExpandEnd(Card card) {
+                    /*
+                    if (mScrollView!=null){
+                        mScrollView.post(new Runnable() {
+                            public void run() {
+                                mScrollView.scrollTo(0, mScrollView.getBottom());
+                            }
+                        });
+                    }*/
+                }
+            });
+        }
 
         //todo add animation
         cardView.setCard(card);
@@ -251,23 +322,29 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
 
                         //COMPANY
                         if (hashTypes.containsKey("Company")) initCompanyCard(companyData);
+                        //RETAIL
+                        if (hashTypes.containsKey("Retail")) initRetailCard(companyData);
 
-                        //RESTAURANT
+                    //RESTAURANT
                         if (hashTypes.containsKey("Restaurant")) initRestaurantCard(companyData);
                         //FOODMENU
-                        if (hashTypes.containsKey("FoodMenu"))
+                        if (hashTypes.containsKey("FoodMenu")) {
                             initFoodMenuCard(dataExamples.getSampleFoodMenu());//TODO read from parse
+                        }
                         //DAYMENU
-                        if (hashTypes.containsKey("DayMenu"))
+                        if (hashTypes.containsKey("DayMenu")) {
                             initDayMenuCard(dataExamples.getSampleDayFoodMenu());//TODO read from parse
+                        }
                         //CHEF
-                        if (hashTypes.containsKey("Chef"))
+                        if (hashTypes.containsKey("Chef")) {
                             initChefCard(dataExamples.getExampleChef());
+                        }
 
 
                         //SCHEDULE  TODO read the schedule from parse
-                        if (hashTypes.containsKey("Schedule"))
+                        if (hashTypes.containsKey("Schedule")) {
                             initScheduleCard();
+                        }
 
                         //AIRPORT
                         if (companyData.isAirport() || hashTypes.containsKey("Airport")) {
@@ -292,6 +369,11 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
                             initTripAdvisorCard(companyData.getTripAdvisorUrl());
                         }
 
+                        //Coupon
+                        if (hashTypes.containsKey("Coupon")) {
+                            init_custom_card_expand_inside("http://vignette3.wikia.nocookie.net/inciclopedia/images/8/8a/Calamardo_Guapo.jpg");
+
+                        }
                     } catch (Exception e) {
                         e.printStackTrace();
                         myLog.add("error aquí." + e.getLocalizedMessage());
@@ -309,6 +391,7 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
 
         }
     }
+
 
     /**
      * When a card that need to wait for data is ready,
@@ -343,6 +426,30 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
 
     }
 
+    class CardExpandInside extends CardExpand {
+
+        private final String imageUrl;
+
+        public CardExpandInside(Context context, String imageUrl) {
+            super(context, R.layout.carddemo_example_expandinside_expand_layout);
+            this.imageUrl = imageUrl;
+        }
+
+        @Override
+        public void setupInnerViewElements(ViewGroup parent, View view) {
+
+            ImageView img = (ImageView) view.findViewById(R.id.carddemo_inside_image);
+
+            if (img != null) {
+                Picasso.with(mContext).load(imageUrl)
+                        .error(R.drawable.abc_ic_ab_back_mtrl_am_alpha)
+                        .placeholder(R.mipmap.ic_launcher)
+                        .into(img);
+
+            }
+        }
+
+    }
 
     class MyJavaScriptInterface {
 

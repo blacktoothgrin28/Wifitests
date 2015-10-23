@@ -213,6 +213,8 @@ public class WeaconParse extends ParseObject {
 
     public boolean isBrowser() {
         String first = getCards()[0];
-        return first.equals("Browser");
+        boolean b = first.equals("Browser");
+        myLog.add("iss bwoser= "+b+" fris card is "+first);
+        return b;
     }
 }
