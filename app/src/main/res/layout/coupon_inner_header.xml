@@ -1,0 +1,59 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/card.native"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="5dp"
+    android:gravity="center_vertical"
+    android:orientation="vertical">
+
+
+    <TextView
+        android:id="@+id/card_header_inner_simple_title"
+        style="@style/card.native.header_simple_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="7dp"
+        android:layout_marginTop="5dp"
+        android:textColor="@android:color/black"
+        tools:text="Descuento exclusivo para ti" />
+
+    <TextView
+        android:id="@+id/card_header_inner_simple_subtitle"
+        style="@style/card.native.header_simple_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="7dp"
+        android:text="20% en toda la sección Niños"
+        android:textColor="@android:color/black" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="7dp"
+        android:paddingBottom="2dp"
+        android:text="Válido sólo en esta tienda por hoy"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="@color/carddemo_blackcolored_color"
+        android:textSize="10dp"
+        android:textStyle="italic" />
+
+    <ImageView
+        android:id="@+id/image_coupon"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_margin="8dp"
+        android:background="#69cec5" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right"
+        android:layout_marginRight="7dp"
+        android:paddingBottom="2dp"
+        android:text="GET CODE"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="@color/carddemo_blackcolored_color" />
+
+</LinearLayout>
+

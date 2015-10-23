@@ -19,36 +19,19 @@
 
 package com.herenow.fase1.Cards;
 
-import android.content.ContentProviderOperation;
 import android.content.Context;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.net.Uri;
-import android.provider.ContactsContract;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.LayoutRes;
-import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.herenow.fase1.CardData.CompanyData;
 import com.herenow.fase1.R;
-import com.herenow.fase1.test.CustomExpandCard;
 import com.herenow.fase1.test.mMaterialLargeImageCardThumbnail;
 
-import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
-
-import it.gmariotti.cardslib.library.cards.actions.BaseSupplementalAction;
-import it.gmariotti.cardslib.library.cards.actions.IconSupplementalAction;
-import it.gmariotti.cardslib.library.cards.actions.TextSupplementalAction;
 import it.gmariotti.cardslib.library.cards.base.BaseMaterialCard;
-import it.gmariotti.cardslib.library.internal.Card;
-import it.gmariotti.cardslib.library.internal.ViewToClickToExpand;
-import util.myLog;
 
 /**
  * @author Gabriele Mariotti (gabri.mariotti@gmail.com)
@@ -417,8 +400,5 @@ public class RetailCard extends BaseMaterialCard {
 
             return card;
         }
-
-
-
     }
 }

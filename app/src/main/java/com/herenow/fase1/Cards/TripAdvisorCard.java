@@ -158,6 +158,17 @@ public class TripAdvisorCard extends CardWithList implements OnTaskCompleted {
 //        mCardViewNews = cardViewNews;
 //    }
 
+    private String KeepFirstWords(String s, int i) {
+        String[] res = s.split(" ");
+        StringBuilder sb = new StringBuilder(res[0]);
+
+        for (int j = 1; j < i; j++) {
+            myLog.add("j=" + j + " " + res[j]);
+            sb.append(" " + res[j]);
+        }
+
+        return sb.toString();
+    }
 
     class ParseURLTrip extends AsyncTask<String, Void, ArrayList<CommentObject>> {
         private OnTaskCompleted listener;
@@ -185,7 +196,8 @@ public class TripAdvisorCard extends CardWithList implements OnTaskCompleted {
                 myLog.add("ranonkig dull" + ranking);
                 String grade = doc.select("img[property=ratingValue]").first().attr("content");
 
-                mTripData = new TripData(KeepFirstWords(ranking, 4), grade);
+//                mTripData = new TripData(KeepFirstWords(ranking, 4), grade);
+                mTripData = new TripData(ranking, grade);
 
                 Elements commentsRaw = doc.select("div.reviewSelector");
 
@@ -248,19 +260,6 @@ public class TripAdvisorCard extends CardWithList implements OnTaskCompleted {
 
 
     }
-
-    private String KeepFirstWords(String s, int i) {
-        String[] res = s.split(" ");
-        StringBuilder sb = new StringBuilder(res[0]);
-
-        for (int j = 1; j < i; j++) {
-            myLog.add("j=" + j + " " + res[j]);
-            sb.append(" " + res[j]);
-        }
-
-        return sb.toString();
-    }
-
 
     // -------------------------------------------------------------
     // Object
