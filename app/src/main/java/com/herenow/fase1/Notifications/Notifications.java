@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 
@@ -172,6 +173,24 @@ public abstract class Notifications {
             NotificationCompat.Action ArrivalAction = new NotificationCompat.Action(R.drawable.ic_flight_land_white_24dp, "Arrivals", pendingArrivals);
             notif.addAction(DepartureAction)
                     .addAction(ArrivalAction);
+        }
+
+        //ZARA APP button
+        if (we.getName().equals("ZARA")) {
+            final String appPackageName = "com.inditex.zara"; // getPackageName() from Context or Activity object
+            Intent getAppIntent;
+
+            try {
+                getAppIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName));
+            } catch (android.content.ActivityNotFoundException anfe) {
+                getAppIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName));
+                myLog.add("app no found: " + anfe.getLocalizedMessage());
+            }
+
+            PendingIntent pendingGetApp = PendingIntent.getActivity(acti.getBaseContext(), 1, getAppIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+            NotificationCompat.Action getAppAction = new NotificationCompat.Action(R.drawable.ic_flight_land_white_24dp, "Get App", pendingGetApp);
+            notif.addAction(getAppAction);
         }
 
         NotificationCompat.BigTextStyle bigTextStyle = new NotificationCompat.BigTextStyle();

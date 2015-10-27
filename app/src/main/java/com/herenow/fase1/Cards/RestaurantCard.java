@@ -493,8 +493,9 @@ public class RestaurantCard extends BaseMaterialCard {
 //            startActivityForResult(mContext,i,1);
 //            startActivityForResult(i, 1);
                 //TODo recover the number
-            }
 
+            }
+            tableNumber=11;//TODO quitar
         }
 
         private void killBill() {

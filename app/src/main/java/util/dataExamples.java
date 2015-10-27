@@ -37,6 +37,7 @@ public class dataExamples {
         foodMenu.addSection(getSecAperitiv());
         foodMenu.addSection(getSecSalad());
         foodMenu.addSection(getSecMar());
+        foodMenu.addSection(getSecGluten());
 
         return foodMenu;
     }
@@ -81,6 +82,16 @@ public class dataExamples {
                         "Rape", "patatas", "jamón ibérico"}, 24)
                 .addFoodItem("Sepias matizadas", "Sepietas de la Barceloneta con sofrito de cebolla y tomate ", new String[]{
                         "Sepia", "tomate", "cebolla"}, 22);
+    }
+
+    private static MenuSection getSecGluten() {
+        return new MenuSection("Gluten Free")
+                .addFoodItem("Buñuelos de bacalao ", "Precio por unidad", new String[]{"Bacalao"
+                }, 3)
+                .addFoodItem("Rape nomás", "Rape al horno de leña con patatas, jamón ibérico y refrito de ajos ", new String[]{
+                        "Rape", "patatas", "jamón ibérico"}, 24)
+                .addFoodItem("Delicia de Rovira", "Sobrasada de Can Rovira con miel y pan de coca con tomate", new String[]{"Pan",
+                        "miel", "tomate"}, 9);
     }
 
     public static Schedule getExampleScheduleData() {
