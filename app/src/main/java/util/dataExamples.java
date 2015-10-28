@@ -114,7 +114,7 @@ public class dataExamples {
         ex.addItem("When Elsa met the Starks", "Princess Anna", 14, 0, "Refrigerator room", "http://www.aia.es");
         ex.addItem("Kill your problems gently", "Dexter", 15, 0, "Basement", "http://www.aia.es");
         ex.addItem("Aaarrggh Eaarmmm", "Zombie B", 16, 0, "Kitchen", "http://www.aia.es");
-        ex.addItem("Next stupid events", "The Master", 17, 0, "Plenaty Room", "http://www.aia.es");
+        ex.addItem("Next amazin events", "The Master", 17, 0, "Plenary Room", "http://www.aia.es");
 
         return ex;
     }

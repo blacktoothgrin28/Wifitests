@@ -9,6 +9,7 @@ import android.os.Environment;
 import android.provider.CalendarContract;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -88,23 +89,7 @@ public class ScheduleCard extends CardWithList {
             so.setOnItemSwipeListener(new OnItemSwipeListener() {
                 @Override
                 public void onItemSwipe(ListObject object, boolean dismissRight) {
-                    Toast.makeText(getContext(), "Downloading presentation\n\"" + so.title + "\" by "
-                            + so.speaker, Toast.LENGTH_SHORT).show();
-
-                    DownloadManager.Request request = new DownloadManager.Request(Uri.parse(so.fileUrl));
-                    // in order for this if to run, you must use the android 3.2 to compile your app
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-                        request.allowScanningByMediaScanner();
-                        request.setTitle("Scheduled presentation")
-                                .setDescription(so.title)
-                                .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-                    }
-                    request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, so.title + ".pdf");//TODO consider other file formats
-
-                    // get download service and enqueue file
-                    DownloadManager manager = (DownloadManager) mContext.getSystemService(Context.DOWNLOAD_SERVICE);
-                    manager.enqueue(request);
-
+                    downloadPresentation(so);
                 }
             });
 
@@ -116,6 +101,25 @@ public class ScheduleCard extends CardWithList {
         return mObjects;
     }
 
+    private void downloadPresentation(ScheduleObject so) {
+        Toast.makeText(getContext(), "Downloading presentation\n\"" + so.title + "\" by "
+                + so.speaker, Toast.LENGTH_SHORT).show();
+
+        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(so.fileUrl));
+        // in order for this if to run, you must use the android 3.2 to compile your app
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            request.allowScanningByMediaScanner();
+            request.setTitle("Scheduled presentation")
+                    .setDescription(so.title)
+                    .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+        }
+        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, so.title + ".pdf");//TODO consider other file formats
+
+        // get download service and enqueue file
+        DownloadManager manager = (DownloadManager) mContext.getSystemService(Context.DOWNLOAD_SERVICE);
+        manager.enqueue(request);
+    }
+
 
     @Override
     public View setupChildView(int childPosition, CardWithList.ListObject object, View convertView, ViewGroup parent) {
@@ -125,20 +129,35 @@ public class ScheduleCard extends CardWithList {
         TextView time = (TextView) convertView.findViewById(R.id.time);
         TextView place = (TextView) convertView.findViewById(R.id.estimated);
         TextView speaker = (TextView) convertView.findViewById(R.id.company_and_flight);
+        ImageView file = (ImageView) convertView.findViewById(R.id.image_ppt);
+
 
         //Retrieve the values from the object
-        ScheduleObject scheduleObject = (ScheduleObject) object;
-        title.setText(scheduleObject.title);
-        time.setText(scheduleObject.getTime());
-        place.setText(scheduleObject.location);
-        speaker.setText(scheduleObject.speaker);
+        final ScheduleObject so = (ScheduleObject) object;
+        title.setText(so.title);
+        time.setText(so.getTime());
+        place.setText(so.location);
+        speaker.setText(so.speaker);
+
+        if (so.fileUrl != null && !so.fileUrl.equals("")) {
+            file.setClickable(true);
+            file.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    downloadPresentation(so);
+                }
+            });
+        } else {
+            file.setVisibility(View.INVISIBLE);
+        }
 
         return convertView;
     }
 
     @Override
     public int getChildLayoutId() {
-        return R.layout.schedule_card_inner_main;
+//        return R.layout.schedule_card_inner_main;
+        return R.layout.schedule_card_inner_main_withfile;
     }
 
 
@@ -148,11 +167,11 @@ public class ScheduleCard extends CardWithList {
 
     class ScheduleObject extends CardWithList.DefaultListObject {
         public String url;
+        public String fileUrl;
         String title, hour, urlImage, location;
         int h, min;
         private String speaker, description = "";
         private long startInMilli, endInMilli;
-        public String fileUrl;
 
 
         public ScheduleObject(Card parentCard) {

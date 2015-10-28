@@ -22,6 +22,7 @@ package com.herenow.fase1.Cards;
 import android.content.Context;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.LayoutRes;
+import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,9 +30,18 @@ import android.widget.TextView;
 
 import com.herenow.fase1.CardData.CompanyData;
 import com.herenow.fase1.R;
+import com.herenow.fase1.actions.Actions;
+import com.herenow.fase1.test.CustomExpandCard;
 import com.herenow.fase1.test.mMaterialLargeImageCardThumbnail;
 
+import java.util.ArrayList;
+
+import it.gmariotti.cardslib.library.cards.actions.BaseSupplementalAction;
+import it.gmariotti.cardslib.library.cards.actions.IconSupplementalAction;
+import it.gmariotti.cardslib.library.cards.actions.TextSupplementalAction;
 import it.gmariotti.cardslib.library.cards.base.BaseMaterialCard;
+import it.gmariotti.cardslib.library.internal.Card;
+import it.gmariotti.cardslib.library.internal.ViewToClickToExpand;
 
 /**
  * @author Gabriele Mariotti (gabri.mariotti@gmail.com)
@@ -312,6 +322,8 @@ public class RetailCard extends BaseMaterialCard {
         private CharSequence mTitle;
         private CharSequence mSubTitle;
         private String iconUrl;
+        private int mSupplementalActionLayoutId;
+        private ArrayList<BaseSupplementalAction> mActions;
 
 
         private SetupWizard(Context context) {
@@ -396,9 +408,86 @@ public class RetailCard extends BaseMaterialCard {
                 card.setTitle(mTitle.toString());
             card.setSubTitle(mSubTitle);
 
+            //Barra de botones mhp
+            mSupplementalActionLayoutId = R.layout.retail_button_bar;
+            mActions = setActions();
+
+            if (mActions != null) {
+                for (BaseSupplementalAction ac : mActions)
+                    card.addSupplementalAction(ac);
+            }
+
+            card.setLayout_supplemental_actions_id(mSupplementalActionLayoutId);
             card.build();
+
+            ViewToClickToExpand viewToClickToExpand2 = ViewToClickToExpand.builder().enableForExpandAction();
+            card.setViewToClickToExpand(viewToClickToExpand2);
+
+            CustomExpandCard expand = new CustomExpandCard(mContext);
+//            expand.setLemma(mCompanyData.getLemma());
+            expand.setBullets(mCompanyData.getExpandInfo());
+//            expand.setDescription(mCompanyData.getDescription());
+            card.addCardExpand(expand);
 
             return card;
         }
+
+        @NonNull
+        private ArrayList<BaseSupplementalAction> setActions() {
+
+            // Set supplemental actions as icon
+            //TODO remove buttons if email or phone not provided. take into account combinations
+            ArrayList<BaseSupplementalAction> actions = new ArrayList<BaseSupplementalAction>();
+
+            ////MORE button
+            TextSupplementalAction moreAction = new TextSupplementalAction(mContext, R.id.bt_more);
+            moreAction.setOnActionClickListener(new BaseSupplementalAction.OnActionClickListener() {
+                @Override
+                public void onClick(Card card, View view) {
+                    card.doToogleExpand();
+                }
+            });
+            actions.add(moreAction);
+            ////webpage button
+            IconSupplementalAction actionHttp = new IconSupplementalAction(mContext, R.id.bt_web);
+            actionHttp.setOnActionClickListener(new BaseSupplementalAction.OnActionClickListener() {
+                @Override
+                public void onClick(Card card, View view) {
+                    Actions.OpenWebPage(mContext, mCompanyData.getWebsite());
+                }
+            });
+            actions.add(actionHttp);
+//            ////AddContact button
+//            IconSupplementalAction actionAddContact = new IconSupplementalAction(mContext, R.id.bt_add_contact);
+//            actionAddContact.setOnActionClickListener(new BaseSupplementalAction.OnActionClickListener() {
+//                @Override
+//                public void onClick(Card card, View view) {
+//                    AddContact(mCompanyData);
+//                }
+//            });
+//            actions.add(actionAddContact);
+//            ////Call button
+//            IconSupplementalAction actionPhone = new IconSupplementalAction(mContext, R.id.bt_check);
+//            actionPhone.setOnActionClickListener(new BaseSupplementalAction.OnActionClickListener() {
+//                @Override
+//                public void onClick(Card card, View view) {
+//                    StartCall();
+//                }
+//            });
+//            actions.add(actionPhone);
+            ////Send email button
+            IconSupplementalAction mailAction = new IconSupplementalAction(mContext, R.id.bt_pay);
+            mailAction.setOnActionClickListener(new BaseSupplementalAction.OnActionClickListener() {
+                @Override
+                public void onClick(Card card, View view) {
+                    Actions.SendEmail(mContext, mCompanyData.getEmail());
+                }
+            });
+            actions.add(mailAction);
+
+            return actions;
+        }
+
+
     }
 }

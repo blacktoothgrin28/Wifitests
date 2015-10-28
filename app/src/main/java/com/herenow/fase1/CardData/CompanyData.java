@@ -18,6 +18,8 @@ import util.myLog;
  * Created by Milenko on 25/08/2015.
  */
 public class CompanyData {
+    String expandInfo;
+
     Bitmap mainImage, logo;
     String name;
     String description;
@@ -69,6 +71,7 @@ public class CompanyData {
         website = po.getString("Website");
         lemma = po.getString("Lemma");
         horario = po.getString("Horario");
+        expandInfo = po.getString("ExpandInfo");
         foundationYear = po.getString("FoundationYear");
         headQuarters = po.getString("Headquarters");
         memberOfGroup = po.getString("MemberOfGroup");
@@ -273,8 +276,21 @@ public class CompanyData {
         return horario;
     }
 
+    public String getExpandInfo() {
+        return expandInfo;
+    }
     public String getTripAdvisorUrl() {
         return tripAdvisorUrl;
+    }
+
+    public boolean isWebResponsive() {
+        if (getName().startsWith("ZAR")) {
+            myLog.add("WEB responsive");
+            return true;
+        } else {
+            myLog.add("WEB NOT responsive");
+            return false;
+        }
     }
 
     public static final class SetupWizard {

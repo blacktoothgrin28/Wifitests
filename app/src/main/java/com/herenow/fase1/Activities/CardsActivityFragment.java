@@ -2,6 +2,7 @@ package com.herenow.fase1.Activities;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.DrawableRes;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,6 +37,7 @@ import com.herenow.fase1.FlightData;
 import com.herenow.fase1.R;
 import com.parse.ParseObject;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.RequestCreator;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -48,6 +50,7 @@ import java.util.List;
 
 import it.gmariotti.cardslib.library.internal.Card;
 import it.gmariotti.cardslib.library.internal.CardExpand;
+import it.gmariotti.cardslib.library.internal.CardHeader;
 import it.gmariotti.cardslib.library.internal.ViewToClickToExpand;
 import parse.ParseActions;
 import util.dataExamples;
@@ -219,12 +222,32 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
         newsCard.init();
     }
 
-    /**
-     * This method builds a card with a collpse/expand section inside
-     *
-     * @param imageUrl
-     * @param codeImageUrl
-     */
+    private void init_card_expand_inside(int resourseId, String title) {
+        try {
+            int cardLayout = R.layout.carddemo_example_native_expandinside_card_layout;
+            //Create a Card
+            Card expandableCard = new Card(getActivity());
+
+            //Create a CardHeader
+            CardHeader header = new CardHeader(getActivity(), R.layout.map_inner_header);
+
+            //Set the header title
+            header.setTitle(title);
+
+            //Add Header to card
+            expandableCard.addCardHeader(header);
+
+            //This provides a simple (and useless) expand area
+            CardExpandInside expand = new CardExpandInside(getActivity(), resourseId);
+            expandableCard.addCardExpand(expand);
+
+            addCardToFragment(cardLayout, expandableCard);
+
+        } catch (Exception e) {
+            myLog.add("XXX errer en init" + e.getLocalizedMessage());
+        }
+    }
+
     private void init_custom_card_expand_inside(String imageUrl, String codeImageUrl) {
         try {
             int cardLayout = R.layout.carddemo_example_native_expandinside_card_layout;
@@ -289,7 +312,7 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
                 @Override
                 public void onExpandEnd(Card card) {
 
-                    if (mScrollView!=null){
+                    if (mScrollView != null) {
                         mScrollView.post(new Runnable() {
                             public void run() {
                                 mScrollView.scrollTo(0, mScrollView.getBottom());
@@ -385,6 +408,11 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
                             init_custom_card_expand_inside(imageUrl, codeImageUrl);
 
                         }
+
+                        //MAP CARD
+                        if (hashTypes.containsKey("Map")) {
+                            init_card_expand_inside(R.drawable.building_map, "Map of the building");
+                        }
                     } catch (Exception e) {
                         e.printStackTrace();
                         myLog.add("error aquí." + e.getLocalizedMessage());
@@ -439,26 +467,37 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
 
     class CardExpandInside extends CardExpand {
 
-        private final String imageUrl;
+        private String imageUrl = null;
+        private int imageResId = 0;
 
         public CardExpandInside(Context context, String imageUrl) {
             super(context, R.layout.carddemo_example_expandinside_expand_layout);
             this.imageUrl = imageUrl;
         }
 
+        public CardExpandInside(Context context, @DrawableRes int imageResID) {
+            super(context, R.layout.carddemo_example_expandinside_expand_layout);
+            this.imageResId = imageResID;
+
+        }
+
         @Override
         public void setupInnerViewElements(ViewGroup parent, View view) {
 
             ImageView img = (ImageView) view.findViewById(R.id.carddemo_inside_image);
+            RequestCreator rc;
 
             if (img != null) {
-                Picasso.with(mContext).load(imageUrl)
-                        .error(R.drawable.abc_ic_ab_back_mtrl_am_alpha)
+                if (imageUrl != null) {
+                    rc = Picasso.with(mContext).load(imageUrl);
+                } else {
+                    rc = Picasso.with(mContext).load(imageResId);
+                }
+
+                rc.error(R.drawable.abc_ic_ab_back_mtrl_am_alpha)
                         .placeholder(R.mipmap.ic_launcher).
-                        fit().centerCrop()
+                        fit().centerInside()
                         .into(img);
-
-
             }
         }
 

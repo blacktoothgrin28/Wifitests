@@ -131,7 +131,7 @@ public class TwitterCard extends CardWithList implements OnTaskCompleted {
             //Select three tweets with name of place
             for (Object ob : elements) {
                 Tweet tw = (Tweet) ob;
-                if (tw.alias.equals("@" + mCompanyTwitterUser)) {
+                if (tw.alias.toLowerCase().equals("@" + mCompanyTwitterUser.toLowerCase())) {
                     mTweetsToShow.add(tw);
                 }
             }

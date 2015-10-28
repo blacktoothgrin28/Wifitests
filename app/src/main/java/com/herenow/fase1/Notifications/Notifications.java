@@ -189,7 +189,19 @@ public abstract class Notifications {
 
             PendingIntent pendingGetApp = PendingIntent.getActivity(acti.getBaseContext(), 1, getAppIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-            NotificationCompat.Action getAppAction = new NotificationCompat.Action(R.drawable.ic_flight_land_white_24dp, "Get App", pendingGetApp);
+            NotificationCompat.Action getAppAction = new NotificationCompat.Action(R.drawable.ic_market, "Get App", pendingGetApp);
+            notif.addAction(getAppAction);
+        }
+
+        //WIFI APP button
+        if (we.getName().startsWith("Conj")) {
+            Intent connectToWifi;
+
+            connectToWifi = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=hola"));//TODO connect..to wifi
+
+            PendingIntent pendingWIFIConnect = PendingIntent.getActivity(acti.getBaseContext(), 1, connectToWifi, PendingIntent.FLAG_UPDATE_CURRENT);
+
+            NotificationCompat.Action getAppAction = new NotificationCompat.Action(R.drawable.ic_wifi, "Connect", pendingWIFIConnect);
             notif.addAction(getAppAction);
         }
 

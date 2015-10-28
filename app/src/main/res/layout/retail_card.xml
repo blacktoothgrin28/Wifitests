@@ -25,5 +25,16 @@
 
     </it.gmariotti.cardslib.library.view.ForegroundLinearLayout>
 
+    <ViewStub
+        android:id="@+id/card_supplemental_actions_vs"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inflatedId="@+id/card_supplemental_actions" />
 
+    <!-- Expand layout. You can customize this element with your CardExpand class -->
+    <FrameLayout
+        android:id="@+id/card_content_expand_layout"
+        style="@style/card.main_contentExpand"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"></FrameLayout>
 </LinearLayout><!-- From: file:/home/gabriele/Lavoro/Android/AndroidStudioProjects/wrks/cardslib/library-cards/src/main/res/layout/native_material_largeimage_card.xml -->
