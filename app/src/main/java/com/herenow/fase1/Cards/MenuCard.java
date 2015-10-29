@@ -1,9 +1,11 @@
 package com.herenow.fase1.Cards;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -12,6 +14,7 @@ import com.herenow.fase1.CardData.FoodMenu;
 import com.herenow.fase1.CardData.MenuSection;
 import com.herenow.fase1.Cards.Components.CardHeader2;
 import com.herenow.fase1.R;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,6 +26,7 @@ import it.gmariotti.cardslib.library.internal.CardHeader;
 import it.gmariotti.cardslib.library.internal.base.BaseCard;
 import it.gmariotti.cardslib.library.prototypes.CardWithList;
 import it.gmariotti.cardslib.library.prototypes.LinearListView;
+import util.stringUtils;
 
 /**
  * Created by Milenko on 19/09/2015.
@@ -179,11 +183,45 @@ public class MenuCard extends CardWithList {
     // -------------------------------------------------------------
     // Object
     // -------------------------------------------------------------
+    private void ShowFoodPicture(FoodObject dish) {
+        final Dialog d = new Dialog(mContext);
+        d.setTitle(dish.name);
+        d.setContentView(R.layout.food_preview);
+        ImageView iv = (ImageView) d.findViewById(R.id.dish_image);
+        TextView tv = (TextView) d.findViewById(R.id.dish_description);
 
-    private void ShowFoodPicture(FoodObject object) {
-        String imageUrl = object.getImageUrl();
-        //TODO shows an activity with picture and description of the food
+//        Button btCancel = (Button) d.findViewById(R.id.button1);
+//        Button bSet = (Button) d.findViewById(R.id.button2);
+
+        iv.setClickable(true);
+        tv.setClickable(true);
+
+        iv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                d.dismiss();
+            }
+        });
+        tv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                d.dismiss();
+            }
+        });
+
+        //SET CONTENT
+        tv.setText(dish.description);
+        if (iv != null) {
+            Picasso.with(mContext).load(dish.getImageUrl())
+                    .error(R.drawable.abc_ic_ab_back_mtrl_am_alpha)
+                    .placeholder(R.mipmap.ic_launcher).fit().centerCrop()
+                    .into(iv);
+        }
+
+        d.show();
     }
+
+
 
     class FoodObject extends DefaultListObject {
 
@@ -204,7 +242,7 @@ public class MenuCard extends CardWithList {
             description = dish.description;
             price = dish.price;
             ingredients = dish.ingredients;
-            imageUrl = dish.imageUrl;
+            imageUrl = dish.getImageUrl();
 
             init();
         }
@@ -240,14 +278,7 @@ public class MenuCard extends CardWithList {
         }
 
         public String getIngredients() {
-            StringBuilder sb = new StringBuilder();
-
-            for (int i = 0; i < ingredients.length - 1; i++) {
-                sb.append(ingredients[i] + ", ");
-            }
-            sb.append(ingredients[ingredients.length - 1]);
-
-            return sb.toString();
+            return stringUtils.ConcatenateComma(ingredients);
         }
 
         public String getImageUrl() {
@@ -269,6 +300,5 @@ public class MenuCard extends CardWithList {
                     '}';
         }
     }
-
 
 }

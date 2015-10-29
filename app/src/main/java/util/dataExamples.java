@@ -4,6 +4,7 @@ import com.herenow.fase1.CardData.ChefData;
 import com.herenow.fase1.CardData.CompanyData;
 import com.herenow.fase1.CardData.DayFoodMenu;
 import com.herenow.fase1.CardData.FoodMenu;
+import com.herenow.fase1.CardData.JobData;
 import com.herenow.fase1.CardData.MenuSection;
 import com.herenow.fase1.CardData.Schedule;
 import com.herenow.fase1.R;
@@ -117,6 +118,29 @@ public class dataExamples {
         ex.addItem("Next amazin events", "The Master", 17, 0, "Plenary Room", "http://www.aia.es");
 
         return ex;
+    }
+
+    public static JobData getExampleJobOffers() {
+        JobData jd = new JobData("Job Opportunities", "23th October 2015");
+
+        JobData.JobOffer j1 = new JobData.JobOfferBuilder().setTitle("Senior Data Scientist ")
+                .setDescription("Your role will be extract value to data through innovative Big Data/Data Science approaches in order to support our business processes and decision making.")
+                .setLanguages(new String[]{"English", "Spanish"})
+                .setSkills(new String[]{"Statistics", "Big Data", "R", "H2O"})
+                .setUrl("https://www.linkedin.com/jobs2/view/78904182?trk=biz-overview-job-post")
+                .createJobOffer();
+
+        JobData.JobOffer j2 = new JobData.JobOfferBuilder().setTitle("Java Developer")
+                .setDescription("Analista Programador en JAVA/J2EE Oracle-Pl/Sql para trabajar en proyectos innovadores para clientes de referencia en el mercado.")
+                .setLanguages(new String[]{"Spanish", "Catalan"})
+                .setSkills(new String[]{"Java", "xml", "Html", "Javascript", "Pl/Sql"})
+                .setUrl("https://www.linkedin.com/jobs2/view/71821162?trk=biz-overview-job-post")
+                .createJobOffer();
+
+        jd.add(j1);
+        jd.add(j2);
+
+        return jd;
     }
 
     public static ChefData getExampleChef() {

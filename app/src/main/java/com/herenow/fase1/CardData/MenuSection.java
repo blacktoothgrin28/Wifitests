@@ -44,7 +44,7 @@ public class MenuSection {
         public String description;
         public String[] ingredients;
         public double price;
-        public String imageUrl;
+        private String imageUrl;
 
         public Dish(String name, String description, String[] ingredients, double price) {
             this.name = name;
@@ -52,6 +52,13 @@ public class MenuSection {
             this.ingredients = ingredients;
             this.price = price;
             //TODO add image to dish
+        }
+
+        public String getImageUrl() {
+            if (imageUrl == null || imageUrl == "") {
+                imageUrl = "http://d3rsl50p8hwbdu.cloudfront.net/square_374_1541.jpg";
+            }
+            return imageUrl;
         }
     }
 }

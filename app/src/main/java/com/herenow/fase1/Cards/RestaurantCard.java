@@ -19,6 +19,7 @@
 
 package com.herenow.fase1.Cards;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -29,13 +30,18 @@ import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.NumberPicker;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.herenow.fase1.CardData.CompanyData;
+import com.herenow.fase1.CardData.MenuSection;
 import com.herenow.fase1.R;
 import com.herenow.fase1.test.CustomExpandCard;
 import com.herenow.fase1.test.mMaterialLargeImageCardThumbnail;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -47,7 +53,7 @@ import it.gmariotti.cardslib.library.internal.Card;
 import it.gmariotti.cardslib.library.internal.ViewToClickToExpand;
 import util.myLog;
 
-public class RestaurantCard extends BaseMaterialCard {
+public class RestaurantCard extends BaseMaterialCard implements NumberPicker.OnValueChangeListener {
     private static int tableNumber = -1;
 //TODO use companycard with other buttons
     /**
@@ -88,6 +94,7 @@ public class RestaurantCard extends BaseMaterialCard {
         this(context, it.gmariotti.cardslib.library.cards.R.layout.native_material_largeimage_inner_base_main);
     }
 
+
     // -------------------------------------------------------------
     // Constructors
     // -------------------------------------------------------------
@@ -100,6 +107,7 @@ public class RestaurantCard extends BaseMaterialCard {
     public static SetupWizard with(Context context) {
         return new SetupWizard(context);
     }
+
 
     // -------------------------------------------------------------
     // Builder
@@ -303,6 +311,11 @@ public class RestaurantCard extends BaseMaterialCard {
         return view;
     }
 
+    @Override
+    public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
+
+    }
+
     public static interface DrawableExternal {
         void setupInnerViewElements(ViewGroup parent, View viewImage);
     }
@@ -488,14 +501,8 @@ public class RestaurantCard extends BaseMaterialCard {
 
         private void askTableNumberIfNeeded() {
             if (tableNumber == -1) {
-//                tableNumber = askTableNumberIfNeeded();
-//            Intent i = new Intent(this, TableNumberActivity.class);
-//            startActivityForResult(mContext,i,1);
-//            startActivityForResult(i, 1);
-                //TODo recover the number
-
+                showDialog();
             }
-            tableNumber=11;//TODO quitar
         }
 
         private void killBill() {
@@ -526,6 +533,32 @@ public class RestaurantCard extends BaseMaterialCard {
             }
         }
 
+        public void showDialog() {
+            final Dialog d = new Dialog(mContext);
+            d.setTitle("Table Number");
+            d.setContentView(R.layout.dialog);
+            Button btSet = (Button) d.findViewById(R.id.button1);
+//            Button bSet = (Button) d.findViewById(R.id.button2);
+            final NumberPicker np = (NumberPicker) d.findViewById(R.id.numberPicker1);
+            np.setMaxValue(25); // max value 100
+            np.setMinValue(1);   // min value 0
+            np.setWrapSelectorWheel(true);
+//            np.setOnValueChangedListener(this);
+            btSet.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    tableNumber = np.getValue();
+                    d.dismiss();
+                }
+            });
+//            bSet.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    d.dismiss(); // dismiss the dialog
+//                }
+//            });
+            d.show();
+        }
 
     }
 }

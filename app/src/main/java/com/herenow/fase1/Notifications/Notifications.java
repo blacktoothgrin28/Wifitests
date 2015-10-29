@@ -155,7 +155,7 @@ public abstract class Notifications {
                 .setSmallIcon(R.drawable.ic_stat_name_hn)
                 .setLargeIcon(we.getLogoRounded())
                 .setContentTitle(we.getName())
-                .setContentText(we.getMessage())
+                .setContentText(we.getType())
                 .setAutoCancel(true)
                 .setDefaults(Notification.DEFAULT_VIBRATE | Notification.DEFAULT_SOUND | Notification.FLAG_SHOW_LIGHTS)
                 .setLights(0xE6D820, 300, 100)
@@ -193,12 +193,20 @@ public abstract class Notifications {
             notif.addAction(getAppAction);
         }
 
+        //Call Waitress
+        if (we.getType().equals("restaurant")) {
+            //TODO replace
+            Intent connectToWifi = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=hola"));
+            PendingIntent pendingWIFIConnect = PendingIntent.getActivity(acti.getBaseContext(), 1, connectToWifi, PendingIntent.FLAG_UPDATE_CURRENT);
+
+            NotificationCompat.Action getAppAction = new NotificationCompat.Action(R.drawable.ic_waiter, "Waiter", pendingWIFIConnect);
+            notif.addAction(getAppAction);
+        }
+
         //WIFI APP button
         if (we.getName().startsWith("Conj")) {
-            Intent connectToWifi;
-
-            connectToWifi = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=hola"));//TODO connect..to wifi
-
+            //TODO replace, doesn't do anything
+            Intent connectToWifi = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=hola"));
             PendingIntent pendingWIFIConnect = PendingIntent.getActivity(acti.getBaseContext(), 1, connectToWifi, PendingIntent.FLAG_UPDATE_CURRENT);
 
             NotificationCompat.Action getAppAction = new NotificationCompat.Action(R.drawable.ic_wifi, "Connect", pendingWIFIConnect);

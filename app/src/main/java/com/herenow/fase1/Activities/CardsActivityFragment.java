@@ -25,6 +25,7 @@ import com.herenow.fase1.Cards.CompanyCard;
 import com.herenow.fase1.Cards.Components.CardHeaderCoupon;
 import com.herenow.fase1.Cards.Components.CardViewNative2;
 import com.herenow.fase1.Cards.DayMenuCard;
+import com.herenow.fase1.Cards.JobOffersCard;
 import com.herenow.fase1.Cards.LinkedinCard;
 import com.herenow.fase1.Cards.MenuCard;
 import com.herenow.fase1.Cards.NewsCard;
@@ -48,6 +49,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+
 import it.gmariotti.cardslib.library.internal.Card;
 import it.gmariotti.cardslib.library.internal.CardExpand;
 import it.gmariotti.cardslib.library.internal.CardHeader;
@@ -65,6 +67,7 @@ import static com.google.android.gms.internal.zzhl.runOnUiThread;
 public class CardsActivityFragment extends Fragment implements cardLoadedListener {
     AirportCard airportCard;
     ScheduleCard scheduleCard;
+    private JobOffersCard jobCard;
     MenuCard menuCard;
     DayMenuCard dayMenuCard;
     ChefCard chefCard;
@@ -73,6 +76,7 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
     private String url;
     private HashMap<String, Integer> hashTypes;
     private ScrollView mScrollView;
+
 
     public CardsActivityFragment() {
     }
@@ -168,6 +172,14 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
         scheduleCard.init();
 
         addCardToFragment(R.layout.native_cardwithlist_layout2, scheduleCard);
+    }
+
+    private void initJobCard() {
+        jobCard = new JobOffersCard(getActivity());
+        jobCard.setData(dataExamples.getExampleJobOffers());
+        jobCard.init();
+
+        addCardToFragment(R.layout.native_cardwithlist_layout2, jobCard);
     }
 
     private void initFoodMenuCard(FoodMenu foodMenu) {
@@ -374,6 +386,10 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
                         //SCHEDULE  TODO read the schedule from parse
                         if (hashTypes.containsKey("Schedule")) {
                             initScheduleCard();
+                        }
+                        //Job offer
+                        if (hashTypes.containsKey("Job")) {
+                            initJobCard();
                         }
 
                         //AIRPORT
