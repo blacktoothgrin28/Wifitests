@@ -1,8 +1,11 @@
 package com.herenow.fase1.Activities;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.speech.tts.TextToSpeech;
 import android.support.v7.app.ActionBarActivity;
 import android.text.method.ScrollingMovementMethod;
 import android.view.Menu;
@@ -28,6 +31,7 @@ import com.parse.ParseException;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -39,7 +43,7 @@ import util.parameters;
 import static util.myLog.WriteUnhandledErrors;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends ActionBarActivity implements TextToSpeech.OnInitListener {
 
     public static Position mPos; //WARN. Lo he hecho static para poder usarlo en SAPO
 
@@ -60,6 +64,7 @@ public class MainActivity extends ActionBarActivity {
     private Spinner spinner;
     private ArrayList<String> lista;
     private ArrayList<String> listaObj;
+    private TextToSpeech myTTS;
 
     /***
      * Write in the main activity
@@ -101,6 +106,9 @@ public class MainActivity extends ActionBarActivity {
 
         //PARSE
         ParseUserLogIn();
+
+        //speack
+        myTTS = new TextToSpeech(this, this);
     }
 
     private void initializeViews() {
@@ -281,10 +289,15 @@ public class MainActivity extends ActionBarActivity {
 
     }
 
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public void clickCards(View view) {
         //open the card activity
-        intentCards = new Intent(this, CardsActivityOld.class);
-        startActivity(intentCards);
+//        intentCards = new Intent(this, CardsActivityOld.class);
+//        startActivity(intentCards);
+
+        String s = "Por fin puedo bajar a comer. Menos mal que Milenko me trata muy bien. Os quiero mucho Amalia, Matías y Rebeca.";
+
+        myTTS.speak(s, TextToSpeech.QUEUE_FLUSH, null, "1");
     }
 
     public void clickAddWeacon(View view) {
@@ -317,6 +330,12 @@ public class MainActivity extends ActionBarActivity {
 
     public void onClickSubscribe(View view) {
         LogInManagement.subscribeAChannel("wifiUniqueName", this.getApplicationContext());
+    }
+
+    @Override
+    public void onInit(int status) {
+        myLog.add("+++speech inicializado");
+        myTTS.setLanguage(new Locale("es", "ES"));
     }
 
 //    class WifiReceiver extends BroadcastReceiver {

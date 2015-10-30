@@ -16,12 +16,13 @@ public class textToSpeech extends Activity implements TextToSpeech.OnInitListene
     private int MY_DATA_CHECK_CODE = 0;
     private TextToSpeech myTTS;
     private Context context;
+
 //http://code.tutsplus.com/tutorials/android-sdk-using-the-text-to-speech-engine--mobile-8540
 
 
     //speak the user text
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    private void speakWords(String speech) {
+    public void speakWords(String speech) {
 
         //speak straight away
 //        myTTS.speak(speech, TextToSpeech.QUEUE_FLUSH, null); //deprecated
