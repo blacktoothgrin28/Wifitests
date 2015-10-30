@@ -21,6 +21,7 @@ package com.herenow.fase1.Cards;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -31,17 +32,14 @@ import android.support.annotation.StringRes;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.NumberPicker;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.herenow.fase1.CardData.CompanyData;
-import com.herenow.fase1.CardData.MenuSection;
 import com.herenow.fase1.R;
 import com.herenow.fase1.test.CustomExpandCard;
 import com.herenow.fase1.test.mMaterialLargeImageCardThumbnail;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -55,6 +53,9 @@ import util.myLog;
 
 public class RestaurantCard extends BaseMaterialCard implements NumberPicker.OnValueChangeListener {
     private static int tableNumber = -1;
+
+    private enum restaurant_op {KILLBILL, CALLWAITER, CHECKPLEASE}
+
 //TODO use companycard with other buttons
     /**
      * Resource Drawable ID
@@ -316,11 +317,12 @@ public class RestaurantCard extends BaseMaterialCard implements NumberPicker.OnV
 
     }
 
+
     public static interface DrawableExternal {
         void setupInnerViewElements(ViewGroup parent, View viewImage);
     }
 
-    public static final class SetupWizard {
+    public static final class SetupWizard implements DialogInterface.OnDismissListener {
         private final Context mContext;
         @DrawableRes
         int mDrawableCardIcon;
@@ -341,6 +343,7 @@ public class RestaurantCard extends BaseMaterialCard implements NumberPicker.OnV
         private Bitmap mLogo;
         private Bitmap mMainImage;
         private String iconUrl;
+        private restaurant_op op;
 
 
         private SetupWizard(Context context) {
@@ -471,7 +474,7 @@ public class RestaurantCard extends BaseMaterialCard implements NumberPicker.OnV
             actionCallWaitress.setOnActionClickListener(new BaseSupplementalAction.OnActionClickListener() {
                 @Override
                 public void onClick(Card card, View view) {
-                    callWaitress();
+                    applyOperation(restaurant_op.CALLWAITER);
                 }
             });
             actions.add(actionCallWaitress);
@@ -481,7 +484,7 @@ public class RestaurantCard extends BaseMaterialCard implements NumberPicker.OnV
             actionCheckPlease.setOnActionClickListener(new BaseSupplementalAction.OnActionClickListener() {
                 @Override
                 public void onClick(Card card, View view) {
-                    checkPlease();
+                    applyOperation(restaurant_op.CHECKPLEASE);
                 }
             });
             actions.add(actionCheckPlease);
@@ -491,7 +494,7 @@ public class RestaurantCard extends BaseMaterialCard implements NumberPicker.OnV
             actionPay.setOnActionClickListener(new BaseSupplementalAction.OnActionClickListener() {
                 @Override
                 public void onClick(Card card, View view) {
-                    killBill();
+                    applyOperation(restaurant_op.KILLBILL);
                 }
             });
             actions.add(actionPay);
@@ -499,24 +502,38 @@ public class RestaurantCard extends BaseMaterialCard implements NumberPicker.OnV
             return actions;
         }
 
-        private void askTableNumberIfNeeded() {
+        private void applyOperation(restaurant_op op) {
             if (tableNumber == -1) {
-                showDialog();
+                askTableNumber();
+                this.op = op;
+            } else {
+                switch (op) {
+                    case CHECKPLEASE:
+                        checkPlease();
+                        break;
+                    case KILLBILL:
+                        killBill();
+                        break;
+                    case CALLWAITER:
+                        callWaitress();
+                        break;
+                }
             }
         }
 
+        private void askTableNumber() {
+            showDialog();
+        }
+
         private void killBill() {
-            askTableNumberIfNeeded();
             Toast.makeText(mContext, "Paying with paypal \nfor table " + tableNumber, Toast.LENGTH_SHORT).show();
         }
 
         private void checkPlease() {
-            askTableNumberIfNeeded();
             Toast.makeText(mContext, "Bringing the check \nfor table " + tableNumber, Toast.LENGTH_SHORT).show();
         }
 
         private void callWaitress() {
-            askTableNumberIfNeeded();
             Toast.makeText(mContext, "Calling waitress \nfor table " + tableNumber, Toast.LENGTH_SHORT).show();
         }
 
@@ -537,8 +554,9 @@ public class RestaurantCard extends BaseMaterialCard implements NumberPicker.OnV
             final Dialog d = new Dialog(mContext);
             d.setTitle("Table Number");
             d.setContentView(R.layout.dialog);
+            d.setOnDismissListener(this);
+
             Button btSet = (Button) d.findViewById(R.id.button1);
-//            Button bSet = (Button) d.findViewById(R.id.button2);
             final NumberPicker np = (NumberPicker) d.findViewById(R.id.numberPicker1);
             np.setMaxValue(25); // max value 100
             np.setMinValue(1);   // min value 0
@@ -549,6 +567,7 @@ public class RestaurantCard extends BaseMaterialCard implements NumberPicker.OnV
                 public void onClick(View v) {
                     tableNumber = np.getValue();
                     d.dismiss();
+
                 }
             });
 //            bSet.setOnClickListener(new View.OnClickListener() {
@@ -560,5 +579,9 @@ public class RestaurantCard extends BaseMaterialCard implements NumberPicker.OnV
             d.show();
         }
 
+        @Override
+        public void onDismiss(DialogInterface dialogInterface) {
+            applyOperation(this.op);
+        }
     }
 }
