@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.herenow.fase1" >
+    package="com.herenow.fase1">
 
     <permission
         android:name="com.herenow.fase1.permission.C2D_MESSAGE"
@@ -30,10 +30,10 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme">
         <activity
             android:name=".Activities.MainActivity"
-            android:label="@string/app_name" >
+            android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.net.wifi.SCAN_RESULTS" />
@@ -43,10 +43,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <service
+            android:name=".Activities.ConnectToWifi"
+            android:exported="false" />
+
         <activity
             android:name=".Activities.WeaconListActivity"
             android:label="@string/title_activity_weacon_list"
-            android:parentActivityName=".Activities.MainActivity" >
+            android:parentActivityName=".Activities.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".Activities.MainActivity" />
@@ -54,7 +58,7 @@
         <activity
             android:name=".Activities.CardsActivityOld"
             android:label="@string/title_activity_cards"
-            android:parentActivityName=".Activities.WeaconListActivity" >
+            android:parentActivityName=".Activities.WeaconListActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".Activities.MainActivity" />
@@ -64,7 +68,7 @@
             android:icon="@mipmap/ic_launcher"
             android:label="@string/title_activity_second"
             android:logo="@mipmap/ic_launcher"
-            android:parentActivityName=".Activities.WeaconListActivity" >
+            android:parentActivityName=".Activities.WeaconListActivity">
 
             <!-- Parent activity meta-data to support 4.0 and lower -->
             <meta-data
@@ -76,7 +80,7 @@
         <activity
             android:name=".Activities.SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:parentActivityName=".Activities.MainActivity" >
+            android:parentActivityName=".Activities.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".Activities.MainActivity" />
@@ -85,7 +89,7 @@
             android:name=".Activities.AddWeaconActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_add_weacon"
-            android:parentActivityName=".Activities.MainActivity" >
+            android:parentActivityName=".Activities.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".Activities.MainActivity" />
@@ -104,7 +108,7 @@
         <!-- PArse push staff -->
         <service android:name="com.parse.PushService" />
 
-        <receiver android:name="com.parse.ParseBroadcastReceiver" >
+        <receiver android:name="com.parse.ParseBroadcastReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.USER_PRESENT" />
@@ -112,7 +116,7 @@
         </receiver>
         <receiver
             android:name="com.parse.GcmBroadcastReceiver"
-            android:permission="com.google.android.c2dm.permission.SEND" >
+            android:permission="com.google.android.c2dm.permission.SEND">
               
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
@@ -123,7 +127,7 @@
         </receiver>
         <receiver
             android:name="com.parse.ParsePushBroadcastReceiver"
-            android:exported="false" >
+            android:exported="false">
             <intent-filter>
                 <action android:name="com.parse.push.intent.RECEIVE" />
                 <action android:name="com.parse.push.intent.OPEN" />
@@ -134,7 +138,7 @@
         <activity
             android:name=".Activities.CardsActivity"
             android:label="@string/title_activity_cards_activity_aer"
-            android:parentActivityName=".Activities.WeaconListActivity" >
+            android:parentActivityName=".Activities.WeaconListActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.herenow.fase1.Activities.WeaconListActivity" />

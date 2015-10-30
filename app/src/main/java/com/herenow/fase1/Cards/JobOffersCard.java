@@ -33,7 +33,7 @@ import util.myLog;
 public class JobOffersCard extends CardWithList {
 
     private JobData mJobData;
-    private int PICKFILE_RESULT_CODE=1;
+    private int PICKFILE_RESULT_CODE = 1;
 
     public JobOffersCard(Context context) {
         super(context);
@@ -68,6 +68,7 @@ public class JobOffersCard extends CardWithList {
         setOnSwipeListener(new OnSwipeListener() {
             @Override
             public void onSwipe(Card card) {
+
                 Toast.makeText(getContext(), "Swipe on " + card.getCardHeader().getTitle(), Toast.LENGTH_SHORT).show();
             }
         });
@@ -82,17 +83,27 @@ public class JobOffersCard extends CardWithList {
         List<ListObject> mObjects = new ArrayList<>();
 
         //Add an object to the list
-        for (JobData.JobOffer ji : mJobData.getItems()) {
+        for (final JobData.JobOffer ji : mJobData.getItems()) {
             final jobOfferObject so = new jobOfferObject(mParentCard, ji);
 
 
-//            //Example onSwipe
-//            so.setOnItemSwipeListener(new OnItemSwipeListener() {
-//                @Override
-//                public void onItemSwipe(ListObject object, boolean dismissRight) {
-//                    downloadPresentation(so);
-//                }
-//            });
+            //Example onSwipe
+            so.setOnItemSwipeListener(new OnItemSwipeListener() {
+                @Override
+                public void onItemSwipe(ListObject object, boolean dismissRight) {
+                    Intent whatsappIntent = new Intent(Intent.ACTION_SEND);
+                    whatsappIntent.setType("text/plain");
+                    whatsappIntent.setPackage("com.whatsapp");
+                    whatsappIntent.putExtra(Intent.EXTRA_TEXT, "You could be interested in this job at " + mJobData.Company + ": " +
+                            ji.title + " " + ji.getUrl());
+
+                    try {
+                        mContext.startActivity(whatsappIntent);
+                    } catch (android.content.ActivityNotFoundException ex) {
+                        Toast.makeText(mContext, "Whatsapp have not been installed.", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
 
 
             mObjects.add(so);

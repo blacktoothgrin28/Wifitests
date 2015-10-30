@@ -121,7 +121,7 @@ public class dataExamples {
     }
 
     public static JobData getExampleJobOffers() {
-        JobData jd = new JobData("Job Opportunities", "23th October 2015");
+        JobData jd = new JobData("Job Opportunities", "23th October 2015", "AIA");
 
         JobData.JobOffer j1 = new JobData.JobOfferBuilder().setTitle("Senior Data Scientist ")
                 .setDescription("Your role will be extract value to data through innovative Big Data/Data Science approaches in order to support our business processes and decision making.")

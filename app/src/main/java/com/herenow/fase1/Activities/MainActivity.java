@@ -1,11 +1,13 @@
 package com.herenow.fase1.Activities;
 
 import android.annotation.TargetApi;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.text.method.ScrollingMovementMethod;
 import android.view.Menu;
@@ -243,61 +245,15 @@ public class MainActivity extends ActionBarActivity implements TextToSpeech.OnIn
         return super.onOptionsItemSelected(item);
     }
 
-    /***
-     * Experimental: connect to a protected wifi
-     *
-     * @param view
-     */
-    public void clickConnect(View view) {
-
-        //This is for connecting programatelly
-//        String networkSSID = "piripiri";
-//        String networkPass = "spideyhg3711";
-//
-//        WifiConfiguration conf = new WifiConfiguration();
-//        conf.SSID = "\"" + networkSSID + "\"";
-//
-//        //WEP In case of WEP, if your password is in hex, you do not need to surround it with quotes.
-////        conf.wepKeys[0] = "\"" + networkPass + "\"";
-////        conf.wepTxKeyIndex = 0;
-////        conf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
-////        conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP40);
-//
-//        //WPA
-//        conf.preSharedKey = "\"" + networkPass + "\"";
-//
-//        //open
-////        conf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
-//
-//        WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-//        if (!wifiManager.isWifiEnabled()) {
-//            wifiManager.setWifiEnabled(true);
-//        }
-//        wifiManager.addNetwork(conf);
-//
-//        List<WifiConfiguration> list = wifiManager.getConfiguredNetworks();
-//
-//        for (WifiConfiguration i : list) {
-//            if (i.SSID != null && i.SSID.equals("\"" + networkSSID + "\"")) {
-//                wifiManager.disconnect();
-//                wifiManager.enableNetwork(i.networkId, true);
-//                wifiManager.reconnect();
-//
-//                break;
-//            }
-//        }
-
-    }
-
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public void clickCards(View view) {
         //open the card activity
-//        intentCards = new Intent(this, CardsActivityOld.class);
-//        startActivity(intentCards);
+        intentCards = new Intent(this, CardsActivityOld.class);
+        startActivity(intentCards);
 
-        String s = "Por fin puedo bajar a comer. Menos mal que Milenko me trata muy bien. Os quiero mucho Amalia, Matías y Rebeca.";
+//        String s = "Por fin puedo bajar a comer. Menos mal que Milenko me trata muy bien. Os quiero mucho Amalia, Matías y Rebeca.";
+//        myTTS.speak(s, TextToSpeech.QUEUE_FLUSH, null, "1");
 
-        myTTS.speak(s, TextToSpeech.QUEUE_FLUSH, null, "1");
     }
 
     public void clickAddWeacon(View view) {

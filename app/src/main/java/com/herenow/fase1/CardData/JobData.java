@@ -11,11 +11,13 @@ public class JobData {
     public String name;
     private String dateString;
     private ArrayList<JobOffer> mJobOffers;
+    public String Company;
 
-    public JobData(String name, String dateString) {
+    public JobData(String name, String dateString, String company) {
         this.dateString = dateString;
         mJobOffers = new ArrayList<>();
-        this.name=name;
+        this.name = name;
+        this.Company = company;
     }
 
     public String getDateString() {

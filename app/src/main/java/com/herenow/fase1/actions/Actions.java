@@ -1,10 +1,13 @@
 package com.herenow.fase1.actions;
 
+import android.app.Activity;
 import android.content.ContentProviderOperation;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.net.wifi.WifiConfiguration;
+import android.net.wifi.WifiManager;
 import android.provider.ContactsContract;
 import android.widget.Toast;
 
@@ -12,6 +15,7 @@ import com.herenow.fase1.CardData.CompanyData;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.util.List;
 
 import util.myLog;
 
@@ -169,6 +173,50 @@ public class Actions {
             }
         } catch (Exception e) {
             myLog.add("---eror adding contact: " + e.getMessage());
+        }
+
+    }
+
+    /***
+     * Experimental: connect to a protected wifi
+     *  @param networkSSID
+     * @param networkPass
+     * @param mContext
+     */
+    public static void ConnectToWifi(String networkSSID, String networkPass, Context mContext) {
+
+        myLog.add("en action connect to wifi");
+        WifiConfiguration conf = new WifiConfiguration();
+        conf.SSID = "\"" + networkSSID + "\"";
+
+        //WEP In case of WEP, if your password is in hex, you do not need to surround it with quotes.
+//        conf.wepKeys[0] = "\"" + networkPass + "\"";
+//        conf.wepTxKeyIndex = 0;
+//        conf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
+//        conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP40);
+
+        //WPA
+        conf.preSharedKey = "\"" + networkPass + "\"";
+
+        //open
+//        conf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
+
+        WifiManager wifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
+        if (!wifiManager.isWifiEnabled()) {
+            wifiManager.setWifiEnabled(true);
+        }
+        wifiManager.addNetwork(conf);
+
+        List<WifiConfiguration> list = wifiManager.getConfiguredNetworks();
+
+        for (WifiConfiguration i : list) {
+            if (i.SSID != null && i.SSID.equals("\"" + networkSSID + "\"")) {
+                wifiManager.disconnect();
+                wifiManager.enableNetwork(i.networkId, true);
+                wifiManager.reconnect();
+
+                break;
+            }
         }
 
     }

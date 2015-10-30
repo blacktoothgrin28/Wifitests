@@ -17,6 +17,7 @@ import android.support.v4.app.NotificationCompat;
 
 import com.herenow.fase1.Activities.BrowserActivity;
 import com.herenow.fase1.Activities.CardsActivity;
+import com.herenow.fase1.Activities.ConnectToWifi;
 import com.herenow.fase1.Activities.WeaconListActivity;
 import com.herenow.fase1.R;
 
@@ -206,8 +207,9 @@ public abstract class Notifications {
         //WIFI APP button
         if (we.getName().startsWith("Conj")) {
             //TODO replace, doesn't do anything
-            Intent connectToWifi = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=hola"));
-            PendingIntent pendingWIFIConnect = PendingIntent.getActivity(acti.getBaseContext(), 1, connectToWifi, PendingIntent.FLAG_UPDATE_CURRENT);
+//            Intent connectToWifi = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=hola"));
+            Intent connectToWifi = new Intent(acti, ConnectToWifi.class);
+            PendingIntent pendingWIFIConnect = PendingIntent.getService(acti.getBaseContext(), 1, connectToWifi, PendingIntent.FLAG_UPDATE_CURRENT);
 
             NotificationCompat.Action getAppAction = new NotificationCompat.Action(R.drawable.ic_wifi, "Connect", pendingWIFIConnect);
             notif.addAction(getAppAction);
