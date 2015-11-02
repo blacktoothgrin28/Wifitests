@@ -17,6 +17,9 @@
   -->
 
 <resources>
+    <color name="sinch_purple">#ff63029d</color>
+    <color name="off_white">#fffafafa</color>
+    <color name="dark_gray">#ffb3b3b3</color>
 
     <color name="demo_title_section_textcolor">#2a84a5</color>
 

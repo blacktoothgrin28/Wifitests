@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/card.native"
+    android:layout_width="match_parent"
+    android:layout_height="250dp"
+    android:orientation="vertical">
+
+
+    <!-- Card visible layout -->
+    <it.gmariotti.cardslib.library.view.ForegroundLinearLayout
+        android:id="@+id/card_main_layout"
+        style="@style/card.native.main_layout_foreground"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+
+        <!-- Compound view for Header Card
+             If you want to customize this element use attr card:card_header_layout_resourceID
+             You can also use your CardHeader subclass-->
+        <it.gmariotti.cardslib.library.view.component.CardHeaderView
+            android:id="@+id/card_header_layout"
+            style="@style/card.native.header_outer_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            card:card_header_layout_resourceID="@layout/native_base_header_layout" />
+
+
+        <!-- Main Content View -->
+        <!--<LinearLayout-->
+            <!--android:id="@+id/card_main_content_layout"-->
+            <!--style="@style/card.native.content_outer_layout"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="150dp"-->
+            <!--android:orientation="vertical">-->
+
+            <!--<EditText-->
+                <!--android:id="@+id/conversation"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="match_parent"-->
+                <!--android:layout_gravity="center_horizontal|top"-->
+                <!--android:background="#edc1c1"-->
+                <!--android:ems="10"-->
+                <!--android:inputType="textMultiLine" />-->
+
+            <!--<EditText-->
+                <!--android:id="@+id/editText2"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--/>-->
+
+        <!--</LinearLayout>-->
+        <RelativeLayout
+
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/card_main_content_layout">
+
+            <ListView
+                android:id="@+id/lstMessages"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_above="@+id/relSendMessage"
+                android:background="@drawable/bg_shadow"
+                android:divider="@null"
+                android:dividerHeight="0dp"
+                android:padding="0dip"
+                android:stackFromBottom="true"
+                android:transcriptMode="alwaysScroll"
+                tools:listitem="@layout/message_left" />
+
+
+            <RelativeLayout
+                android:id="@+id/relSendMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:layout_alignParentBottom="true"
+                android:background="@android:color/white"
+                android:paddingLeft="10dp">
+
+
+                <EditText
+                    android:id="@+id/txtTextBody"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_alignBottom="@+id/btnSend"
+                    android:layout_alignTop="@+id/btnSend"
+                    android:layout_marginBottom="-4dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_toLeftOf="@+id/btnSend"
+                    android:background="@android:color/white"
+                    android:hint="Message..."
+                    android:textColor="@color/dark_gray"
+                    android:textSize="14sp" />
+
+                <Button
+                    android:id="@+id/btnSend"
+                    android:layout_width="72dp"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentRight="true"
+                    android:layout_margin="4dp"
+                    android:background="@drawable/button_send" />
+            </RelativeLayout>
+
+
+        </RelativeLayout>
+
+    </it.gmariotti.cardslib.library.view.ForegroundLinearLayout>
+
+
+    <!-- Expand layout. You can customize this element with your CardExpand class -->
+    <FrameLayout
+        android:id="@+id/card_content_expand_layout"
+        style="@style/card.native.main_contentExpand"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+
+    </FrameLayout>
+
+
+</LinearLayout>
