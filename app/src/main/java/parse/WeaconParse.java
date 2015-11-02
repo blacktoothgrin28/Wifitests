@@ -200,7 +200,7 @@ public class WeaconParse extends ParseObject {
     }
 
     public boolean isAirport() {
-        return getType().equals("airport");
+        return getType().equals("AIRPORT");
     }
 
     public String getType() {

@@ -6,6 +6,9 @@ import com.herenow.fase1.CardData.DayFoodMenu;
 import com.herenow.fase1.CardData.FoodMenu;
 import com.herenow.fase1.CardData.JobData;
 import com.herenow.fase1.CardData.MenuSection;
+import com.herenow.fase1.CardData.ProductItem;
+import com.herenow.fase1.CardData.ProductItemBuilder;
+import com.herenow.fase1.CardData.ProductsData;
 import com.herenow.fase1.CardData.Schedule;
 import com.herenow.fase1.R;
 
@@ -118,6 +121,37 @@ public class dataExamples {
         ex.addItem("Next amazin events", "The Master", 17, 0, "Plenary Room", "http://www.aia.es");
 
         return ex;
+    }
+
+    public static ProductsData getExampleProducts() {
+        ProductsData productsData = new ProductsData("AIA");
+        ProductItem it = new ProductItemBuilder()
+                .setName("HELM-Flow")
+                .setDesription("HELM-Flow is a simulation and analysis tool for transmission and distribution that delivers fast, accurate workflow")
+                .setKeyWords("Software, Power Systems, Simulation.")
+                .setImageUrl("http://gridquant.com/assets/HELM_Flow-300x180.jpg")
+                .createProductItem();
+
+        ProductItem it2 = new ProductItemBuilder()
+                .setName("iTesla")
+                .setDesription("The iTesla project aims at improving network operations with a new security assessment tool able to cope with increasingly uncertain operating conditions and take advantage of the growing flexibility of the grid. ")
+                .setKeyWords("EU project, FP7, Power Grids.")
+                .setImageUrl("http://www.energyville.be/sites/default/files/styles/2mpact_detail/public/itesla_1.jpg")
+                .createProductItem();
+
+        ProductItem it3 = new ProductItemBuilder()
+                .setName("Big Data Banking")
+                .setDesription("The value of Big Data to the retail banking industry is estimated at more than £6 billion over the next five years. Immediate cost-reduction opportunities lie in fraud and sanctions management, while account management can be enhanced by enhanced customer insight.")
+                .setKeyWords("Consultancy, Big Data, Banking.")
+                .setImageUrl("http://41e67ca818dba1c3d3c5-369a671ebb934b49b239e372822005c5.r33.cf1.rackcdn.com/big-data-analytics-context-aware-security-landingPageImage-7-w-419.jpg")
+                .createProductItem();
+
+
+        productsData.addProduct(it);
+        productsData.addProduct(it2);
+        productsData.addProduct(it3);
+
+        return productsData;
     }
 
     public static JobData getExampleJobOffers() {

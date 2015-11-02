@@ -19,6 +19,7 @@ import com.herenow.fase1.CardData.ChefData;
 import com.herenow.fase1.CardData.CompanyData;
 import com.herenow.fase1.CardData.DayFoodMenu;
 import com.herenow.fase1.CardData.FoodMenu;
+import com.herenow.fase1.CardData.ProductsData;
 import com.herenow.fase1.Cards.AirportCard;
 import com.herenow.fase1.Cards.ChefCard;
 import com.herenow.fase1.Cards.CompanyCard;
@@ -29,6 +30,7 @@ import com.herenow.fase1.Cards.JobOffersCard;
 import com.herenow.fase1.Cards.LinkedinCard;
 import com.herenow.fase1.Cards.MenuCard;
 import com.herenow.fase1.Cards.NewsCard;
+import com.herenow.fase1.Cards.ProductsCard;
 import com.herenow.fase1.Cards.RestaurantCard;
 import com.herenow.fase1.Cards.RetailCard;
 import com.herenow.fase1.Cards.ScheduleCard;
@@ -67,11 +69,12 @@ import static com.google.android.gms.internal.zzhl.runOnUiThread;
 public class CardsActivityFragment extends Fragment implements cardLoadedListener {
     AirportCard airportCard;
     ScheduleCard scheduleCard;
-    private JobOffersCard jobCard;
+    JobOffersCard jobCard;
+    ProductsCard productCard;
     MenuCard menuCard;
     DayMenuCard dayMenuCard;
-    ChefCard chefCard;
 
+    ChefCard chefCard;
     private boolean injectJavaScript;
     private String url;
     private HashMap<String, Integer> hashTypes;
@@ -188,6 +191,14 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
         menuCard.init();
 
         addCardToFragment(R.layout.native_cardwithlist_layout2, menuCard);
+    }
+
+    private void initProductsCard(ProductsData productsData) {
+        productCard = new ProductsCard(getActivity());
+        productCard.setData(productsData);
+        productCard.init();
+
+        addCardToFragment(R.layout.native_cardwithlist_layout2, productCard);
     }
 
     private void initDayMenuCard(DayFoodMenu foodMenu) {
@@ -415,6 +426,11 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
                             initTripAdvisorCard(companyData.getTripAdvisorUrl());
                         }
 
+                        //PRODUCTS
+                        if (hashTypes.containsKey("Products")) {
+                            initProductsCard(dataExamples.getExampleProducts());
+                        }
+
                         //Coupon
                         if (hashTypes.containsKey("Coupon")) {
 //                            init_custom_card_expand_inside("http://vignette3.wikia.nocookie.net/inciclopedia/images/8/8a/Calamardo_Guapo.jpg", "");
@@ -443,7 +459,6 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
 
         } else {
             myLog.add("-__No tiene cardObjectId");
-
         }
     }
 
@@ -512,7 +527,7 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
 
                 rc.error(R.drawable.abc_ic_ab_back_mtrl_am_alpha)
                         .placeholder(R.mipmap.ic_launcher).
-                        fit().centerInside()
+                        fit().centerCrop()
                         .into(img);
             }
         }

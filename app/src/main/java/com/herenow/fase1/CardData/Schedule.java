@@ -53,7 +53,7 @@ public class Schedule {
     public class ScheduleItem {
         private final String place;
         private final String speaker;
-        public String url, description;//Todo add a desription to event
+        public String url, description;//Todo add a description to event
         String title, hour, urlImage;
         int h, min;
         private int position;

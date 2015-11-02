@@ -57,9 +57,6 @@ public class MainActivity extends ActionBarActivity implements TextToSpeech.OnIn
 
 
     private Intent intentCards;
-    private WifiUpdater wu;
-    private Timer t;
-    //    private Switch mySwitch;
     //Todo solve reporting time between scannings
     //Report on screen
     private Switch swDetection;// start or stot wifiservice detection
@@ -109,8 +106,12 @@ public class MainActivity extends ActionBarActivity implements TextToSpeech.OnIn
         //PARSE
         ParseUserLogIn();
 
-        //speack
-        myTTS = new TextToSpeech(this, this);
+        //speak
+//        myTTS = new TextToSpeech(this, this);
+
+        //TEST
+//   clickCards(null);
+
     }
 
     private void initializeViews() {
@@ -248,8 +249,11 @@ public class MainActivity extends ActionBarActivity implements TextToSpeech.OnIn
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public void clickCards(View view) {
         //open the card activity
-        intentCards = new Intent(this, CardsActivityOld.class);
-        startActivity(intentCards);
+//        intentCards = new Intent(this, CardsActivityOld.class);
+//        startActivity(intentCards);
+
+        Intent testIntentCards = new Intent(this, TestCardsActivity.class);
+        startActivity(testIntentCards);
 
 //        String s = "Por fin puedo bajar a comer. Menos mal que Milenko me trata muy bien. Os quiero mucho Amalia, Matías y Rebeca.";
 //        myTTS.speak(s, TextToSpeech.QUEUE_FLUSH, null, "1");

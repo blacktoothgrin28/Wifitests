@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+
+    <ScrollView
+        android:id="@+id/card_scrollview"
+        style="@style/carddemo_default_container_padding"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <!--TEST CARD1-->
+            <it.gmariotti.cardslib.library.view.CardViewNative
+                android:id="@+id/test_card1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="12dp"
+                android:layout_marginRight="12dp"
+                android:layout_marginTop="12dp"
+                card:card_layout_resourceID="@layout/native_cardwithlist_layout" />
+
+            <!-- Empty view-->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="15dp" />
+
+            <!--TEST CARD2-->
+            <it.gmariotti.cardslib.library.view.CardViewNative
+                android:id="@+id/test_card2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="12dp"
+                android:layout_marginRight="12dp"
+                android:layout_marginTop="12dp"
+                card:card_layout_resourceID="@layout/native_cardwithlist_layout" />
+
+            <!-- Empty view-->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="15dp" />
+
+            <!--TEST CARD3-->
+            <it.gmariotti.cardslib.library.view.CardViewNative
+                android:id="@+id/test_card3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="12dp"
+                android:layout_marginRight="12dp"
+                android:layout_marginTop="12dp"
+                card:card_layout_resourceID="@layout/native_cardwithlist_layout" />
+
+            <!-- Empty view-->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="15dp" />
+
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</LinearLayout>
