@@ -347,9 +347,8 @@ class ParseURL extends AsyncTask<String, Void, ArrayList<Noticia>> {
             myLog.add("Connected to [" + strings[0] + "]");
 //            String code = doc.select("script").get(9).html();//todo assure that is 9
 
-//            String mydata = "some string with 'the data i want' inside";
-
-            HashMap<String, Bitmap> tableImages = ObtainCodedImages(doc.select("script").get(9).html());
+            Elements script = doc.select("script");
+            HashMap<String, Bitmap> tableImages = ObtainCodedImages(script.get(8).html());
             myLog.add("news:la tablde de imagenes: " + tableImages.size());
             Element table = doc.select("ol[id=rso]").first();
             myLog.add("news: numero de elemnts: " + table.children().size());

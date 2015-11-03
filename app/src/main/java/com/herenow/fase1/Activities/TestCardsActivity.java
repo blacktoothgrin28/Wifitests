@@ -4,11 +4,13 @@ import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.widget.LinearLayout;
 
+import com.herenow.fase1.Cards.ChatCard;
 import com.herenow.fase1.Cards.ScheduleCard;
 import com.herenow.fase1.Cards.ScheduleCardTest;
 import com.herenow.fase1.R;
 
 import it.gmariotti.cardslib.library.internal.Card;
+import it.gmariotti.cardslib.library.internal.CardHeader;
 import it.gmariotti.cardslib.library.prototypes.LinearListView;
 import it.gmariotti.cardslib.library.view.CardViewNative;
 import util.dataExamples;
@@ -36,18 +38,25 @@ public class TestCardsActivity extends ActionBarActivity {
 //            myLog.add("problema horizontalizatnfo" + e.getLocalizedMessage());
 //        }
 
+        ChatCard chatCard = new ChatCard(this, R.layout.chat_card);
 
-        ScheduleCardTest card2 = new ScheduleCardTest(this, R.layout.inner_base_main_cardwithlist_horizontal);
-        card2.setData(dataExamples.getExampleScheduleData());
-        card2.init();
+        CardHeader cardHeader = new CardHeader(this);
+        cardHeader.setTitle("Chat with Creapolis");
 
-        cv2.setCard(card2);
-
-        ScheduleCardTest card1 = new ScheduleCardTest(this);
-        card1.setData(dataExamples.getExampleScheduleData());
-        card1.init();
-
-        cv1.setCard(card1);
+        chatCard.addCardHeader(cardHeader);
+        cv1.setCard(chatCard);
+//
+//        ScheduleCardTest card2 = new ScheduleCardTest(this, R.layout.inner_base_main_cardwithlist_horizontal);
+//        card2.setData(dataExamples.getExampleScheduleData());
+//        card2.init();
+//
+//        cv2.setCard(card2);
+//
+//        ScheduleCardTest card1 = new ScheduleCardTest(this);
+//        card1.setData(dataExamples.getExampleScheduleData());
+//        card1.init();
+//
+//        cv1.setCard(card1);
 
 
     }
