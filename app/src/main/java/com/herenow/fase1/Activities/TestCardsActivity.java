@@ -41,9 +41,10 @@ public class TestCardsActivity extends ActionBarActivity {
         ChatCard chatCard = new ChatCard(this, R.layout.chat_card);
 
         CardHeader cardHeader = new CardHeader(this);
-        cardHeader.setTitle("Chat with Creapolis");
-
+//        cardHeader.setTitle("Chat with Creapolis");
+//        cardHeader.setButtonOverflowVisible(false);
         chatCard.addCardHeader(cardHeader);
+//chatCard.setTitle("PUPA");
         cv1.setCard(chatCard);
 //
 //        ScheduleCardTest card2 = new ScheduleCardTest(this, R.layout.inner_base_main_cardwithlist_horizontal);
