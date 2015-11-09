@@ -18,14 +18,19 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import it.gmariotti.cardslib.library.internal.Card;
 import util.myLog;
+
+import static com.google.android.gms.internal.zzhl.runOnUiThread;
 
 /**
  * Created by Milenko on 02/11/2015.
  */
 public class ChatCard extends Card {
+    int iAns;
     EditText edt;
     private ListView list;
     private MessageAdapter mMessageAdapter;
@@ -36,16 +41,16 @@ public class ChatCard extends Card {
 
     public ChatCard(Context context, int innerLayout) {
         super(context, innerLayout);
-
+        iAns = 0;
     }
 
     @Override
     public void setupInnerViewElements(ViewGroup parent, View view) {
         super.setupInnerViewElements(parent, view);
 
-        Button btn=(Button) view.findViewById(R.id.btnSend);
+        Button btn = (Button) view.findViewById(R.id.btnSend);
         edt = (EditText) view.findViewById(R.id.txtTextBody);
-        list=(ListView)view.findViewById(R.id.lstMessages);
+        list = (ListView) view.findViewById(R.id.lstMessages);
 
         mMessageAdapter = new MessageAdapter((Activity) mContext);
         list.setAdapter(mMessageAdapter);
@@ -64,11 +69,43 @@ public class ChatCard extends Card {
     private void SendMessage(String s) {
         try {
             //TODO send mesage
-            Message msg=new MessageOut(s);
+            Message msg = new MessageOut(s, "Yo");
             mMessageAdapter.addMessage(msg, MessageAdapter.DIRECTION_OUTGOING);
+
+
+            //waits 3 secs and send answer
+            final Timer t = new Timer();
+            final ArrayList<String> answers = new ArrayList<>();
+            answers.add("Give me a second, I'm gonna check...");
+            answers.add("Goods news! Somebody returned a wallet to Reception.");
+
+            t.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    if (iAns == answers.size() - 1) {
+                        this.cancel();
+                    }
+                    Answering(answers);
+                    myLog.add("ians=" + iAns + "|answersize=" + answers.size());
+                }
+            }, 4000, 4000);
+
         } catch (Exception e) {
-            e.printStackTrace();
+            myLog.add("errer sending chat message");
         }
+    }
+
+    private void Answering(ArrayList<String> answers) {
+        final String msg = answers.get(iAns);
+        myLog.add("answering:" + msg + " " + iAns);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mMessageAdapter.addMessage(new MessageOut(msg, "Creapolis"), MessageAdapter.DIRECTION_INCOMING);
+                iAns++;
+            }
+        });
+
     }
 
     @Override
@@ -77,12 +114,13 @@ public class ChatCard extends Card {
     }
 
     private class MessageOut implements Message {
-        private String textBody;
+        private String textBody, senderId;
         private Date timestamp;
 
-        public MessageOut(String s) {
-            textBody=s;
-            timestamp=new java.util.Date();
+        public MessageOut(String s, String senderId) {
+            textBody = s;
+            this.senderId = senderId;
+            timestamp = new java.util.Date();
 
         }
 
@@ -94,8 +132,8 @@ public class ChatCard extends Card {
         @Override
         public Map<String, String> getHeaders() {
 
-            Map<String,String> map= new HashMap<>();
-            map.put("ii","oo");
+            Map<String, String> map = new HashMap<>();
+            map.put("ii", "oo");
             return null;
         }
 
@@ -106,7 +144,7 @@ public class ChatCard extends Card {
 
         @Override
         public List<String> getRecipientIds() {
- List<String>res= new ArrayList<>();
+            List<String> res = new ArrayList<>();
             res.add("pipi");
 
             return res;
@@ -114,7 +152,7 @@ public class ChatCard extends Card {
 
         @Override
         public String getSenderId() {
-            return "yo";
+            return senderId;
         }
 
         @Override

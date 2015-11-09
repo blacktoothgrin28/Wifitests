@@ -15,6 +15,7 @@ import com.herenow.fase1.Activities.cardLoadedListener;
 import com.herenow.fase1.CardData.TripData;
 import com.herenow.fase1.Cards.Components.CardHeader2;
 import com.herenow.fase1.R;
+import com.herenow.fase1.actions.Actions;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -76,6 +77,12 @@ public class TripAdvisorCard extends CardWithList implements OnTaskCompleted {
 
         setUseProgressBar(true);
 
+        setOnClickListener(new OnCardClickListener() {
+            @Override
+            public void onClick(Card card, View view) {
+                Actions.OpenWebPage(mContext, mTripUrl);
+            }
+        });
     }
 
     @Override

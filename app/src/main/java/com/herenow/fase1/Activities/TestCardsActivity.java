@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.widget.LinearLayout;
 
 import com.herenow.fase1.Cards.ChatCard;
+import com.herenow.fase1.Cards.Components.CardHeader2;
 import com.herenow.fase1.Cards.ScheduleCard;
 import com.herenow.fase1.Cards.ScheduleCardTest;
 import com.herenow.fase1.R;
@@ -41,7 +42,7 @@ public class TestCardsActivity extends ActionBarActivity {
         ChatCard chatCard = new ChatCard(this, R.layout.chat_card);
 
         CardHeader cardHeader = new CardHeader(this);
-//        cardHeader.setTitle("Chat with Creapolis");
+        cardHeader.setTitle("Chat with Creapolis");
 //        cardHeader.setButtonOverflowVisible(false);
         chatCard.addCardHeader(cardHeader);
 //chatCard.setTitle("PUPA");

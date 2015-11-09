@@ -21,6 +21,7 @@ import com.herenow.fase1.CardData.DayFoodMenu;
 import com.herenow.fase1.CardData.FoodMenu;
 import com.herenow.fase1.CardData.ProductsData;
 import com.herenow.fase1.Cards.AirportCard;
+import com.herenow.fase1.Cards.ChatCard;
 import com.herenow.fase1.Cards.ChefCard;
 import com.herenow.fase1.Cards.CompanyCard;
 import com.herenow.fase1.Cards.Components.CardHeaderCoupon;
@@ -73,12 +74,14 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
     ProductsCard productCard;
     MenuCard menuCard;
     DayMenuCard dayMenuCard;
-
+    ChatCard chatCard;
     ChefCard chefCard;
+
     private boolean injectJavaScript;
     private String url;
     private HashMap<String, Integer> hashTypes;
     private ScrollView mScrollView;
+
 
 
     public CardsActivityFragment() {
@@ -185,6 +188,16 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
         addCardToFragment(R.layout.native_cardwithlist_layout2, jobCard);
     }
 
+    private void initVerticalChat() {
+        myLog.add("INIT chat card");
+        chatCard = new ChatCard(getActivity(), R.layout.chat_card);
+//        jobCard.setData(dataExamples.getExampleJobOffers());
+        CardHeader cardHeader = new CardHeader(getActivity());
+        cardHeader.setTitle("Chat with Creapolis");
+        chatCard.addCardHeader(cardHeader);
+
+        addCardToFragment(R.layout.native_cardwithlist_layout, chatCard );
+    }
     private void initFoodMenuCard(FoodMenu foodMenu) {
         menuCard = new MenuCard(getActivity());
         menuCard.setData(foodMenu);
@@ -229,6 +242,7 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
         tripAdvisorCard.setListener(this);
         tripAdvisorCard.init();
     }
+
 
     private void initTwitterCard(String twitterUrl) {
         TwitterCard twitterCard = new TwitterCard(getActivity(), twitterUrl);
@@ -444,6 +458,10 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
                         //MAP CARD
                         if (hashTypes.containsKey("Map")) {
                             init_card_expand_inside(R.drawable.building_map, "Map of the building");
+                        }
+                        //CHAT VERTICAL
+                        if (hashTypes.containsKey("Chat")) {
+                            initVerticalChat();
                         }
                     } catch (Exception e) {
                         e.printStackTrace();

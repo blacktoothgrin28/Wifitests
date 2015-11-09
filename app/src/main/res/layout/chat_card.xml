@@ -20,63 +20,65 @@
         <!-- Compound view for Header Card
              If you want to customize this element use attr card:card_header_layout_resourceID
              You can also use your CardHeader subclass-->
-        <it.gmariotti.cardslib.library.view.component.CardHeaderView
-            android:id="@+id/card_header_layout"
-            style="@style/card.native.header_outer_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            card:card_header_layout_resourceID="@layout/native_base_header_layout" />
+        <!--<it.gmariotti.cardslib.library.view.component.CardHeaderView-->
+        <!--android:id="@+id/card_header_layout"-->
+        <!--style="@style/card.native.header_outer_layout"-->
+        <!--android:background="#e70b0b"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--card:card_header_layout_resourceID="@layout/native_base_header_layout_wo_buttons" />-->
 
 
         <!-- Main Content View -->
         <!--<LinearLayout-->
-            <!--android:id="@+id/card_main_content_layout"-->
-            <!--style="@style/card.native.content_outer_layout"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="150dp"-->
-            <!--android:orientation="vertical">-->
+        <!--android:id="@+id/card_main_content_layout"-->
+        <!--style="@style/card.native.content_outer_layout"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="150dp"-->
+        <!--android:orientation="vertical">-->
 
-            <!--<EditText-->
-                <!--android:id="@+id/conversation"-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="match_parent"-->
-                <!--android:layout_gravity="center_horizontal|top"-->
-                <!--android:background="#edc1c1"-->
-                <!--android:ems="10"-->
-                <!--android:inputType="textMultiLine" />-->
+        <!--<EditText-->
+        <!--android:id="@+id/conversation"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:layout_gravity="center_horizontal|top"-->
+        <!--android:background="#edc1c1"-->
+        <!--android:ems="10"-->
+        <!--android:inputType="textMultiLine" />-->
 
-            <!--<EditText-->
-                <!--android:id="@+id/editText2"-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--/>-->
+        <!--<EditText-->
+        <!--android:id="@+id/editText2"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--/>-->
 
         <!--</LinearLayout>-->
         <RelativeLayout
 
+            android:id="@+id/card_main_content_layout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/card_main_content_layout">
+            android:layout_height="match_parent">
 
             <ListView
                 android:id="@+id/lstMessages"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_above="@+id/relSendMessage"
-                android:background="@drawable/bg_shadow"
+                android:background="@color/chat_bg"
                 android:divider="@null"
                 android:dividerHeight="0dp"
                 android:padding="0dip"
                 android:stackFromBottom="true"
                 android:transcriptMode="alwaysScroll"
                 tools:listitem="@layout/message_left" />
-
+            <!--android:background="@drawable/bg_shadow"-->
 
             <RelativeLayout
                 android:id="@+id/relSendMessage"
                 android:layout_width="wrap_content"
                 android:layout_height="48dp"
                 android:layout_alignParentBottom="true"
+
                 android:background="@android:color/white"
                 android:paddingLeft="10dp">
 
