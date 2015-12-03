@@ -31,6 +31,7 @@ import com.herenow.fase1.Cards.JobOffersCard;
 import com.herenow.fase1.Cards.LinkedinCard;
 import com.herenow.fase1.Cards.MenuCard;
 import com.herenow.fase1.Cards.NewsCard;
+import com.herenow.fase1.Cards.ParadaCard;
 import com.herenow.fase1.Cards.ProductsCard;
 import com.herenow.fase1.Cards.RestaurantCard;
 import com.herenow.fase1.Cards.RetailCard;
@@ -58,6 +59,7 @@ import it.gmariotti.cardslib.library.internal.CardExpand;
 import it.gmariotti.cardslib.library.internal.CardHeader;
 import it.gmariotti.cardslib.library.internal.ViewToClickToExpand;
 import parse.ParseActions;
+import util.GPSCoordinates;
 import util.dataExamples;
 import util.myLog;
 import util.parameters;
@@ -76,6 +78,7 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
     DayMenuCard dayMenuCard;
     ChatCard chatCard;
     ChefCard chefCard;
+    ParadaCard paradaCard;
 
     private boolean injectJavaScript;
     private String url;
@@ -512,6 +515,16 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
     public void OnCardErrorLoadingData(Exception e) {
         myLog.add("error en onreading a card:" + e.getLocalizedMessage());
 
+    }
+
+    public void setParadaCoordinates(double wLat, double wLon) {
+        initParadaCard(new GPSCoordinates(wLat,wLon));
+    }
+
+    private void initParadaCard(GPSCoordinates gps) {
+                paradaCard = new ParadaCard(getActivity(), gps);
+        paradaCard.setLister(this);
+        paradaCard.init();
     }
 
     class CardExpandInside extends CardExpand {

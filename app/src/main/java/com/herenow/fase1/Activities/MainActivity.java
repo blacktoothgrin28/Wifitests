@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
@@ -23,6 +24,7 @@ import android.widget.Toast;
 
 import com.herenow.fase1.MyServices.WifiObserverService;
 import com.herenow.fase1.Notifications.Notifications;
+import com.herenow.fase1.Parada;
 import com.herenow.fase1.Position;
 import com.herenow.fase1.R;
 import com.herenow.fase1.Wifi.LocationAsker;
@@ -32,6 +34,15 @@ import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.jsoup.Connection;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Timer;
@@ -297,6 +308,25 @@ public class MainActivity extends ActionBarActivity implements TextToSpeech.OnIn
         myLog.add("+++speech inicializado");
         myTTS.setLanguage(new Locale("es", "ES"));
     }
+
+    /**
+     * Shows parada info in Sant Cugat
+     *
+     * @param view
+     */
+    public void onClickParada(View view) {
+        //1. get coordinates
+        (new LocationAsker()).DoSomethingWithPosition(new LocationCallback() {
+            @Override
+            public void LocationReceived(GPSCoordinates gps) {
+                //2. ask near stops, retrieve data and open activity
+//                (new readParada()).execute(new GPSCoordinates[]{gps});
+            }
+        }, this);
+
+    }
+
+
 
 //    class WifiReceiver extends BroadcastReceiver {
 //

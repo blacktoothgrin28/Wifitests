@@ -33,6 +33,8 @@ import it.gmariotti.cardslib.library.prototypes.LinearListView;
 import util.OnTaskCompleted;
 import util.myLog;
 
+import static util.stringUtils.TrimFirstWords;
+
 /**
  * Created by Milenko on 19/09/2015.
  */
@@ -218,19 +220,9 @@ public class TripAdvisorCard extends CardWithList implements OnTaskCompleted {
             return comments;
         }
 
-        private String TrimFirstWord(String s) {
-            int i = s.indexOf(" ");
-            return s.substring(i + 1);
-        }
 
-        private String TrimFirstWords(String s, int n) {
-            String sa = s;
-            for (int i = 0; i < n; i++) {
-                String sol = TrimFirstWord(sa);
-                sa = sol;
-            }
-            return sa;
-        }
+
+
 
         private CommentObject ProcessHtmlComment(Element element) {
             CommentObject comment = new CommentObject(mParentCard);

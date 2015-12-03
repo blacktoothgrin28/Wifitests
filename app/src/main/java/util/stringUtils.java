@@ -17,4 +17,18 @@ public class stringUtils {
 
         return sb.toString();
     }
+
+    public static  String TrimFirstWord(String s) {
+        int i = s.indexOf(" ");
+        return s.substring(i + 1);
+    }
+
+    public static  String TrimFirstWords(String s, int n) {
+        String sa = s;
+        for (int i = 0; i < n; i++) {
+            String sol = TrimFirstWord(sa);
+            sa = sol;
+        }
+        return sa;
+    }
 }

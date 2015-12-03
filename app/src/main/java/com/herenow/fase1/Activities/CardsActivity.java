@@ -25,6 +25,9 @@ public class CardsActivity extends ActionBarActivity {
 //            String wUrl = b.getString("wUrl");
             String wName = b.getString("wName");
             String wCompanyDataObId = b.getString("wComapanyDataObId");
+            double wLat = b.getDouble("wLatitude");
+            double wLon = b.getDouble("wLongitude");
+
             String[] wCards = b.getStringArray("wCards");
 
             setTitle(wName);
@@ -47,7 +50,8 @@ public class CardsActivity extends ActionBarActivity {
             CardsActivityFragment rf = (CardsActivityFragment) getSupportFragmentManager().findFragmentById(R.id.cards_fragment);
             if (rf != null) {
                 rf.setCardsType(wCards);
-                rf.setCardData(wCompanyDataObId, mTypeAirportCard);
+                if (wCompanyDataObId != null) rf.setCardData(wCompanyDataObId, mTypeAirportCard);
+                if (wLat != 0.0d) rf.setParadaCoordinates(wLat, wLon);
             }
 
         } catch (Exception e) {

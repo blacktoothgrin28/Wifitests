@@ -88,6 +88,26 @@
                 android:text="Subscribe"
                 android:visibility="visible" />
 
+            <Button
+                android:id="@+id/btParada"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal|bottom"
+                android:gravity="center"
+                android:onClick="onClickParada"
+                android:text="parada"
+                android:visibility="visible" />
+            <Button
+                android:id="@+id/btCapture"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal|bottom"
+                android:gravity="center"
+                android:onClick="onClickCapture"
+                android:text="Capture"
+                android:visibility="visible" />
         </LinearLayout>
 
         <LinearLayout
