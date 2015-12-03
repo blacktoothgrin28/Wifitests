@@ -81,7 +81,8 @@ public class ParadaCard extends CardWithList implements OnTaskCompleted {
     }
     @Override
     protected List<ListObject> initChildren() {
-        return mParadasToShow;
+//        return mParadasToShow;
+    return null;
     }
     //////////////
     public ParadaCard(Context context, int innerLayout) {
@@ -89,7 +90,7 @@ public class ParadaCard extends CardWithList implements OnTaskCompleted {
     }
 
     public void setData(ProductsData productsData) {
-        mProductData = productsData;
+//        mProductData = productsData;
     }
 
 
@@ -156,7 +157,7 @@ public class ParadaCard extends CardWithList implements OnTaskCompleted {
         try {
             myLog.add("ontaskcompleted:" + elements.size() + " paradas");
             //Select three news with exact name
-            mParadasToShow = elements;
+//            mParadasToShow = elements;
             super.init();
 
             listener.OnCardReady(this, R.layout.native_cardwithlist_layout2);

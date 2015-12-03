@@ -28,7 +28,7 @@ import com.herenow.fase1.Cards.Components.CardHeaderCoupon;
 import com.herenow.fase1.Cards.Components.CardViewNative2;
 import com.herenow.fase1.Cards.DayMenuCard;
 import com.herenow.fase1.Cards.JobOffersCard;
-import com.herenow.fase1.Cards.LinkedinCard;
+import com.herenow.fase1.Cards.Linkedin2;
 import com.herenow.fase1.Cards.MenuCard;
 import com.herenow.fase1.Cards.NewsCard;
 import com.herenow.fase1.Cards.ParadaCard;
@@ -84,7 +84,6 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
     private String url;
     private HashMap<String, Integer> hashTypes;
     private ScrollView mScrollView;
-
 
 
     public CardsActivityFragment() {
@@ -199,8 +198,9 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
         cardHeader.setTitle("Chat with Creapolis");
         chatCard.addCardHeader(cardHeader);
 
-        addCardToFragment(R.layout.native_cardwithlist_layout, chatCard );
+        addCardToFragment(R.layout.native_cardwithlist_layout, chatCard);
     }
+
     private void initFoodMenuCard(FoodMenu foodMenu) {
         menuCard = new MenuCard(getActivity());
         menuCard.setData(foodMenu);
@@ -234,10 +234,9 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
     }
 
     private void initLinkedinCard(String linkedinUrl) {
-        // todo change format of linkedin card
-        LinkedinCard linkedinCard = new LinkedinCard(getActivity(), linkedinUrl);
-        linkedinCard.setListener(this);
-        linkedinCard.init();
+        Linkedin2 linkedin2 = new Linkedin2(getActivity(), linkedinUrl, "Quien trabaja Aquí", R.layout.linkedin2_inner_main);
+        linkedin2.setListener(this);
+        linkedin2.init();
     }
 
     private void initTripAdvisorCard(String tripAdvisorUrl) {
@@ -518,12 +517,12 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
     }
 
     public void setParadaCoordinates(double wLat, double wLon) {
-        initParadaCard(new GPSCoordinates(wLat,wLon));
+        initParadaCard(new GPSCoordinates(wLat, wLon));
     }
 
     private void initParadaCard(GPSCoordinates gps) {
-                paradaCard = new ParadaCard(getActivity(), gps);
-        paradaCard.setLister(this);
+        paradaCard = new ParadaCard(getActivity(), gps);
+//        paradaCard.setListener(this);
         paradaCard.init();
     }
 
