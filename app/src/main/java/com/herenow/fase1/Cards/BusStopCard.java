@@ -23,6 +23,7 @@ import org.jsoup.nodes.Element;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import it.gmariotti.cardslib.library.internal.Card;
 import it.gmariotti.cardslib.library.prototypes.LinearListView;
@@ -55,13 +56,13 @@ public class BusStopCard extends FetchingCard {
                 parada.update();
                 paradasUpdated.add(parada);
             }
-
-//            paradasUpdated = ProcessJson(response.body());
-
+            myLog.add("todas las paradas updated");
         } catch (IOException e) {
             myLog.add("error en gettin data from url: " + e.getLocalizedMessage());
         } catch (JSONException e) {
             myLog.add("error2 en gettin data from url: " + e.getLocalizedMessage());
+        } catch (Exception e) {
+            myLog.add("error generico en extract object: " + e.getLocalizedMessage());
         }
         return paradasUpdated;
     }
@@ -97,8 +98,8 @@ public class BusStopCard extends FetchingCard {
             //Retrieve the values from the object
             BusStop busStop = (BusStop) object;
             address.setText(busStop.address);
-            id.setText("id:" +Integer.toString(busStop.id));
-            distance.setText(Double.toString(busStop.distance)+"km");
+            id.setText("id:" + Integer.toString(busStop.id));
+            distance.setText(Double.toString(busStop.distance) + "km");
             times.setText(busStop.TimesSummary());
 
             String url = busStop.getImageUrl();
@@ -118,6 +119,18 @@ public class BusStopCard extends FetchingCard {
     }
 
     class BusStop extends DefaultListObject {
+        @Override
+        public String toString() {
+            return "BusStop{" +
+                    "address='" + address + '\'' +
+                    ", reference='" + reference + '\'' +
+                    ", id=" + id +
+                    ", distance=" + distance +
+                    ", gps=" + gps +
+                    ", lineTimes=" + lineTimes +
+                    '}';
+        }
+
         public String address, reference;
         int id;
         double distance;
@@ -142,6 +155,24 @@ public class BusStopCard extends FetchingCard {
                 myLog.add("no se pudo tener una timeline");
             }
             return s2;
+        }
+
+        public String TimesSummarySorted() {
+            HashMap<String, ArrayList<LineTime>> tableLines = new HashMap<>();
+            ArrayList arr;
+            for (LineTime lineTime : lineTimes) {
+                String lc = lineTime.lineCode;
+                if (tableLines.containsKey(lc)) {
+                    arr = tableLines.get(lc);
+                    arr.add(lineTime);
+                    tableLines.put(lc, arr);
+                } else {
+                    arr = new ArrayList();
+                    arr.add(lineTime);
+                    tableLines.put(lc, arr);
+                }
+            }
+            //TODO recorrer la hash
         }
 
         private void init() {
@@ -179,7 +210,7 @@ public class BusStopCard extends FetchingCard {
         }
 
         public String getImageUrl() {
-            String s = "https://maps.googleapis.com/maps/api/streetview?size=200x100&location=" +
+            String s = "https://maps.googleapis.com/maps/api/streetview?size=640x480&location=" +
                     gps.getLatitude() + "," + gps.getLongitude() +
                     "&heading=151.78&pitch=-0.76&key=AIzaSyD_H8UMnok_oZIW19KLCCmGJoaKrWbUXi8";
             return s;
@@ -212,6 +243,7 @@ public class BusStopCard extends FetchingCard {
                     myLog.add(lineTime.toString());
                 }
             }
+            myLog.add("updated todas las lineas de la parada:" + this.id);
         }
     }
 
