@@ -21,6 +21,7 @@ import com.herenow.fase1.CardData.DayFoodMenu;
 import com.herenow.fase1.CardData.FoodMenu;
 import com.herenow.fase1.CardData.ProductsData;
 import com.herenow.fase1.Cards.AirportCard;
+import com.herenow.fase1.Cards.BusStopCard;
 import com.herenow.fase1.Cards.ChatCard;
 import com.herenow.fase1.Cards.ChefCard;
 import com.herenow.fase1.Cards.CompanyCard;
@@ -516,14 +517,11 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
 
     }
 
-    public void setParadaCoordinates(double wLat, double wLon) {
-        initParadaCard(new GPSCoordinates(wLat, wLon));
-    }
-
-    private void initParadaCard(GPSCoordinates gps) {
-        paradaCard = new ParadaCard(getActivity(), gps);
-//        paradaCard.setListener(this);
-        paradaCard.init();
+    public void launchBusCard(double wLat, double wLon) {
+        String urlGps = "http://www.santqbus.santcugat.cat/consultasae.php?x=" + wLat + "&y=" + wLon;
+        BusStopCard busStopCard = new BusStopCard(getActivity(), urlGps, "Paradas cercanas", R.layout.busstop_inner_main);
+        busStopCard.setListener(this);
+        busStopCard.init();
     }
 
     class CardExpandInside extends CardExpand {

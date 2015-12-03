@@ -89,7 +89,7 @@ public abstract class FetchingCard extends CardWithList implements OnTaskComplet
     }
 
     public void setListener(cardLoadedListener listener) {
-       myLog.add("setting listener on fechtinc card (card loaded)");
+      myLog.add("setting listener on fechtinc card (card loaded)");
         this.cardLoadedListener = listener;
     }
 

@@ -321,11 +321,18 @@ public class MainActivity extends ActionBarActivity implements TextToSpeech.OnIn
             public void LocationReceived(GPSCoordinates gps) {
                 //2. ask near stops, retrieve data and open activity
 //                (new readParada()).execute(new GPSCoordinates[]{gps});
+
+                Intent IntentCards = new Intent(getBaseContext(), CardsActivity.class);
+                IntentCards.putExtra("wLatitude", gps.getLatitude());
+                IntentCards.putExtra("wLongitude", gps.getLongitude());
+                IntentCards.putExtra("wCards", new String[]{"parada"});
+                startActivity(IntentCards);
+
+
             }
         }, this);
 
     }
-
 
 
 //    class WifiReceiver extends BroadcastReceiver {

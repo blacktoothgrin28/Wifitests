@@ -43,7 +43,7 @@ public class CardsActivity extends ActionBarActivity {
                     mTypeAirportCard = AirportCard.TypeOfCard.departure;
                 }
             } catch (Exception e) {
-                myLog.add("no hemos recibido en la card activiy el typo de carta");
+                myLog.add("no hemos recibido en la card activiy el typo de carta:"+e.getLocalizedMessage());
             }
 
             //Pass some data to the fragment:
@@ -51,13 +51,11 @@ public class CardsActivity extends ActionBarActivity {
             if (rf != null) {
                 rf.setCardsType(wCards);
                 if (wCompanyDataObId != null) rf.setCardData(wCompanyDataObId, mTypeAirportCard);
-                if (wLat != 0.0d) rf.setParadaCoordinates(wLat, wLon);
+                if (wLat != 0.0d) rf.launchBusCard(wLat, wLon);
             }
-
         } catch (Exception e) {
             myLog.add("elloooo" + e.getLocalizedMessage());
         }
-
     }
 
     @Override
