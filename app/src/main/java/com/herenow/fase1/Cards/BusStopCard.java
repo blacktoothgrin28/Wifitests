@@ -1,9 +1,9 @@
 package com.herenow.fase1.Cards;
 
 import android.content.Context;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.net.Uri;
+import android.content.IntentFilter;
+import android.net.wifi.ScanResult;
+import android.net.wifi.WifiManager;
 import android.support.annotation.LayoutRes;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,19 +11,19 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.herenow.fase1.Parada;
 import com.herenow.fase1.R;
+import com.herenow.fase1.Wifi.preguntaWifi;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
-import org.jsoup.nodes.Element;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import it.gmariotti.cardslib.library.internal.Card;
 import it.gmariotti.cardslib.library.prototypes.LinearListView;
@@ -33,7 +33,9 @@ import util.myLog;
 /**
  * Created by Milenko on 03/12/2015.
  */
-public class BusStopCard extends FetchingCard {
+public class BusStopCard extends FetchingCard implements preguntaWifi {
+    private WifiManager wifi;
+
     public BusStopCard(Context context, String url, String title, @LayoutRes int innerLayout) {
         super(context, url, title, innerLayout);
     }
@@ -75,6 +77,7 @@ public class BusStopCard extends FetchingCard {
             if (parte.length() > 3) {
                 BusStop busStop = new BusStop(this);
                 busStop.setData(new JSONObject("{" + parte + "}"));
+                busStop.setObjectId(Integer.toString(busStop.id));
                 arr.add(busStop);
                 myLog.add(busStop.toString());
                 if (arr.size() == 5) break;
@@ -100,7 +103,7 @@ public class BusStopCard extends FetchingCard {
             address.setText(busStop.address);
             id.setText("id:" + Integer.toString(busStop.id));
             distance.setText(Double.toString(busStop.distance) + "km");
-            times.setText(busStop.TimesSummary());
+            times.setText(busStop.TimesSummary() + "\n" + busStop.TimesSummarySorted());
 
             String url = busStop.getImageUrl();
 
@@ -118,7 +121,24 @@ public class BusStopCard extends FetchingCard {
         return convertView;
     }
 
+
+    @Override
+    public void OnReceiveWifis(List<ScanResult> sr) {
+        myLog.add("se han detecetado las wifis");
+    }
+
+    @Override
+    public void noWifiDetected() {
+        myLog.add("no wifi detected");
+    }
+
     class BusStop extends DefaultListObject {
+        public String address, reference;
+        int id;
+        double distance;
+        GPSCoordinates gps;
+        private ArrayList<LineTime> lineTimes;
+
         @Override
         public String toString() {
             return "BusStop{" +
@@ -130,12 +150,6 @@ public class BusStopCard extends FetchingCard {
                     ", lineTimes=" + lineTimes +
                     '}';
         }
-
-        public String address, reference;
-        int id;
-        double distance;
-        GPSCoordinates gps;
-        private ArrayList<LineTime> lineTimes;
 
         public BusStop(Card parentCard) {
             super(parentCard);
@@ -158,21 +172,42 @@ public class BusStopCard extends FetchingCard {
         }
 
         public String TimesSummarySorted() {
-            HashMap<String, ArrayList<LineTime>> tableLines = new HashMap<>();
-            ArrayList arr;
-            for (LineTime lineTime : lineTimes) {
-                String lc = lineTime.lineCode;
-                if (tableLines.containsKey(lc)) {
-                    arr = tableLines.get(lc);
-                    arr.add(lineTime);
-                    tableLines.put(lc, arr);
-                } else {
-                    arr = new ArrayList();
-                    arr.add(lineTime);
-                    tableLines.put(lc, arr);
+            String substring = "";
+            try {
+                HashMap<String, ArrayList<LineTime>> tableLines = new HashMap<>();
+                ArrayList arr;
+                for (LineTime lineTime : lineTimes) {
+                    String lc = lineTime.lineCode;
+                    if (tableLines.containsKey(lc)) {
+                        arr = tableLines.get(lc);
+                        arr.add(lineTime);
+                        tableLines.put(lc, arr);
+                    } else {
+                        arr = new ArrayList();
+                        arr.add(lineTime);
+                        tableLines.put(lc, arr);
+                    }
                 }
+                Iterable<String> pp = tableLines.keySet();
+                StringBuilder sb = new StringBuilder();
+                for (String name : tableLines.keySet()) {
+                    sb.append(summaryLineTimes(name, tableLines.get(name)) + "\n");
+                }
+                String s = sb.toString();
+                substring = s.substring(0, s.length() - 2);
+            } catch (Exception e) {
+                myLog.add("error mostrando resumen ordenado de timeline");
             }
-            //TODO recorrer la hash
+            return substring;
+        }
+
+        private String summaryLineTimes(String name, ArrayList<LineTime> lineTimes) {
+            StringBuilder sb = new StringBuilder(name + ": ");
+            for (LineTime lineTime : lineTimes) {
+                sb.append(lineTime.roundedTime + ", ");
+            }
+            String s = sb.toString();
+            return s.substring(0, s.length() - 2) + ".";
         }
 
         private void init() {
@@ -180,10 +215,10 @@ public class BusStopCard extends FetchingCard {
             setOnItemClickListener(new OnItemClickListener() {
                 @Override
                 public void onItemClick(LinearListView parent, View view, int position, ListObject object) {
-                    Toast.makeText(getContext(), "Click on " + getObjectId(), Toast.LENGTH_SHORT).show();
-
-                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(getObjectId()));
-                    mContext.startActivity(browserIntent);
+                    Toast.makeText(getContext(), "Clicked on " + getObjectId(), Toast.LENGTH_SHORT).show();
+                    SaveWifis(getObjectId());
+//                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(getObjectId()));
+//                    mContext.startActivity(browserIntent);
                 }
             });
 
@@ -210,7 +245,7 @@ public class BusStopCard extends FetchingCard {
         }
 
         public String getImageUrl() {
-            String s = "https://maps.googleapis.com/maps/api/streetview?size=640x480&location=" +
+            String s = "https://maps.googleapis.com/maps/api/streetview?size=640x350&location=" +
                     gps.getLatitude() + "," + gps.getLongitude() +
                     "&heading=151.78&pitch=-0.76&key=AIzaSyD_H8UMnok_oZIW19KLCCmGJoaKrWbUXi8";
             return s;
@@ -247,6 +282,7 @@ public class BusStopCard extends FetchingCard {
         }
     }
 
+
     class LineTime {
         int arrivalTime;
         String lineCode;
@@ -271,8 +307,6 @@ public class BusStopCard extends FetchingCard {
         }
 
         public String summary() {
-//TO DO juntar lo de la misma linea en un a linea
-
             return lineCode + ": " + roundedTime;
         }
     }
