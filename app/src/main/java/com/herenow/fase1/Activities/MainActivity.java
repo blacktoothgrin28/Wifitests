@@ -209,6 +209,7 @@ public class MainActivity extends ActionBarActivity implements TextToSpeech.OnIn
         (new LocationAsker()).DoSomethingWithPosition(new LocationCallback() {
             @Override
             public void LocationReceived(GPSCoordinates gps) {
+                if(gps==null)gps=new GPSCoordinates(41.474722,                2.086667);
                 ParseActions.getSpots(bLocal, radio, gps, getApplicationContext());
             }
         }, this);

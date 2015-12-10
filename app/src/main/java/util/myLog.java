@@ -39,7 +39,6 @@ public class myLog {
         try {
             MainActivity.writeOnScreen(text);
         } catch (Exception e) {
-
         }
         add(text, "mhp");
     }

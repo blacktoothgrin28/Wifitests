@@ -115,7 +115,7 @@ public abstract class ParseActions {
             public void done(List<WifiSpot> spots, ParseException e) {
                 if (e == null) {
                     int n = spots.size();
-                    LogInManagement.ReportDetectedSpots(spots,mContext);
+                    LogInManagement.ReportDetectedSpots(spots, mContext);
                     if (n == 0) {
                         myLog.add("MegaQuery no match", "WE");
                     } else { //There are matches
@@ -251,10 +251,10 @@ public abstract class ParseActions {
                         WeaconParse we = spots.get(0).getWeacon();
                         Notifications.sendNotification(we);
                     } catch (Exception e1) {
-                        myLog.add("error waiting for launcihgn weacon"+e1);
+                        myLog.add("error waiting for launcihgn weacon" + e1);
                     }
-                }else{
-                    myLog.add("***ERROR PARSE FORCESD  error waiting for launcihgn weacon"+e);
+                } else {
+                    myLog.add("***ERROR PARSE FORCESD  error waiting for launcihgn weacon" + e);
 
                 }
             }
