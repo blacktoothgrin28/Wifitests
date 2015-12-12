@@ -18,10 +18,12 @@ import util.myLog;
 public class WifiAsker {
     private final preguntaWifi mListener;
     private final WifiReceiver receiver;
+    private final Context mContext;
     private WifiManager wifi;
 
-    public WifiAsker(preguntaWifi listener, Context context) {
+    public WifiAsker(Context context, preguntaWifi listener) {
         mListener = listener;
+        mContext = context;
 
         //la busqueda y la escucha está en el mismo contexto
         wifi = (WifiManager) context.getSystemService(context.WIFI_SERVICE);
@@ -55,6 +57,7 @@ public class WifiAsker {
             } else {
                 myLog.add("Entering in a different state of network: " + action, "CON");
             }
+            mContext.unregisterReceiver(receiver);
         }
     }
 }

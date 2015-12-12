@@ -51,9 +51,6 @@ public class CardsActivity extends ActionBarActivity {
             if (rf != null) {
                 rf.setCardsType(wCards);
                 if (wCompanyDataObId != null) rf.setCardData(wCompanyDataObId, mTypeAirportCard);
-                wLat=41.474722;
-                wLon=2.086667;
-                myLog.add("addin false position");
                 if (wLat != 0.0d) rf.launchBusCard(wLat, wLon);
             }
         } catch (Exception e) {

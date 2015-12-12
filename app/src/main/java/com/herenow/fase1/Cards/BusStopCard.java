@@ -12,6 +12,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.herenow.fase1.R;
+import com.herenow.fase1.Wifi.WifiAsker;
 import com.herenow.fase1.Wifi.preguntaWifi;
 import com.squareup.picasso.Picasso;
 
@@ -103,7 +104,8 @@ public class BusStopCard extends FetchingCard implements preguntaWifi {
             address.setText(busStop.address);
             id.setText("id:" + Integer.toString(busStop.id));
             distance.setText(Double.toString(busStop.distance) + "km");
-            times.setText(busStop.TimesSummary() + "\n" + busStop.TimesSummarySorted());
+//            times.setText(busStop.TimesSummary() + "\n" + busStop.TimesSummarySorted());
+            times.setText(busStop.TimesSummarySorted());
 
             String url = busStop.getImageUrl();
 
@@ -156,26 +158,33 @@ public class BusStopCard extends FetchingCard implements preguntaWifi {
             init();
         }
 
-        public String TimesSummary() {
-            StringBuilder sb = new StringBuilder();
-            String s2 = "No info ";
-            try {
-                for (LineTime lineTime : lineTimes) {
-                    sb.append(lineTime.summary() + "\n");
-                }
-                String s = sb.toString();
-                s2 = s.substring(0, s.length() - 1);
-            } catch (Exception e) {
-                myLog.add("no se pudo tener una timeline");
-            }
-            return s2;
-        }
+//        public String TimesSummary() {
+//            StringBuilder sb = new StringBuilder();
+//            String s2 = "No info ";
+//            try {
+//                for (LineTime lineTime : lineTimes) {
+//                    sb.append(lineTime.summary() + "\n");
+//                }
+//                String s = sb.toString();
+//                s2 = s.substring(0, s.length() - 1);
+//            } catch (Exception e) {
+//                myLog.add("no se pudo tener una timeline");
+//            }
+//            return s2;
+//        }
 
+        /**
+         *  reformat the times as
+         *  L1: 3 min, 4 min, 50 min.
+         *  L9: 6min, 72 min.
+         * @return
+         */
         public String TimesSummarySorted() {
-            String substring = "";
+            String substring = "No info";
             try {
                 HashMap<String, ArrayList<LineTime>> tableLines = new HashMap<>();
                 ArrayList arr;
+                //a
                 for (LineTime lineTime : lineTimes) {
                     String lc = lineTime.lineCode;
                     if (tableLines.containsKey(lc)) {
@@ -188,7 +197,7 @@ public class BusStopCard extends FetchingCard implements preguntaWifi {
                         tableLines.put(lc, arr);
                     }
                 }
-                Iterable<String> pp = tableLines.keySet();
+
                 StringBuilder sb = new StringBuilder();
                 for (String name : tableLines.keySet()) {
                     sb.append(summaryLineTimes(name, tableLines.get(name)) + "\n");
@@ -207,7 +216,7 @@ public class BusStopCard extends FetchingCard implements preguntaWifi {
                 sb.append(lineTime.roundedTime + ", ");
             }
             String s = sb.toString();
-            return s.substring(0, s.length() - 2) + ".";
+            return (s.substring(0, s.length() - 2) + ".");
         }
 
         private void init() {
@@ -216,7 +225,22 @@ public class BusStopCard extends FetchingCard implements preguntaWifi {
                 @Override
                 public void onItemClick(LinearListView parent, View view, int position, ListObject object) {
                     Toast.makeText(getContext(), "Clicked on " + getObjectId(), Toast.LENGTH_SHORT).show();
-                    SaveWifis(getObjectId());
+
+                    new WifiAsker(mContext, new preguntaWifi() {
+                        @Override
+                        public void OnReceiveWifis(List<ScanResult> sr) {
+                            Toast.makeText(mContext, "recibidos " + sr.size() + "wifis", Toast.LENGTH_SHORT).show();
+                            myLog.add("recibidos los wifis forzados");
+                            uploadWifis(getObjectId(),sr);
+                        }
+
+                        @Override
+                        public void noWifiDetected() {
+                            myLog.add("error recibiendo los sopotsde manera forzasa");
+                        }
+                    });
+
+//                    SaveWifis(getObjectId());
 //                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(getObjectId()));
 //                    mContext.startActivity(browserIntent);
                 }
@@ -229,6 +253,10 @@ public class BusStopCard extends FetchingCard implements preguntaWifi {
                     Toast.makeText(getContext(), "Swipe on " + object.getObjectId(), Toast.LENGTH_SHORT).show();
                 }
             });
+        }
+
+        private void uploadWifis(String busStopId, List<ScanResult> sr) {
+            
         }
 
         public void setData(JSONObject json) {
@@ -281,7 +309,6 @@ public class BusStopCard extends FetchingCard implements preguntaWifi {
             myLog.add("updated todas las lineas de la parada:" + this.id);
         }
     }
-
 
     class LineTime {
         int arrivalTime;

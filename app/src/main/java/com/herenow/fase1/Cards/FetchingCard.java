@@ -19,7 +19,6 @@ import util.myLog;
 /**
  * Created by Milenko on 19/09/2015.
  */
-//inspired in Linkedin Card
 
 public abstract class FetchingCard extends CardWithList implements OnTaskCompleted {
 
@@ -34,7 +33,6 @@ public abstract class FetchingCard extends CardWithList implements OnTaskComplet
         mTitle = title;
         myInnerLayout = innerLayout;
     }
-
 
     @Override
     protected CardHeader initCardHeader() {
@@ -68,7 +66,6 @@ public abstract class FetchingCard extends CardWithList implements OnTaskComplet
         return mElementsToShow;
     }
 
-
     @Override
     public int getChildLayoutId() {
         return myInnerLayout;
@@ -83,13 +80,13 @@ public abstract class FetchingCard extends CardWithList implements OnTaskComplet
 
             cardLoadedListener.OnCardReady(this, R.layout.native_cardwithlist_layout2);
         } catch (Exception e) {
-            myLog.add("---errorr en ontraskcompleted fetching "+ e.getLocalizedMessage());
+            myLog.add("---errorr en ontraskcompleted fetching " + e.getLocalizedMessage());
             cardLoadedListener.OnCardErrorLoadingData(e);
         }
     }
 
     public void setListener(cardLoadedListener listener) {
-      myLog.add("setting listener on fechtinc card (card loaded)");
+        myLog.add("setting listener on fechtinc card (card loaded)");
         this.cardLoadedListener = listener;
     }
 
@@ -98,12 +95,6 @@ public abstract class FetchingCard extends CardWithList implements OnTaskComplet
         myLog.add("usando la verison antigua de Extraction");
         return null;
     }
-
-//    protected DefaultListObject ProcessHtmlEmployee(Element element) {
-//        myLog.add("usando la verison antigua de process");
-//        return null;
-//    }
-
 
     class FetchUrl extends AsyncTask<String, Void, ArrayList<DefaultListObject>> {
         private OnTaskCompleted onTaskCompletedListener;
