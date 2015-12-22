@@ -10,6 +10,8 @@ import com.herenow.fase1.Notifications.Notifications;
 import com.herenow.fase1.Wifi.LogInManagement;
 import com.parse.DeleteCallback;
 import com.parse.FindCallback;
+import com.parse.GetCallback;
+import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
@@ -18,6 +20,7 @@ import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import util.GPSCoordinates;
@@ -31,6 +34,108 @@ public abstract class ParseActions {
 
     private static Context mContext;
 
+
+    /**
+     * create in parse the SSID not already created, an assign the weacon of the bustop.
+     * Also register the intensities
+     *
+     * @param paradaId
+     * @param sr
+     */
+    public static void assignSpotsToWeacon(final String paradaId, final List<ScanResult> sr, final GPSCoordinates gps) {
+        final ArrayList<String> macs = new ArrayList<>();
+        for (ScanResult r : sr) {
+            macs.add(r.BSSID);
+        }
+
+        ParseQuery<WeaconParse> query = ParseQuery.getQuery(WeaconParse.class);
+        query.whereEqualTo("paradaId", paradaId);
+        query.getFirstInBackground(new GetCallback<WeaconParse>() {
+            @Override
+            public void done(WeaconParse weaconParse, ParseException e) {
+                if (e == null) {
+                    final String weParadaId = weaconParse.getObjectId();
+
+                    // Create only the new ones
+                    ParseQuery<WifiSpot> query = ParseQuery.getQuery(WifiSpot.class);
+                    query.whereContainedIn("bssid", macs);
+                    query.findInBackground(new FindCallback<WifiSpot>() {
+                        @Override
+                        public void done(List<WifiSpot> list, ParseException e) {
+                            List<String> created = new ArrayList<>();
+                            final ArrayList<WifiSpot> newOnes = new ArrayList<>();
+
+                            if (e == null) {
+                                myLog.add("Detected: " + sr.size() + " alread created: " + list.size());
+                                for (WifiSpot ws : list) {
+                                    created.add(ws.getBSSID());
+                                }
+
+                                final WeaconParse we = (WeaconParse) ParseObject.createWithoutData("Weacon", weParadaId);
+                                for (ScanResult r : sr) {
+                                    if (!created.contains(r.BSSID)) {
+                                        WifiSpot ws = new WifiSpot(r.SSID, r.BSSID, we, gps.getLatitude(), gps.getLongitude());
+                                        newOnes.add(ws);
+                                    }
+                                }
+
+                                //Upload batch
+                                WifiSpot.saveAllInBackground(newOnes, new SaveCallback() {
+                                    @Override
+                                    public void done(ParseException e) {
+                                        if (e == null) {
+                                            myLog.add("subidos varios wifispots " + newOnes.size());
+
+                                            //create the weMeasured
+                                            final ParseObject weMeasured = ParseObject.create("WeMeasured");
+                                            weMeasured.put("weacon", we);
+                                            weMeasured.saveInBackground(new SaveCallback() {
+                                                @Override
+                                                public void done(ParseException e) {
+                                                    if (e == null) {
+                                                        final ArrayList<ParseObject> intiensities = new ArrayList<ParseObject>();
+                                                        for (ScanResult r : sr) {
+                                                            ParseObject intensity = ParseObject.create("Intensities");
+                                                            intensity.put("level", r.level);
+                                                            intensity.put("weMeasured", weMeasured);
+                                                            intensity.put("ssid", r.SSID);
+                                                            intensity.put("bssid", r.BSSID);
+                                                            intiensities.add(intensity);
+                                                        }
+                                                        ParseObject.saveAllInBackground(intiensities, new SaveCallback() {
+                                                            @Override
+                                                            public void done(ParseException e) {
+                                                                if (e == null) {
+                                                                    myLog.add("saved several intensities " + intiensities.size());
+                                                                } else {
+                                                                    myLog.add("---error in saving inteisintes " + e.getLocalizedMessage());
+                                                                }
+                                                            }
+                                                        });
+                                                    } else {
+                                                        myLog.add("error in creating we measured " + e.getLocalizedMessage());
+                                                    }
+                                                }
+                                            });
+
+                                        } else {
+                                            myLog.add("error al subir varios wifispots " + e.getLocalizedMessage());
+                                        }
+                                    }
+                                });
+                            } else {
+                                myLog.add("errro getting bssids from parse " + e.getLocalizedMessage());
+                            }
+                        }
+                    });
+                } else {
+                    myLog.add("...error getting the id of busstp " + e.getLocalizedMessage());
+                }
+            }
+        });
+
+    }
+
     /***
      * get wifispots from parse in a area and pin them the object includes the weacon
      *
@@ -39,6 +144,7 @@ public abstract class ParseActions {
      * @param center  center of queried area
      * @param context
      */
+
     public static void getSpots(final boolean bLocal, final double radio, final GPSCoordinates center, final Context context) {
         try {
             mContext = context;
@@ -93,6 +199,10 @@ public abstract class ParseActions {
 
     public static void CheckSpotMatches(final List<ScanResult> sr, ArrayList<String> bssids, ArrayList<String> ssids) {
 
+        //one weacon can have many ssids, that could trigger at same time; this is for avoiding it
+        final ArrayList<String> uniqueWeacons = new ArrayList();
+
+
         //Query BSSID
         ParseQuery<WifiSpot> qb = ParseQuery.getQuery(WifiSpot.class);
         qb.whereContainedIn("bssid", bssids);
@@ -127,6 +237,11 @@ public abstract class ParseActions {
                             sb.append(spot.toString() + "\n");
                             registerHitSSID(spot);
                             WeaconParse we = spot.getWeacon();
+                            if (uniqueWeacons.contains(we.getObjectId())) {
+                                continue;
+                            } else {
+                                uniqueWeacons.add(we.getObjectId());
+                            }
 
                             //TODO  Log in y log out
                             //send a Notification for each one if has

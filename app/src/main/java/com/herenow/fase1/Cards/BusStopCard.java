@@ -1,7 +1,6 @@
 package com.herenow.fase1.Cards;
 
 import android.content.Context;
-import android.content.IntentFilter;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.support.annotation.LayoutRes;
@@ -11,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.herenow.fase1.LineTime;
 import com.herenow.fase1.R;
 import com.herenow.fase1.Wifi.WifiAsker;
 import com.herenow.fase1.Wifi.preguntaWifi;
@@ -23,13 +23,14 @@ import org.jsoup.Jsoup;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import it.gmariotti.cardslib.library.internal.Card;
 import it.gmariotti.cardslib.library.prototypes.LinearListView;
+import parse.ParseActions;
 import util.GPSCoordinates;
 import util.myLog;
+import util.stringUtils;
 
 /**
  * Created by Milenko on 03/12/2015.
@@ -104,7 +105,6 @@ public class BusStopCard extends FetchingCard implements preguntaWifi {
             address.setText(busStop.address);
             id.setText("id:" + Integer.toString(busStop.id));
             distance.setText(Double.toString(busStop.distance) + "km");
-//            times.setText(busStop.TimesSummary() + "\n" + busStop.TimesSummarySorted());
             times.setText(busStop.TimesSummarySorted());
 
             String url = busStop.getImageUrl();
@@ -158,7 +158,7 @@ public class BusStopCard extends FetchingCard implements preguntaWifi {
             init();
         }
 
-//        public String TimesSummary() {
+        //        public String TimesSummary() {
 //            StringBuilder sb = new StringBuilder();
 //            String s2 = "No info ";
 //            try {
@@ -172,51 +172,8 @@ public class BusStopCard extends FetchingCard implements preguntaWifi {
 //            }
 //            return s2;
 //        }
-
-        /**
-         *  reformat the times as
-         *  L1: 3 min, 4 min, 50 min.
-         *  L9: 6min, 72 min.
-         * @return
-         */
         public String TimesSummarySorted() {
-            String substring = "No info";
-            try {
-                HashMap<String, ArrayList<LineTime>> tableLines = new HashMap<>();
-                ArrayList arr;
-                //a
-                for (LineTime lineTime : lineTimes) {
-                    String lc = lineTime.lineCode;
-                    if (tableLines.containsKey(lc)) {
-                        arr = tableLines.get(lc);
-                        arr.add(lineTime);
-                        tableLines.put(lc, arr);
-                    } else {
-                        arr = new ArrayList();
-                        arr.add(lineTime);
-                        tableLines.put(lc, arr);
-                    }
-                }
-
-                StringBuilder sb = new StringBuilder();
-                for (String name : tableLines.keySet()) {
-                    sb.append(summaryLineTimes(name, tableLines.get(name)) + "\n");
-                }
-                String s = sb.toString();
-                substring = s.substring(0, s.length() - 2);
-            } catch (Exception e) {
-                myLog.add("error mostrando resumen ordenado de timeline");
-            }
-            return substring;
-        }
-
-        private String summaryLineTimes(String name, ArrayList<LineTime> lineTimes) {
-            StringBuilder sb = new StringBuilder(name + ": ");
-            for (LineTime lineTime : lineTimes) {
-                sb.append(lineTime.roundedTime + ", ");
-            }
-            String s = sb.toString();
-            return (s.substring(0, s.length() - 2) + ".");
+            return stringUtils.TimesSummarySorted(lineTimes);
         }
 
         private void init() {
@@ -230,8 +187,14 @@ public class BusStopCard extends FetchingCard implements preguntaWifi {
                         @Override
                         public void OnReceiveWifis(List<ScanResult> sr) {
                             Toast.makeText(mContext, "recibidos " + sr.size() + "wifis", Toast.LENGTH_SHORT).show();
-                            myLog.add("recibidos los wifis forzados");
-                            uploadWifis(getObjectId(),sr);
+                            myLog.add("recibidos los wifis forzados para autobus");
+
+                            try {
+                                ParseActions.assignSpotsToWeacon(getObjectId(), sr, gps);
+                            } catch (Exception e) {
+                                myLog.add("error in assign spot to weacon:" + e.getLocalizedMessage());
+                            }
+
                         }
 
                         @Override
@@ -255,9 +218,6 @@ public class BusStopCard extends FetchingCard implements preguntaWifi {
             });
         }
 
-        private void uploadWifis(String busStopId, List<ScanResult> sr) {
-            
-        }
 
         public void setData(JSONObject json) {
             try {
@@ -310,31 +270,4 @@ public class BusStopCard extends FetchingCard implements preguntaWifi {
         }
     }
 
-    class LineTime {
-        int arrivalTime;
-        String lineCode;
-        String roundedTime;
-        int stopCode;
-
-        public LineTime(JSONObject json) throws JSONException {
-            arrivalTime = json.getInt("arrivalTime");
-            lineCode = json.getString("lineCode");
-            roundedTime = json.getString("roundedArrivalTime");
-            stopCode = json.getInt("stopCode");
-        }
-
-        @Override
-        public String toString() {
-            return "LineTime{" +
-                    "arrivalTime=" + arrivalTime +
-                    ", lineCode='" + lineCode + '\'' +
-                    ", roundedTime='" + roundedTime + '\'' +
-                    ", stopCode=" + stopCode +
-                    '}';
-        }
-
-        public String summary() {
-            return lineCode + ": " + roundedTime;
-        }
-    }
 }

@@ -57,7 +57,6 @@ public class WifiObserverService extends Service {
             myLog.add("error starign " + e.getLocalizedMessage());
         }
 
-
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -66,7 +65,7 @@ public class WifiObserverService extends Service {
         myLog.add("Destroying", tag);
         try {
             Toast.makeText(mContext,"Detection OFF",Toast.LENGTH_LONG).show();
-            unregisterReceiver(receiverWifi);
+            mContext.unregisterReceiver(receiverWifi);
             super.onDestroy();
         } catch (Exception e) {
             Toast.makeText(mContext,"Not possible to turn off detection",Toast.LENGTH_LONG).show();

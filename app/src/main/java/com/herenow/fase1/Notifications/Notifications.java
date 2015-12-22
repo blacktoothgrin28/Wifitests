@@ -12,20 +12,33 @@ import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
+import android.text.SpannableString;
 
 import com.herenow.fase1.Activities.BrowserActivity;
 import com.herenow.fase1.Activities.CardsActivity;
 import com.herenow.fase1.Activities.ConnectToWifi;
 import com.herenow.fase1.Activities.WeaconListActivity;
+import com.herenow.fase1.LineTime;
 import com.herenow.fase1.R;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.jsoup.Connection;
+import org.jsoup.Jsoup;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import it.gmariotti.cardslib.library.prototypes.CardWithList;
 import parse.WeaconParse;
+import util.OnTaskCompleted;
+import util.formatter;
 import util.myLog;
+import util.stringUtils;
 
 /**
  * Created by Milenko on 17/07/2015.
@@ -60,7 +73,7 @@ public abstract class Notifications {
         acti = act;
         weaconsLaunchedTable = new HashMap<>();
         showedNotifications = new ArrayList<>(); //Weacons showed in notification
-        myLog.add("showedNotif created in initialization", tag);
+//        myLog.add("showedNotif created in initialization", tag);
         mNotificationManager = (NotificationManager) act.getSystemService(Context.NOTIFICATION_SERVICE);
 
     }
@@ -71,29 +84,47 @@ public abstract class Notifications {
         return b;
     }
 
-    public static void sendNotification(WeaconParse we) {
-
+    public static void sendNotification(final WeaconParse we) {
         try {
-            Intent intent = new Intent(NOTIFICATION_DELETED_ACTION);
-            pendingDeleteIntent = PendingIntent.getBroadcast(acti.getBaseContext(), 0, intent, 0);
+            if (!we.NotificationRequiresFetching() || we.NotificationAlreadyFetched()) {
+                we.setAlreadyFetched(false);
+                myLog.add("no requiere o ya fetched", tag);
+                Intent intent = new Intent(NOTIFICATION_DELETED_ACTION);
+                pendingDeleteIntent = PendingIntent.getBroadcast(acti.getBaseContext(), 0, intent, 0);
 
-            //TODO put in parse that this weacon was notified
-            if (showedNotifications == null) {
-                showedNotifications = new ArrayList<>();
-                myLog.add("***hemos debido crear denuevo la showednotifications", tag);
-            }
+                //TODO put in parse that this weacon was notified
+                if (showedNotifications == null) {
+                    showedNotifications = new ArrayList<>();
+                    myLog.add("***hemos debido crear denuevo la showednotifications", tag);
+                }
 
-            if (showedNotifications.size() == 0) {
-                sendNewNotification(we);
+                if (showedNotifications.size() == 0) {
+                    sendNewNotification(we);
+                } else {
+                    updateNotification(we);
+                }
+                weaconsLaunchedTable.put(we.getObjectId(), we);
+
             } else {
-                updateNotification(we);
+                //Need to fetch info
+                myLog.add("need fetching", tag);
+                getInfoBuses(new OnTaskCompleted() {
+                    @Override
+                    public void OnTaskCompleted(ArrayList elements) {
+                        myLog.add("tenemos resultados de consulta de timepos en parada:" + elements.size(), tag);
+                        we.setFetchingResults(elements);
+                        sendNotification(we);
+                    }
+                }, we.getParadaId());
             }
-
-            weaconsLaunchedTable.put(we.getObjectId(), we);
         } catch (Exception e) {
             myLog.add("---ERROR in sendNotification: " + e.getMessage());
         }
+    }
 
+
+    private static void getInfoBuses(OnTaskCompleted listener, String paradaId) {
+        (new FetchUrl(listener)).execute(new String[]{paradaId});
     }
 
     private static void sendNewNotification(WeaconParse we) {
@@ -106,11 +137,11 @@ public abstract class Notifications {
 
         mIdSingle = currentId;
         showedNotifications.add(we);
-
+        myLog.add("sendign new notif", tag);
         acti.registerReceiver(receiverDeleteNotification, new IntentFilter(NOTIFICATION_DELETED_ACTION));
 
         if (we.isBrowser()) {
-            myLog.add("este weacon es de tipo browser");
+            myLog.add("este weacon es de tipo browser", tag);
             cls = BrowserActivity.class;
         } else {
             cls = CardsActivity.class;
@@ -215,12 +246,30 @@ public abstract class Notifications {
             notif.addAction(getAppAction);
         }
 
-        NotificationCompat.BigTextStyle bigTextStyle = new NotificationCompat.BigTextStyle();
+        // Bus stop
+        if (we.getType().equals("bus_stop")) {
+            formatter form = new formatter(we.getFetchedElements());
 
-        bigTextStyle.setBigContentTitle(we.getName());
-        bigTextStyle.bigText(we.getMessage());
+            notif.setContentText("BUS STOP. " + form.summarizeAllLines());
 
-        notif.setStyle(bigTextStyle);
+            //InboxStyle
+            NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
+            inboxStyle.setBigContentTitle(we.getMessage());
+            inboxStyle.setSummaryText("Deciding what to put here ");
+
+            for (SpannableString s : form.summarizeByOneLine()) {
+                inboxStyle.addLine(s);
+                notif.setStyle(inboxStyle);
+            }
+
+        } else {
+            //Bigtext style
+            NotificationCompat.BigTextStyle textStyle = new NotificationCompat.BigTextStyle();
+            textStyle.setBigContentTitle(we.getName());
+            textStyle.bigText(we.getMessage());
+            notif.setStyle(textStyle);
+        }
+
         notif.setContentIntent(resultPendingIntent);
 
         return notif;
@@ -267,6 +316,61 @@ public abstract class Notifications {
         notif.setContentIntent(resultPendingIntent);
 
         return notif;
+    }
+
+
+    static class FetchUrl extends AsyncTask<String, Void, ArrayList<CardWithList.DefaultListObject>> {
+        private OnTaskCompleted onTaskCompletedListener;
+
+        FetchUrl(OnTaskCompleted listener) {
+            this.onTaskCompletedListener = listener;
+        }
+
+        @Override
+        protected ArrayList<CardWithList.DefaultListObject> doInBackground(String... strings) {
+            Connection.Response response = null;
+            String paradaId = strings[0];
+            String q2 = "http://www.santqbus.santcugat.cat/consultatr.php?idparada=" + paradaId + "&idliniasae=-1&codlinea=-1";
+
+            try {
+                response = Jsoup.connect(q2)
+                        .ignoreContentType(true)
+                        .referrer("http://www.google.com")
+                        .timeout(5000)
+                        .followRedirects(true)
+                        .execute();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            String s = response.body();
+            String[] partes = s.split("\\}\\,\\{|\\[\\{|\\}\\]");
+
+            ArrayList lineTimes = new ArrayList();
+
+            for (String parte : partes) {
+                if (parte.length() > 3) {
+                    LineTime lineTime = null;
+                    try {
+                        lineTime = new LineTime(new JSONObject("{" + parte + "}"));
+                    } catch (JSONException e) {
+                        myLog.add("eeror en json parsinog");
+                        e.printStackTrace();
+                    }
+                    lineTimes.add(lineTime);
+                    myLog.add(lineTime.toString());
+                }
+            }
+            myLog.add("updated todas las lineas de la parada:" + paradaId);
+
+            return lineTimes;
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList<CardWithList.DefaultListObject> elements) {
+            super.onPostExecute(elements);
+            onTaskCompletedListener.OnTaskCompleted(elements);
+        }
     }
 
 }

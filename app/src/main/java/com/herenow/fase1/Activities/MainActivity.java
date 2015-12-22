@@ -160,6 +160,8 @@ public class MainActivity extends ActionBarActivity implements TextToSpeech.OnIn
         listasAdd("Monasterio", "wifip224");
         listasAdd("Vermell", "HotelsantcugatP1");
         listasAdd("ZARA", "WLAN_11F8");
+        listasAdd("BUS", "CSE131U");
+
 //        listasAdd("Juan", "wifip224");
 
 

@@ -15,6 +15,7 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import util.RoundImage;
@@ -27,6 +28,8 @@ import util.myLog;
 public class WeaconParse extends ParseObject {
 
     private String[] cards;
+    private boolean wasFetched = false;
+    private ArrayList fetchedElements;
 
     public WeaconParse() {
     }
@@ -97,6 +100,11 @@ public class WeaconParse extends ParseObject {
         Bitmap logoRounded = drawableToBitmap(new RoundImage(bm));
 
         return logoRounded;
+    }
+
+    public String getParadaId() {
+        String paradaId = getString("paradaId");
+        return paradaId;
     }
 
     public String getMessage() {
@@ -211,10 +219,44 @@ public class WeaconParse extends ParseObject {
         put("Type", type);
     }
 
+    public ArrayList getFetchedElements() {
+        return fetchedElements;
+    }
+
     public boolean isBrowser() {
-        String first = getCards()[0];
-        boolean b = first.equals("Browser");
-        myLog.add("iss bwoser= "+b+" fris card is "+first);
+        boolean b=false;
+        try {
+            String first = getCards()[0];
+            b = first.equals("Browser");
+            myLog.add("iss bwoser= " + b + " fris card is " + first);
+        } catch (Exception e) {
+            myLog.add("no tinene card definida en parse");
+        }
         return b;
+    }
+
+    public void setMessage(String message) {
+        put("Description", message);
+    }
+
+    public boolean NotificationRequiresFetching() {
+        if (getType().equals("bus_stop")) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean NotificationAlreadyFetched() {
+        return this.wasFetched;
+    }
+
+    public void setFetchingResults(ArrayList elements) {
+        this.wasFetched = true;
+        this.fetchedElements =elements;
+    }
+
+    public void setAlreadyFetched(boolean b) {
+        this.wasFetched=b;
     }
 }
