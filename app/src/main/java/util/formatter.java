@@ -93,9 +93,8 @@ public class formatter {
             SpannableString span = new SpannableString(sub);
             span.setSpan(new ForegroundColorSpan(Color.BLACK), 0, name.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             span.setSpan(new StyleSpan(android.graphics.Typeface.BOLD), 0, name.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            span.setSpan(new RelativeSizeSpan(1.2f), 0, name.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            span.setSpan(new RelativeSizeSpan(1.1f), 0, name.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 
-//            arr.add(sub);
             arr.add(span);
         }
 

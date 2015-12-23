@@ -38,7 +38,6 @@ import parse.WeaconParse;
 import util.OnTaskCompleted;
 import util.formatter;
 import util.myLog;
-import util.stringUtils;
 
 /**
  * Created by Milenko on 17/07/2015.
@@ -124,7 +123,7 @@ public abstract class Notifications {
 
 
     private static void getInfoBuses(OnTaskCompleted listener, String paradaId) {
-        (new FetchUrl(listener)).execute(new String[]{paradaId});
+        (new FetchUrl(listener)).execute(paradaId);
     }
 
     private static void sendNewNotification(WeaconParse we) {
@@ -255,12 +254,12 @@ public abstract class Notifications {
             //InboxStyle
             NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
             inboxStyle.setBigContentTitle(we.getMessage());
-            inboxStyle.setSummaryText("Deciding what to put here ");
+//            inboxStyle.setSummaryText("Deciding what to put here ");
 
             for (SpannableString s : form.summarizeByOneLine()) {
                 inboxStyle.addLine(s);
-                notif.setStyle(inboxStyle);
             }
+            notif.setStyle(inboxStyle);
 
         } else {
             //Bigtext style
