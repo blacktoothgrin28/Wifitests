@@ -134,6 +134,11 @@ public class BusStopCard extends FetchingCard implements preguntaWifi {
         myLog.add("no wifi detected");
     }
 
+    @Override
+    public void OnError(Exception e) {
+
+    }
+
     class BusStop extends DefaultListObject {
         public String address, reference;
         int id;

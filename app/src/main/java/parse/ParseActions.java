@@ -230,7 +230,13 @@ public abstract class ParseActions {
                         myLog.add("MegaQuery no match", "WE");
                     } else { //There are matches
                         myLog.add("From megaquery we have several matches: " + n, "WE");
-                        MainActivity.reportScanning(n, sr.size());
+
+                        try {
+                            MainActivity.reportScanning(n, sr.size());
+                        } catch (Exception e1) {
+//                            e1.printStackTrace();
+                            myLog.add("--ERRno se puede escrinit ls escanes en main: " + e1);
+                        }
 
                         StringBuilder sb = new StringBuilder("***********\n");
                         for (WifiSpot spot : spots) {
@@ -276,6 +282,9 @@ public abstract class ParseActions {
             query.findInBackground(new FindCallback<ParseObject>() {
                 @Override
                 public void done(List<ParseObject> list, ParseException e) {
+                    if (list == null) {
+                        return;
+                    }
                     if (list.size() == 0) { //create
                         ParseObject hit = new ParseObject("w_hit");
                         hit.put("ssid", spot);
@@ -318,7 +327,7 @@ public abstract class ParseActions {
                 }
                 sb.append("******");
                 myLog.add(sb.toString(), "places");
-                MainActivity.writeOnScreen(sb.toString());
+//                MainActivity.writeOnScreen(sb.toString());
             }
         });
 

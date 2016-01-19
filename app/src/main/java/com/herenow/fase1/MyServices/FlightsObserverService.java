@@ -183,6 +183,11 @@ public class FlightsObserverService extends Service {
 //                myLog.add("Hasn't changed ", tag);
             }
         }
+
+        @Override
+        public void OnError(Exception e) {
+
+        }
     }
 
     class readGoogleFlight extends AsyncTask<String, Void, GoogleFlight> {

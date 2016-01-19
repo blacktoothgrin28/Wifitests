@@ -103,7 +103,7 @@ public class Position implements GoogleApiClient.ConnectionCallbacks, GoogleApiC
                     }
                     sb.append("******");
                     myLog.add(sb.toString(), "places");
-                    MainActivity.writeOnScreen(sb.toString());
+//                    MainActivity.writeOnScreen(sb.toString());
 
                 }
             });

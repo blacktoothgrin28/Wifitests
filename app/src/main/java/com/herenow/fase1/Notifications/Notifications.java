@@ -79,7 +79,16 @@ public abstract class Notifications {
 
     public static boolean shouldBeLaunched(WeaconParse we) {
         //TODO decide from online info
-        boolean b = !weaconsLaunchedTable.containsKey(we.getObjectId());
+        boolean b = false;
+
+        try {
+            myLog.add("***hashlaunched has keys : " + weaconsLaunchedTable.keySet().toString());
+            myLog.add("buscando enl a tabala de lanzados el el weacon:" + we.getName());
+            b = !weaconsLaunchedTable.containsKey(we.getObjectId());
+        } catch (Exception e) {
+            myLog.add(" --should be launched" + e.getLocalizedMessage());
+        }
+
         return b;
     }
 
@@ -113,6 +122,11 @@ public abstract class Notifications {
                         myLog.add("tenemos resultados de consulta de timepos en parada:" + elements.size(), tag);
                         we.setFetchingResults(elements);
                         sendNotification(we);
+                    }
+
+                    @Override
+                    public void OnError(Exception e) {
+                        myLog.add("Not possible to fecth info from parada *" + e);
                     }
                 }, we.getParadaId());
             }
@@ -339,8 +353,11 @@ public abstract class Notifications {
                         .followRedirects(true)
                         .execute();
             } catch (IOException e) {
-                e.printStackTrace();
+//                e.printStackTrace();
+                onTaskCompletedListener.OnError(e);
             }
+
+            if (response == null) return null;
 
             String s = response.body();
             String[] partes = s.split("\\}\\,\\{|\\[\\{|\\}\\]");
@@ -353,8 +370,7 @@ public abstract class Notifications {
                     try {
                         lineTime = new LineTime(new JSONObject("{" + parte + "}"));
                     } catch (JSONException e) {
-                        myLog.add("eeror en json parsinog");
-                        e.printStackTrace();
+                        onTaskCompletedListener.OnError(e);
                     }
                     lineTimes.add(lineTime);
                     myLog.add(lineTime.toString());
@@ -368,7 +384,7 @@ public abstract class Notifications {
         @Override
         protected void onPostExecute(ArrayList<CardWithList.DefaultListObject> elements) {
             super.onPostExecute(elements);
-            onTaskCompletedListener.OnTaskCompleted(elements);
+            if (elements != null) onTaskCompletedListener.OnTaskCompleted(elements);
         }
     }
 

@@ -156,6 +156,11 @@ public class TwitterCard extends CardWithList implements OnTaskCompleted {
 //        mCardViewNews.setCard(this);
     }
 
+    @Override
+    public void OnError(Exception e) {
+        //TODO
+    }
+
     public void setListener(cardLoadedListener listener) {
         this.listener = listener;
     }

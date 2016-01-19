@@ -70,7 +70,6 @@ public class MainActivity extends ActionBarActivity implements TextToSpeech.OnIn
     Intent intentWifiObs;
     private Intent intentAddWeacon;
 
-
     private Intent intentCards;
     //Todo solve reporting time between scannings
     //Report on screen
@@ -79,6 +78,9 @@ public class MainActivity extends ActionBarActivity implements TextToSpeech.OnIn
     private ArrayList<String> lista;
     private ArrayList<String> listaObj;
     private TextToSpeech myTTS;
+
+    private static final int TIME_DELAY = 2000;
+    private static long back_pressed;
 
     /***
      * Write in the main activity
@@ -102,7 +104,6 @@ public class MainActivity extends ActionBarActivity implements TextToSpeech.OnIn
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        myLog.add("++++++++++++++++ On create");
         setContentView(R.layout.activity_main);
 
         if (savedInstanceState != null) {
@@ -129,6 +130,29 @@ public class MainActivity extends ActionBarActivity implements TextToSpeech.OnIn
 
     }
 
+    @Override
+    protected void onDestroy() {
+        try {
+            Context mContext = getApplicationContext();
+            mContext.stopService(new Intent(mContext, WifiObserverService.class));
+            myLog.add("cerrando el servicio wifiobserver porque se cierrra la app");
+            super.onDestroy();
+        } catch (Exception e) {
+            myLog.add("---serrror al destroy app");
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (back_pressed + TIME_DELAY > System.currentTimeMillis()) {
+            super.onBackPressed();
+        } else {
+            Toast.makeText(getBaseContext(), "Press once again to exit!",
+                    Toast.LENGTH_SHORT).show();
+        }
+        back_pressed = System.currentTimeMillis();
+    }
+
     private void initializeViews() {
 
         swDetection = (Switch) findViewById(R.id.sw_detection);
@@ -136,13 +160,10 @@ public class MainActivity extends ActionBarActivity implements TextToSpeech.OnIn
         swDetection.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Context mContext = getApplicationContext();
                 if (isChecked) {
-                    //startWifiService();
-                    Context mContext = getApplicationContext();
                     mContext.startService(new Intent(mContext, WifiObserverService.class));
                 } else {
-                    //stopWifiService();
-                    Context mContext = getApplicationContext();
                     mContext.stopService(new Intent(mContext, WifiObserverService.class));
                 }
             }

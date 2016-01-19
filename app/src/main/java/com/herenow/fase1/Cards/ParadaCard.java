@@ -167,6 +167,11 @@ public class ParadaCard extends CardWithList implements OnTaskCompleted {
 
     }
 
+    @Override
+    public void OnError(Exception e) {
+
+    }
+
     class readParada extends AsyncTask<GPSCoordinates, Void, ArrayList<Parada>> {
 
         @Override

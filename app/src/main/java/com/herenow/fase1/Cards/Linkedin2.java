@@ -107,6 +107,11 @@ public class Linkedin2 extends FetchingCard {
         return emp;
     }
 
+    @Override
+    public void OnError(Exception e) {
+
+    }
+
     class Employee extends DefaultListObject {
         public String position = "";
         public String url;

@@ -9,6 +9,7 @@ import com.parse.ParsePush;
 import com.parse.SaveCallback;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import parse.WifiSpot;
@@ -51,20 +52,32 @@ public abstract class LogInManagement {
         //los logged que estan en lista, quedan en cero
         //los que no, se les resta uno
 
-        for (WifiSpot spot : spots) {
-            String b = spot.getBSSID();
-            if (loggedWeacons.containsKey(b)) {
-                int n = loggedWeacons.get(b);
-                loggedWeacons.put(b, n + 1);
+        try {
+            for (WifiSpot spot : spots) {
+                String b = spot.getBSSID();
+                if (loggedWeacons.containsKey(b)) {
+                    int n = loggedWeacons.get(b);
+                    loggedWeacons.put(b, n + 1);
+                }
             }
-        }
-        for (String b : loggedWeacons.keySet()) {
-            int n = loggedWeacons.get(b);
-            loggedWeacons.put(b, n - 1);
-            if (n - 1 == -3) LogOut(b);
-        }
 
+            Iterator<String> it = loggedWeacons.keySet().iterator();
+            while (it.hasNext()) {
+                String b = it.next();
+                int n = loggedWeacons.get(b);
+                loggedWeacons.put(b, n - 1);
+                if (n - 1 == -3) LogOut(b);
+            }
 
+//            for (String b : loggedWeacons.keySet()) {
+//                //BUG concurrent modification
+//                int n = loggedWeacons.get(b);
+//                loggedWeacons.put(b, n - 1);
+//                if (n - 1 == -3) LogOut(b);
+//            }
+        } catch (Exception e) {
+            myLog.add("---error en logout: " + e.getLocalizedMessage());
+        }
     }
 
     private static void LogIn(WifiSpot spot) {
@@ -75,7 +88,14 @@ public abstract class LogInManagement {
         String msg = "Logged in:" + spot + "\n" + "channel name=" + channelName;
         myLog.add(msg);
 
-        Toast.makeText(mContext, msg, Toast.LENGTH_SHORT).show();
+        //Bug: al parecer cuando está cerrada la  app, este context da problemas
+        //mcontxt viene de parseactions, que viene de main cuando hace el "getspots"
+
+        try {
+            Toast.makeText(mContext, msg, Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            myLog.add("-- error al mostar toast: " + e.getLocalizedMessage());
+        }
 
         subscribeAChannel(channelName);
     }
@@ -91,9 +111,13 @@ public abstract class LogInManagement {
                 } else {
                     text = "failed to subscribe for push: " + e.getMessage() + " \n" + e;
                 }
-                MainActivity.writeOnScreen("Substribed to channel:" + channelName);
                 myLog.add(text);
-                Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
+                try {
+                    Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
+//                    MainActivity.writeOnScreen("Substribed to channel:" + channelName);
+                } catch (Exception e1) {
+                    myLog.add("---error subscribinb cchane: " + e1.getLocalizedMessage());
+                }
             }
         });
 
@@ -105,9 +129,14 @@ public abstract class LogInManagement {
 
     private static void LogOut(String bssid) {
         //TODO inform parse
-        loggedWeacons.remove(bssid);
-        myLog.add("Logged out:" + bssid);
-        ParsePush.unsubscribeInBackground(ChannelName(bssid));
+
+        try {
+            loggedWeacons.remove(bssid);
+            myLog.add("Logged out:" + bssid);
+            ParsePush.unsubscribeInBackground(ChannelName(bssid));
+        } catch (Exception e) {
+            myLog.add("---Error loguin out del chat");
+        }
     }
 
     /**

@@ -237,6 +237,11 @@ public class AirportCard extends CardWithList implements OnTaskCompleted {
 
     }
 
+    @Override
+    public void OnError(Exception e) {
+
+    }
+
     private void GetInfoFlightFromGoogleSync(String code) {
 
         try {

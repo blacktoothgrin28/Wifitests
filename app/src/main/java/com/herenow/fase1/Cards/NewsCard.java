@@ -261,6 +261,11 @@ public class NewsCard extends CardWithList implements OnTaskCompleted {
 //        mCardViewNews.setCard(this);
     }
 
+    @Override
+    public void OnError(Exception e) {
+
+    }
+
 //    public void setView(CardViewNative cardViewNews) {
 //        mCardViewNews = cardViewNews;
 //    }

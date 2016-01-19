@@ -160,6 +160,11 @@ public class TripAdvisorCard extends CardWithList implements OnTaskCompleted {
 //        mCardViewNews.setCard(this);
     }
 
+    @Override
+    public void OnError(Exception e) {
+
+    }
+
     public void setListener(cardLoadedListener listener) {
         this.listener = listener;
     }

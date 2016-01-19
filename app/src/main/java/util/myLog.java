@@ -23,8 +23,7 @@ public class myLog {
     public static void initialize(String filePath) {
         int file_size;
 
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
-        currentDateandTime = sdf.format(new Date());
+        currentDateandTime = currentDate();
 
         fileName = currentDateandTime + "_mhp.txt";
         File logFile = new File(Environment.getExternalStorageDirectory() + filePath);
@@ -34,12 +33,18 @@ public class myLog {
 
     }
 
+    private static String currentDate() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
+        return sdf.format(new Date());
+    }
+
     public static void add(String text) {
 
-        try {
-            MainActivity.writeOnScreen(text);
-        } catch (Exception e) {
-        }
+//        try {
+//            MainActivity.writeOnScreen(text);
+//        } catch (Exception e) {
+//            add("No se puede escribir en la pantalla principal", "mhp");
+//        }
         add(text, "mhp");
     }
 
@@ -51,6 +56,7 @@ public class myLog {
      */
     public static void add(String text, String TAG) {
         Log.d(TAG, text);
+        if (currentDateandTime == null) currentDateandTime = currentDate() + "_rec";
 
         File logFile = new File(Environment.getExternalStorageDirectory(), "/WCLOG/" + currentDateandTime + "_" + TAG + ".txt");
         if (!logFile.exists()) {

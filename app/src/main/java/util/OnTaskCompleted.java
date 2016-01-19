@@ -7,4 +7,6 @@ import java.util.ArrayList;
  */
 public interface OnTaskCompleted {
     void OnTaskCompleted(ArrayList elements);
+
+    void OnError(Exception e);
 }
