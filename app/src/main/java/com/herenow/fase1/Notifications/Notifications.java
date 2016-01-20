@@ -35,6 +35,7 @@ import org.jsoup.Jsoup;
 import java.io.IOException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 
 import javax.sql.RowSet;
@@ -42,6 +43,7 @@ import javax.sql.RowSet;
 import it.gmariotti.cardslib.library.prototypes.CardWithList;
 import parse.WeaconParse;
 import util.OnTaskCompleted;
+import util.Weacon;
 import util.formatter;
 import util.myLog;
 
@@ -59,8 +61,20 @@ public abstract class Notifications {
     private static int mIdNoti = 103;
 
     private static int currentId = 1;
+    private final static BroadcastReceiver receiverDeleteNotification = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            try {
+                myLog.add("<<<<<<<<<<<<Has borrado una notif>>>>", tag);
+                currentId = currentId + 2;
+                showedNotifications = new ArrayList<>();
 
-
+            } catch (Exception e) {
+                myLog.add("---ERROR<<<<<<<<<<<<Has borrado una notif>>>>" + e.getMessage());
+            }
+            context.unregisterReceiver(this);
+        }
+    };
     private static PendingIntent pendingDeleteIntent;
 
     public static void Initialize(Activity act) {
@@ -72,121 +86,12 @@ public abstract class Notifications {
 
     }
 
-    public static boolean shouldBeLaunched(WeaconParse we) {
-        //TODO decide from online info
-        boolean b = false;
-
-        try {
-            myLog.add("***hashlaunched has keys : " + weaconsLaunchedTable.keySet().toString());
-            myLog.add("buscando enl a tabala de lanzados el el weacon:" + we.getName());
-            b = !weaconsLaunchedTable.containsKey(we.getObjectId());
-        } catch (Exception e) {
-            myLog.add(" --should be launched" + e.getLocalizedMessage());
-        }
-
-        return b;
-    }
-
-    public static void sendNotificationOLD(final WeaconParse we) {
-        try {
-            if (!we.NotificationRequiresFetching() || we.NotificationAlreadyFetched()) {
-                we.setAlreadyFetched(false);
-                myLog.add("no requiere o ya fetched", tag);
-                Intent intent = new Intent(NOTIFICATION_DELETED_ACTION);
-                pendingDeleteIntent = PendingIntent.getBroadcast(acti.getBaseContext(), 0, intent, 0);
-
-                //TODO put in parse that this weacon was notified
-                if (showedNotifications == null) {
-                    showedNotifications = new ArrayList<>();
-                    myLog.add("***hemos debido crear denuevo la showednotifications", tag);
-                }
-
-                if (showedNotifications.size() == 0) {
-                    sendNewNotificationOLD(we);
-                } else {
-                    updateNotificationOLD(we);
-                }
-                weaconsLaunchedTable.put(we.getObjectId(), we);
-
-            } else {
-                //Need to fetch info
-                myLog.add("need fetching", tag);
-                getInfoBuses(new OnTaskCompleted() {
-                    @Override
-                    public void OnTaskCompleted(ArrayList elements) {
-                        myLog.add("tenemos resultados de consulta de timepos en parada:" + elements.size(), tag);
-                        we.setFetchingResults(elements);
-                        sendNotificationOLD(we);
-                    }
-
-                    @Override
-                    public void OnError(Exception e) {
-                        myLog.add("Not possible to fecth info from parada *" + e);
-                    }
-                }, we.getParadaId());
-            }
-        } catch (Exception e) {
-            myLog.add("---ERROR in sendNotification: " + e.getMessage());
-        }
-    }
-
     private static void fetchThenNotify(WeaconParse[] weacons, OnTaskCompleted listener) {
         (new FetchUrlsParadas(listener)).execute(weacons);
     }
 
     private static void getInfoBuses(OnTaskCompleted listener, String paradaId) {
         (new FetchUrl(listener)).execute(paradaId);
-    }
-
-    private static void sendNewNotificationOLD(WeaconParse we) {
-
-        Intent resultIntent;
-        TaskStackBuilder stackBuilder;
-        PendingIntent resultPendingIntent;
-        NotificationCompat.Builder notification;
-        Class<?> cls;
-
-        mIdSingle = currentId;
-        showedNotifications.add(we);
-        myLog.add("sendign new notif", tag);
-        acti.registerReceiver(receiverDeleteNotification, new IntentFilter(NOTIFICATION_DELETED_ACTION));
-
-        if (we.isBrowser()) {
-            myLog.add("este weacon es de tipo browser", tag);
-            cls = BrowserActivity.class;
-        } else {
-            cls = CardsActivity.class;
-        }
-
-        resultIntent = new Intent(acti.getBaseContext(), cls)
-                .putExtra("wUrl", we.getUrl())
-                .putExtra("wName", we.getName())
-                .putExtra("wLogo", we.getLogoRounded())
-                .putExtra("wComapanyDataObId", we.getCompanyDataObjectId())
-                .putExtra("wCards", we.getCards())
-                .putExtra("typeOfAiportCard", "Departures");
-
-        stackBuilder = TaskStackBuilder.create(acti.getBaseContext());
-        stackBuilder.addParentStack(cls);
-        stackBuilder.addNextIntent(resultIntent);
-        resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT); //Todo solve the stack for going back from cards
-
-        notification = buildSingleNotification(we, resultIntent, resultPendingIntent, true);
-
-        mNotificationManager.notify(mIdSingle, notification.build());
-    }
-
-    private static void updateNotificationOLD(WeaconParse we) {
-
-        NotificationCompat.Builder notif;
-
-        mNotificationManager.cancel(mIdSingle);
-        mIdGroup = mIdSingle + 1;
-        showedNotifications.add(we);
-
-        notif = buildMultipleNotification(we);
-
-        mNotificationManager.notify(mIdGroup, notif.build());
     }
 
     private static NotificationCompat.Builder buildSingleNotification(WeaconParse we, Intent resultIntent, PendingIntent resultPendingIntent, boolean sound) {
@@ -334,6 +239,12 @@ public abstract class Notifications {
     }
 
     public static void showNotification(final ArrayList<WeaconParse> notificables, boolean someWeaconRequiresFetching, boolean sound) {
+        if (notificables.size() == 0) {
+            mNotificationManager.cancel(mIdNoti);
+            myLog.add("Borrada la notifcacion porque no estamos en área de ninguno.", "LIM");
+            return;
+        }
+
         if (!someWeaconRequiresFetching) {
             showNotification(notificables, sound);
         } else {
@@ -358,14 +269,10 @@ public abstract class Notifications {
 
                 }
             });
-
-
         }
     }
 
     private static void showNotification(ArrayList<WeaconParse> notificables, boolean sound) {
-        //todo If there is already one, remove it. is the same remove than update?
-
         try {
             if (notificables.size() > 0) {
                 if (notificables.size() == 1) {
@@ -385,15 +292,18 @@ public abstract class Notifications {
         Intent resultIntent;
         TaskStackBuilder stackBuilder;
         PendingIntent resultPendingIntent;
-        Bitmap bm = BitmapFactory.decodeResource(acti.getResources(), R.mipmap.ic_launcher);
+
+        myLog.add("Order Before:" + util.stringUtils.Listar(notificables));
+        Collections.reverse(notificables);
+        myLog.add("Order After:" + util.stringUtils.Listar(notificables));
 
         String msg = Integer.toString(LogInManagement.getActiveWeacons().size()) + " weacons around you";
 
         notif = new NotificationCompat.Builder(acti)
                 .setSmallIcon(R.drawable.ic_stat_name_dup)
-                .setLargeIcon(bm)
+                .setLargeIcon(notificables.get(0).getLogoRounded())
                 .setContentTitle(msg)
-                .setContentText(notificables.get(0).getName() + " and others ")
+                .setContentText(notificables.get(0).getName() + " and others.")
                 .setAutoCancel(true)
                 .setDeleteIntent(pendingDeleteIntent)
                 .setTicker(msg);
@@ -458,20 +368,115 @@ public abstract class Notifications {
         }
     }
 
-    private final static BroadcastReceiver receiverDeleteNotification = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            try {
-                myLog.add("<<<<<<<<<<<<Has borrado una notif>>>>", tag);
-                currentId = currentId + 2;
-                showedNotifications = new ArrayList<>();
+    //OLD
+    public static void sendNotificationOLD(final WeaconParse we) {
+        try {
+            if (!we.NotificationRequiresFetching() || we.NotificationAlreadyFetched()) {
+                we.setAlreadyFetched(false);
+                myLog.add("no requiere o ya fetched", tag);
+                Intent intent = new Intent(NOTIFICATION_DELETED_ACTION);
+                pendingDeleteIntent = PendingIntent.getBroadcast(acti.getBaseContext(), 0, intent, 0);
 
-            } catch (Exception e) {
-                myLog.add("---ERROR<<<<<<<<<<<<Has borrado una notif>>>>" + e.getMessage());
+                //TODO put in parse that this weacon was notified
+                if (showedNotifications == null) {
+                    showedNotifications = new ArrayList<>();
+                    myLog.add("***hemos debido crear denuevo la showednotifications", tag);
+                }
+
+                if (showedNotifications.size() == 0) {
+                    sendNewNotificationOLD(we);
+                } else {
+                    updateNotificationOLD(we);
+                }
+                weaconsLaunchedTable.put(we.getObjectId(), we);
+
+            } else {
+                //Need to fetch info
+                myLog.add("need fetching", tag);
+                getInfoBuses(new OnTaskCompleted() {
+                    @Override
+                    public void OnTaskCompleted(ArrayList elements) {
+                        myLog.add("tenemos resultados de consulta de timepos en parada:" + elements.size(), tag);
+                        we.setFetchingResults(elements);
+                        sendNotificationOLD(we);
+                    }
+
+                    @Override
+                    public void OnError(Exception e) {
+                        myLog.add("Not possible to fecth info from parada *" + e);
+                    }
+                }, we.getParadaId());
             }
-            context.unregisterReceiver(this);
+        } catch (Exception e) {
+            myLog.add("---ERROR in sendNotification: " + e.getMessage());
         }
-    };
+    }
+
+    private static void sendNewNotificationOLD(WeaconParse we) {
+
+        Intent resultIntent;
+        TaskStackBuilder stackBuilder;
+        PendingIntent resultPendingIntent;
+        NotificationCompat.Builder notification;
+        Class<?> cls;
+
+        mIdSingle = currentId;
+        showedNotifications.add(we);
+        myLog.add("sendign new notif", tag);
+        acti.registerReceiver(receiverDeleteNotification, new IntentFilter(NOTIFICATION_DELETED_ACTION));
+
+        if (we.isBrowser()) {
+            myLog.add("este weacon es de tipo browser", tag);
+            cls = BrowserActivity.class;
+        } else {
+            cls = CardsActivity.class;
+        }
+
+        resultIntent = new Intent(acti.getBaseContext(), cls)
+                .putExtra("wUrl", we.getUrl())
+                .putExtra("wName", we.getName())
+                .putExtra("wLogo", we.getLogoRounded())
+                .putExtra("wComapanyDataObId", we.getCompanyDataObjectId())
+                .putExtra("wCards", we.getCards())
+                .putExtra("typeOfAiportCard", "Departures");
+
+        stackBuilder = TaskStackBuilder.create(acti.getBaseContext());
+        stackBuilder.addParentStack(cls);
+        stackBuilder.addNextIntent(resultIntent);
+        resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT); //Todo solve the stack for going back from cards
+
+        notification = buildSingleNotification(we, resultIntent, resultPendingIntent, true);
+
+        mNotificationManager.notify(mIdSingle, notification.build());
+    }
+
+    private static void updateNotificationOLD(WeaconParse we) {
+
+        NotificationCompat.Builder notif;
+
+        mNotificationManager.cancel(mIdSingle);
+        mIdGroup = mIdSingle + 1;
+        showedNotifications.add(we);
+
+        notif = buildMultipleNotification(we);
+
+        mNotificationManager.notify(mIdGroup, notif.build());
+    }
+
+    public static boolean shouldBeLaunched(WeaconParse we) {
+        //TODO decide from online info
+        boolean b = false;
+
+        try {
+            myLog.add("***hashlaunched has keys : " + weaconsLaunchedTable.keySet().toString());
+            myLog.add("buscando enl a tabala de lanzados el el weacon:" + we.getName());
+            b = !weaconsLaunchedTable.containsKey(we.getObjectId());
+        } catch (Exception e) {
+            myLog.add(" --should be launched" + e.getLocalizedMessage());
+        }
+
+        return b;
+    }
 
     static class FetchUrl extends AsyncTask<String, Void, ArrayList<CardWithList.DefaultListObject>> {
         private OnTaskCompleted onTaskCompletedListener;

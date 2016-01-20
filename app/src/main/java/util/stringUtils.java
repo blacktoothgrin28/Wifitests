@@ -93,18 +93,26 @@ public class stringUtils {
     }
 
 
-    public static String Listar(HashSet<WeaconParse> weaconHashSet) {
+    public static String Listar(HashSet<WeaconParse> weacons) {
         StringBuilder sb = new StringBuilder();
-        for (WeaconParse we : weaconHashSet) {
+        for (WeaconParse we : weacons) {
             sb.append(we.getName() + " | ");
         }
         return sb.toString();
     }
 
-    public static String Listar(HashMap<WeaconParse, Integer> contabilidad) {
+    public static String Listar(HashMap<WeaconParse, Integer> hash) {
         StringBuilder sb = new StringBuilder();
-        for (Map.Entry<WeaconParse, Integer> entry : contabilidad.entrySet()) {
+        for (Map.Entry<WeaconParse, Integer> entry : hash.entrySet()) {
             sb.append(entry.getKey().getName() + ":" + entry.getValue() + " | ");
+        }
+        return sb.toString();
+    }
+
+    public static String Listar(ArrayList<WeaconParse> weacons) {
+        StringBuilder sb = new StringBuilder();
+        for (WeaconParse we : weacons) {
+            sb.append(we.getName() + " | ");
         }
         return sb.toString();
     }

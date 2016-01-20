@@ -24,18 +24,15 @@ import util.stringUtils;
  * Created by Milenko on 10/08/2015.
  */
 public abstract class LogInManagement {
-    private static HashMap<WeaconParse, Integer> contabilidad = new HashMap<>(); //{we,n}
-
-    private static HashMap<String, Integer> oldSpots = new HashMap<>();
-    private static HashMap<String, Integer> newSpots;
-    private static HashMap<String, Integer> loggedWeacons = new HashMap<>();
-    private static Context mContext;
-
     static int repeatedOffToDisappear = 10;
     static int repeatedOffRemoveFromNotification = 5;
     static int repeatedOffToChatOff = 4;
     static int repeatedOnToChatOn = 3;
-
+    private static HashMap<WeaconParse, Integer> contabilidad = new HashMap<>(); //{we,n}
+    private static HashMap<String, Integer> oldSpots = new HashMap<>();
+    private static HashMap<String, Integer> newSpots;
+    private static HashMap<String, Integer> loggedWeacons = new HashMap<>();
+    private static Context mContext;
     private static boolean anychange = false;
     private static ArrayList<WeaconParse> onNotification = new ArrayList<>();
     private static ArrayList<WeaconParse> onChat = new ArrayList<>();
@@ -138,10 +135,6 @@ public abstract class LogInManagement {
         return "Z_" + bs.replace(":", "_");
     }
 
-    public HashMap getCurrentlyLogged() {
-        return loggedWeacons;
-    }
-
     public static void setNewWeacons(HashSet<WeaconParse> weaconsDetected) {
 
         anychange = false; //is there any changes for send or modify notification?
@@ -212,21 +205,22 @@ public abstract class LogInManagement {
 
             //Notify or change notification
             if (anychange) {
-                ArrayList<WeaconParse> notificables = new ArrayList();
-                myLog.add("We Will notify: ", "LIM");
+//                ArrayList<WeaconParse> notificables = new ArrayList();
+//                myLog.add("We Will notify: ", "LIM");
+//
+//                if (contabilidad.keySet().size() == 0) {
+//                    myLog.add("Remove all notified weacons", "LIM");
+//                }
+//
+//                for (WeaconParse we : contabilidad.keySet()) {
+//                    if (contabilidad.get(we) > 0) {
+//                        notificables.add(we);
+//                        myLog.add("     ->" + we.getName(), "LIM");
+//                    }
+//                }
 
-                if (contabilidad.keySet().size() == 0) {
-                    myLog.add("Remove all notified weacons", "LIM");
-                }
-
-                for (WeaconParse we : contabilidad.keySet()) {
-                    if (contabilidad.get(we) > 0) {
-                        notificables.add(we);
-                        myLog.add("     ->" + we.getName(), "LIM");
-                    }
-                }
-
-                Notifications.showNotification(notificables, someWeaconRequiresFetching, sound);
+//                Notifications.showNotification(notificables, someWeaconRequiresFetching, sound);
+                Notifications.showNotification(onNotification, someWeaconRequiresFetching, sound);
             }
             myLog.add("****************************", "LIM");
 
@@ -311,6 +305,10 @@ public abstract class LogInManagement {
         contabilidad.remove(we);
         myLog.add("Forget it, too far: " + we.getName(), "LIM");
 
+    }
+
+    public HashMap getCurrentlyLogged() {
+        return loggedWeacons;
     }
 
 
