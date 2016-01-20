@@ -6,6 +6,10 @@ import com.herenow.fase1.LineTime;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+
+import parse.WeaconParse;
 
 /**
  * Created by Milenko on 29/10/2015.
@@ -89,5 +93,20 @@ public class stringUtils {
     }
 
 
+    public static String Listar(HashSet<WeaconParse> weaconHashSet) {
+        StringBuilder sb = new StringBuilder();
+        for (WeaconParse we : weaconHashSet) {
+            sb.append(we.getName() + " | ");
+        }
+        return sb.toString();
+    }
+
+    public static String Listar(HashMap<WeaconParse, Integer> contabilidad) {
+        StringBuilder sb = new StringBuilder();
+        for (Map.Entry<WeaconParse, Integer> entry : contabilidad.entrySet()) {
+            sb.append(entry.getKey().getName() + ":" + entry.getValue() + " | ");
+        }
+        return sb.toString();
+    }
 }
 

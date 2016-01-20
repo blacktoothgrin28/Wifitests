@@ -17,12 +17,15 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 import android.text.SpannableString;
 
+import com.google.android.gms.internal.zzeo;
+import com.google.android.gms.tagmanager.Container;
 import com.herenow.fase1.Activities.BrowserActivity;
 import com.herenow.fase1.Activities.CardsActivity;
 import com.herenow.fase1.Activities.ConnectToWifi;
 import com.herenow.fase1.Activities.WeaconListActivity;
 import com.herenow.fase1.LineTime;
 import com.herenow.fase1.R;
+import com.herenow.fase1.Wifi.LogInManagement;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -30,8 +33,11 @@ import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 
 import java.io.IOException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import javax.sql.RowSet;
 
 import it.gmariotti.cardslib.library.prototypes.CardWithList;
 import parse.WeaconParse;
@@ -50,21 +56,10 @@ public abstract class Notifications {
     private static NotificationManager mNotificationManager;
     private static Activity acti;
     private static int mIdSingle, mIdGroup;
-    private static int currentId = 1;
-    private final static BroadcastReceiver receiverDeleteNotification = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            try {
-                myLog.add("<<<<<<<<<<<<Has borrado una notif>>>>", tag);
-                currentId = currentId + 2;
-                showedNotifications = new ArrayList<>();
+    private static int mIdNoti = 103;
 
-            } catch (Exception e) {
-                myLog.add("---ERROR<<<<<<<<<<<<Has borrado una notif>>>>" + e.getMessage());
-            }
-            context.unregisterReceiver(this);
-        }
-    };
+    private static int currentId = 1;
+
 
     private static PendingIntent pendingDeleteIntent;
 
@@ -92,7 +87,7 @@ public abstract class Notifications {
         return b;
     }
 
-    public static void sendNotification(final WeaconParse we) {
+    public static void sendNotificationOLD(final WeaconParse we) {
         try {
             if (!we.NotificationRequiresFetching() || we.NotificationAlreadyFetched()) {
                 we.setAlreadyFetched(false);
@@ -107,9 +102,9 @@ public abstract class Notifications {
                 }
 
                 if (showedNotifications.size() == 0) {
-                    sendNewNotification(we);
+                    sendNewNotificationOLD(we);
                 } else {
-                    updateNotification(we);
+                    updateNotificationOLD(we);
                 }
                 weaconsLaunchedTable.put(we.getObjectId(), we);
 
@@ -121,7 +116,7 @@ public abstract class Notifications {
                     public void OnTaskCompleted(ArrayList elements) {
                         myLog.add("tenemos resultados de consulta de timepos en parada:" + elements.size(), tag);
                         we.setFetchingResults(elements);
-                        sendNotification(we);
+                        sendNotificationOLD(we);
                     }
 
                     @Override
@@ -135,12 +130,15 @@ public abstract class Notifications {
         }
     }
 
+    private static void fetchThenNotify(WeaconParse[] weacons, OnTaskCompleted listener) {
+        (new FetchUrlsParadas(listener)).execute(weacons);
+    }
 
     private static void getInfoBuses(OnTaskCompleted listener, String paradaId) {
         (new FetchUrl(listener)).execute(paradaId);
     }
 
-    private static void sendNewNotification(WeaconParse we) {
+    private static void sendNewNotificationOLD(WeaconParse we) {
 
         Intent resultIntent;
         TaskStackBuilder stackBuilder;
@@ -173,12 +171,12 @@ public abstract class Notifications {
         stackBuilder.addNextIntent(resultIntent);
         resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT); //Todo solve the stack for going back from cards
 
-        notification = buildSingleNotification(we, resultIntent, resultPendingIntent);
+        notification = buildSingleNotification(we, resultIntent, resultPendingIntent, true);
 
         mNotificationManager.notify(mIdSingle, notification.build());
     }
 
-    private static void updateNotification(WeaconParse we) {
+    private static void updateNotificationOLD(WeaconParse we) {
 
         NotificationCompat.Builder notif;
 
@@ -191,7 +189,7 @@ public abstract class Notifications {
         mNotificationManager.notify(mIdGroup, notif.build());
     }
 
-    private static NotificationCompat.Builder buildSingleNotification(WeaconParse we, Intent resultIntent, PendingIntent resultPendingIntent) {
+    private static NotificationCompat.Builder buildSingleNotification(WeaconParse we, Intent resultIntent, PendingIntent resultPendingIntent, boolean sound) {
         NotificationCompat.Builder notif;
 
         NotificationCompat.Action actionSilence = new NotificationCompat.Action(R.drawable.ic_silence, "Turn Off", resultPendingIntent);//TODO to create the silence intent
@@ -202,11 +200,13 @@ public abstract class Notifications {
                 .setContentTitle(we.getName())
                 .setContentText(we.getType())
                 .setAutoCancel(true)
-                .setDefaults(Notification.DEFAULT_VIBRATE | Notification.DEFAULT_SOUND | Notification.FLAG_SHOW_LIGHTS)
-                .setLights(0xE6D820, 300, 100)
                 .setTicker("Weacon detected\n" + we.getName())
                 .setDeleteIntent(pendingDeleteIntent)
                 .addAction(actionSilence);
+        if (sound) {
+            notif.setLights(0xE6D820, 300, 100)
+                    .setDefaults(Notification.DEFAULT_VIBRATE | Notification.DEFAULT_SOUND | Notification.FLAG_SHOW_LIGHTS);
+        }
 
         //Airport Buttons
         if (we.isAirport()) {
@@ -307,6 +307,8 @@ public abstract class Notifications {
                 .setLights(0x36E629, 100, 100)
                 .setDeleteIntent(pendingDeleteIntent)
                 .setTicker(msg);
+
+
         NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
         inboxStyle.setBigContentTitle(msg);
         inboxStyle.setSummaryText("Currently " + Integer.toString(showedNotifications.size() + 5)
@@ -331,6 +333,145 @@ public abstract class Notifications {
         return notif;
     }
 
+    public static void showNotification(final ArrayList<WeaconParse> notificables, boolean someWeaconRequiresFetching, boolean sound) {
+        if (!someWeaconRequiresFetching) {
+            showNotification(notificables, sound);
+        } else {
+//            String[] paradasIds = new String[notificables.size()];
+//            for (int i = 0; i < notificables.size(); i++) {
+//                WeaconParse we = notificables.get(i);
+//                if (we.NotificationRequiresFetching()) {
+//                    paradasIds[i] = we.getParadaId();
+//                } else {
+//                    paradasIds[i] = "";
+//                }
+//            }
+
+            fetchThenNotify((WeaconParse[]) notificables.toArray(), new OnTaskCompleted() {
+                @Override
+                public void OnTaskCompleted(ArrayList elements) {
+                    showNotification(elements, true);
+                }
+
+                @Override
+                public void OnError(Exception e) {
+
+                }
+            });
+
+
+        }
+    }
+
+    private static void showNotification(ArrayList<WeaconParse> notificables, boolean sound) {
+        //todo If there is already one, remove it. is the same remove than update?
+
+        try {
+            if (notificables.size() > 0) {
+                if (notificables.size() == 1) {
+                    sendOneWeacon(notificables.get(0), sound);
+                } else {
+                    sendSeveralWeacons(notificables, sound);
+                }
+            }
+        } catch (Exception e) {
+            myLog.add("---Errod en shownotif: " + e.getLocalizedMessage());
+        }
+    }
+
+    private static void sendSeveralWeacons(ArrayList<WeaconParse> notificables, boolean sound) {
+        NotificationCompat.Builder notif;
+
+        Intent resultIntent;
+        TaskStackBuilder stackBuilder;
+        PendingIntent resultPendingIntent;
+        Bitmap bm = BitmapFactory.decodeResource(acti.getResources(), R.mipmap.ic_launcher);
+
+        String msg = Integer.toString(LogInManagement.getActiveWeacons().size()) + " weacons around you";
+
+        notif = new NotificationCompat.Builder(acti)
+                .setSmallIcon(R.drawable.ic_stat_name_dup)
+                .setLargeIcon(bm)
+                .setContentTitle(msg)
+                .setContentText(notificables.get(0).getName() + " and others ")
+                .setAutoCancel(true)
+                .setDeleteIntent(pendingDeleteIntent)
+                .setTicker(msg);
+
+        if (sound) {
+            notif.setLights(0xE6D820, 300, 100)
+                    .setDefaults(Notification.DEFAULT_VIBRATE | Notification.DEFAULT_SOUND | Notification.FLAG_SHOW_LIGHTS);
+        }
+
+        NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
+        inboxStyle.setBigContentTitle(msg);
+        inboxStyle.setSummaryText("Currently " + LogInManagement.getActiveWeacons().size() + " weacons active");
+
+        for (WeaconParse weacon : notificables) {
+            inboxStyle.addLine(weacon.getName());
+        }
+
+        notif.setStyle(inboxStyle);
+        resultIntent = new Intent(acti.getBaseContext(), WeaconListActivity.class);
+
+        stackBuilder = TaskStackBuilder.create(acti.getBaseContext());
+        stackBuilder.addParentStack(WeaconListActivity.class);
+        stackBuilder.addNextIntent(resultIntent);
+        resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+        notif.setContentIntent(resultPendingIntent);
+
+        mNotificationManager.notify(mIdNoti, notif.build());
+    }
+
+    private static void sendOneWeacon(WeaconParse we, boolean sound) {
+        try {
+            Intent resultIntent;
+            TaskStackBuilder stackBuilder;
+            PendingIntent resultPendingIntent;
+            NotificationCompat.Builder notification;
+            Class<?> cls;
+
+            if (we.isBrowser()) {
+                cls = BrowserActivity.class;
+            } else {
+                cls = CardsActivity.class;
+            }
+
+            resultIntent = new Intent(acti.getBaseContext(), cls)
+                    .putExtra("wUrl", we.getUrl())
+                    .putExtra("wName", we.getName())
+                    .putExtra("wLogo", we.getLogoRounded())
+                    .putExtra("wComapanyDataObId", we.getCompanyDataObjectId())
+                    .putExtra("wCards", we.getCards())
+                    .putExtra("typeOfAiportCard", "Departures");
+
+            stackBuilder = TaskStackBuilder.create(acti.getBaseContext());
+            stackBuilder.addParentStack(cls);
+            stackBuilder.addNextIntent(resultIntent);
+            resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT); //Todo solve the stack for going back from cards
+
+            notification = buildSingleNotification(we, resultIntent, resultPendingIntent, sound);
+
+            mNotificationManager.notify(mIdNoti, notification.build());
+        } catch (Exception e) {
+            myLog.add("---error en send one notif" + e.getLocalizedMessage());
+        }
+    }
+
+    private final static BroadcastReceiver receiverDeleteNotification = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            try {
+                myLog.add("<<<<<<<<<<<<Has borrado una notif>>>>", tag);
+                currentId = currentId + 2;
+                showedNotifications = new ArrayList<>();
+
+            } catch (Exception e) {
+                myLog.add("---ERROR<<<<<<<<<<<<Has borrado una notif>>>>" + e.getMessage());
+            }
+            context.unregisterReceiver(this);
+        }
+    };
 
     static class FetchUrl extends AsyncTask<String, Void, ArrayList<CardWithList.DefaultListObject>> {
         private OnTaskCompleted onTaskCompletedListener;
@@ -388,4 +529,62 @@ public abstract class Notifications {
         }
     }
 
+    private static class FetchUrlsParadas extends AsyncTask<WeaconParse, Void, ArrayList<WeaconParse>> {
+        private OnTaskCompleted onTaskCompletedListener;
+        private ArrayList<WeaconParse> updatedWeacons;
+
+        FetchUrlsParadas(OnTaskCompleted listener) {
+            this.onTaskCompletedListener = listener;
+        }
+
+        @Override
+        protected ArrayList<WeaconParse> doInBackground(WeaconParse... params) {
+            for (WeaconParse we : params) {
+                if (we.NotificationRequiresFetching()) {
+                    Connection.Response response = null;
+                    String paradaId = we.getParadaId();
+                    String q2 = "http://www.santqbus.santcugat.cat/consultatr.php?idparada=" + paradaId + "&idliniasae=-1&codlinea=-1";
+
+                    try {
+                        response = Jsoup.connect(q2)
+                                .ignoreContentType(true)
+                                .referrer("http://www.google.com")
+                                .timeout(5000)
+                                .followRedirects(true)
+                                .execute();
+                    } catch (IOException e) {
+                        onTaskCompletedListener.OnError(e);
+                    }
+                    if (response == null) return null;
+
+                    String s = response.body();
+                    String[] partes = s.split("\\}\\,\\{|\\[\\{|\\}\\]");
+
+                    ArrayList lineTimes = new ArrayList();
+
+                    for (String parte : partes) {
+                        if (parte.length() > 3) {
+                            LineTime lineTime = null;
+                            try {
+                                lineTime = new LineTime(new JSONObject("{" + parte + "}"));
+                            } catch (JSONException e) {
+                                onTaskCompletedListener.OnError(e);
+                            }
+                            lineTimes.add(lineTime);
+                            myLog.add(lineTime.toString());
+                        }
+                    }
+                    we.setFetchingResults(lineTimes);
+                }
+                updatedWeacons.add(we);
+            }
+            return updatedWeacons;
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList<WeaconParse> updatedWeacons) {
+            super.onPostExecute(updatedWeacons);
+            onTaskCompletedListener.OnTaskCompleted(updatedWeacons);
+        }
+    }
 }

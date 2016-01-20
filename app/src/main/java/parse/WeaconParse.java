@@ -34,6 +34,20 @@ public class WeaconParse extends ParseObject {
     public WeaconParse() {
     }
 
+    @Override
+    public int hashCode() {
+        return getObjectId().hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null) return false;
+        if (!(o instanceof WeaconParse)) return false;
+
+        WeaconParse other = (WeaconParse) o;
+        return this.getObjectId() == other.getObjectId();
+    }
+
     public WeaconParse(String name, String mainUrl, String phone, String url2, String url3, String description,
                        String type, double lat, double lon, int rating, boolean automatic, ParseUser user, Bitmap logo) {
         setName(name);
@@ -224,7 +238,7 @@ public class WeaconParse extends ParseObject {
     }
 
     public boolean isBrowser() {
-        boolean b=false;
+        boolean b = false;
         try {
             String first = getCards()[0];
             b = first.equals("Browser");
@@ -253,10 +267,10 @@ public class WeaconParse extends ParseObject {
 
     public void setFetchingResults(ArrayList elements) {
         this.wasFetched = true;
-        this.fetchedElements =elements;
+        this.fetchedElements = elements;
     }
 
     public void setAlreadyFetched(boolean b) {
-        this.wasFetched=b;
+        this.wasFetched = b;
     }
 }

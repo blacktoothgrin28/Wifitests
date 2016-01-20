@@ -67,6 +67,37 @@ public class WifiObserverService extends Service {
     }
 
 
+    /**
+     * From the list of ScanResults, it looks if SSIDS are present in parse list,
+     * and launch the notifications
+     *
+     * @param sr scanResults
+     * @return number of matches
+     */
+    public void CheckScanResults(final List<ScanResult> sr) {
+        iScan++;
+//        if (iScan % 8 == 0) {
+//            ReportLocalPlaces();
+//        }
+
+        ArrayList<String> bssids = new ArrayList<>();
+        ArrayList<String> ssids = new ArrayList<>();
+        StringBuilder sb = new StringBuilder(iScan + "+++++++ Scan results:+" + "\n");
+        StringBuilder sb2 = new StringBuilder();
+
+        for (ScanResult r : sr) {
+            bssids.add(r.BSSID);
+            ssids.add(r.SSID);
+            sb.append("  '" + r.SSID + "' | " + r.BSSID + " | l= " + r.level + "\n");
+            sb2.append(r.SSID + " | ");
+        }
+        sb.append("+++++++++");
+        myLog.add(sb.toString(), tag);
+        updateRecordingNotification("new scann", sb2.toString());
+
+        CheckSpotMatches(sr, bssids, ssids);
+    }
+
     private void showRecordingNotification() {
         mNotificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -140,42 +171,6 @@ public class WifiObserverService extends Service {
             Toast.makeText(mContext, "Not possible to turn off detection", Toast.LENGTH_LONG).show();
             myLog.add("error destroying: " + e.getLocalizedMessage());
         }
-    }
-
-    /**
-     * From the list of ScanResults, it looks if SSIDS are present in parse list,
-     * and launch the notifications
-     *
-     * @param sr scanResults
-     * @return number of matches
-     */
-    public void CheckScanResults(final List<ScanResult> sr) {
-        iScan++;
-//        if (iScan % 8 == 0) {
-//            ReportLocalPlaces();
-//        }
-
-        ArrayList<String> bssids = new ArrayList<>();
-        ArrayList<String> ssids = new ArrayList<>();
-        StringBuilder sb = new StringBuilder(iScan + "+++++++ Scan results:+" + "\n");
-        StringBuilder sb2 = new StringBuilder();
-
-        for (ScanResult r : sr) {
-            bssids.add(r.BSSID);
-            ssids.add(r.SSID);
-            sb.append("  '" + r.SSID + "' | " + r.BSSID + " | l= " + r.level + "\n");
-
-            sb2.append(r.SSID + " | ");
-        }
-
-        sb.append("+++++++++");
-        myLog.add(sb.toString(), tag);
-
-        CheckSpotMatches(sr, bssids, ssids);
-
-        updateRecordingNotification("new scann", sb2.toString());
-
-
     }
 
     class WifiReceiver extends BroadcastReceiver {

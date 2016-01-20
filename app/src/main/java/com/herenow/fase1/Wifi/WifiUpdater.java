@@ -75,7 +75,7 @@ public class WifiUpdater implements Runnable {
                 public void done(WeaconParse we, ParseException e) {
                     if (e == null) {
                         myLog.add("WifiUpdater | findFakeWeacon. lauching = " + we);
-                        Notifications.sendNotification(we);
+                        Notifications.sendNotificationOLD(we);
                     } else {
                         myLog.add("---Error in fakeweacon: " + e.getMessage());
                     }

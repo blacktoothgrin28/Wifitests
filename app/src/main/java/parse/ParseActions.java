@@ -4,14 +4,12 @@ import android.content.Context;
 import android.net.wifi.ScanResult;
 import android.widget.Toast;
 
-import com.herenow.fase1.Activities.MainActivity;
 import com.herenow.fase1.Activities.ParseCallback;
 import com.herenow.fase1.Notifications.Notifications;
 import com.herenow.fase1.Wifi.LogInManagement;
 import com.parse.DeleteCallback;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
-import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
@@ -20,12 +18,13 @@ import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import util.GPSCoordinates;
 import util.myLog;
 import util.parameters;
+import util.stringUtils;
 
 /**
  * Created by Milenko on 25/09/2015.
@@ -199,10 +198,6 @@ public abstract class ParseActions {
 
     public static void CheckSpotMatches(final List<ScanResult> sr, ArrayList<String> bssids, ArrayList<String> ssids) {
 
-        //one weacon can have many ssids, that could trigger at same time; this is for avoiding it
-        final ArrayList<String> uniqueWeacons = new ArrayList();
-
-
         //Query BSSID
         ParseQuery<WifiSpot> qb = ParseQuery.getQuery(WifiSpot.class);
         qb.whereContainedIn("bssid", bssids);
@@ -225,40 +220,28 @@ public abstract class ParseActions {
             public void done(List<WifiSpot> spots, ParseException e) {
                 if (e == null) {
                     int n = spots.size();
-                    LogInManagement.ReportDetectedSpots(spots, mContext);
+//                    LogInManagement.ReportDetectedSpots(spots, mContext);
                     if (n == 0) {
                         myLog.add("MegaQuery no match", "WE");
                     } else { //There are matches
                         myLog.add("From megaquery we have several matches: " + n, "WE");
 
-                        try {
-                            MainActivity.reportScanning(n, sr.size());
-                        } catch (Exception e1) {
-//                            e1.printStackTrace();
-                            myLog.add("--ERRno se puede escrinit ls escanes en main: " + e1);
-                        }
+                        HashSet<WeaconParse> weaconHashSet = new HashSet<>();
 
                         StringBuilder sb = new StringBuilder("***********\n");
                         for (WifiSpot spot : spots) {
                             sb.append(spot.toString() + "\n");
                             registerHitSSID(spot);
                             WeaconParse we = spot.getWeacon();
-                            if (uniqueWeacons.contains(we.getObjectId())) {
-                                continue;
-                            } else {
-                                uniqueWeacons.add(we.getObjectId());
-                            }
 
-                            //TODO  Log in y log out
-                            //send a Notification for each one if has
-                            if (Notifications.shouldBeLaunched(we)) {
-                                Notifications.sendNotification(we);
-                            } else {
-                                myLog.add("Weacon already notified: " + we.getName());
-                            }
+                            weaconHashSet.add(we);
                         }
-                        sb.append("**********");
                         myLog.add(sb.toString(), "WE");
+
+                        myLog.add("Detected spots: " + spots.size() + " | Different weacons: " + weaconHashSet.size(), "LIM");
+                        myLog.add(" " + stringUtils.Listar(weaconHashSet), "LIM");
+
+                        LogInManagement.setNewWeacons(weaconHashSet);
                     }
                 } else {
                     myLog.addError(this.getClass(), e);
@@ -373,7 +356,7 @@ public abstract class ParseActions {
                         Thread.sleep(1000 * secWait);
                         myLog.add("***FORCED se an recuperado:" + spots.size());
                         WeaconParse we = spots.get(0).getWeacon();
-                        Notifications.sendNotification(we);
+                        Notifications.sendNotificationOLD(we);
                     } catch (Exception e1) {
                         myLog.add("error waiting for launcihgn weacon" + e1);
                     }
