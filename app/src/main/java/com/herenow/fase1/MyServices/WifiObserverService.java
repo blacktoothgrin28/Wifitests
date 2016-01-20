@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import com.herenow.fase1.R;
 import com.herenow.fase1.Sapo.SAPO2;
+import com.herenow.fase1.Wifi.LogInManagement;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -127,7 +128,7 @@ public class WifiObserverService extends Service {
     }
 
     private void updateRecordingNotification(String title, String content) {
-        mNotificationManager.cancel(101);
+//        mNotificationManager.cancel(101);
 
         NotificationCompat.Builder notif;
 
@@ -145,8 +146,9 @@ public class WifiObserverService extends Service {
 //                .addAction(actionSilence);
         //Bigtext style
         NotificationCompat.BigTextStyle textStyle = new NotificationCompat.BigTextStyle();
-        textStyle.setBigContentTitle("ulltimos wifisx   ");
+        textStyle.setBigContentTitle("wifis around");
         textStyle.bigText(content);
+//        textStyle.bigText(LogInManagement.getContabilidadString());
         notif.setStyle(textStyle);
 
         mNotificationManager.notify(101, notif.build());

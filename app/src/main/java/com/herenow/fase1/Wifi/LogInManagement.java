@@ -221,6 +221,7 @@ public abstract class LogInManagement {
 
 //                Notifications.showNotification(notificables, someWeaconRequiresFetching, sound);
                 Notifications.showNotification(onNotification, someWeaconRequiresFetching, sound);
+                Notifications.notifyContabilidad(getContabilidadString());
             }
             myLog.add("****************************", "LIM");
 
@@ -232,6 +233,10 @@ public abstract class LogInManagement {
     public static ArrayList<WeaconParse> getActiveWeacons() {
         ArrayList arr = new ArrayList(contabilidad.keySet());
         return arr;
+    }
+
+    public static String getContabilidadString() {
+        return stringUtils.Listar(contabilidad);
     }
 
     //CHAT
@@ -310,6 +315,5 @@ public abstract class LogInManagement {
     public HashMap getCurrentlyLogged() {
         return loggedWeacons;
     }
-
 
 }

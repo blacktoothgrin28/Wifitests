@@ -288,14 +288,11 @@ public abstract class Notifications {
 
     private static void sendSeveralWeacons(ArrayList<WeaconParse> notificables, boolean sound) {
         NotificationCompat.Builder notif;
+        Collections.reverse(notificables);
 
         Intent resultIntent;
         TaskStackBuilder stackBuilder;
         PendingIntent resultPendingIntent;
-
-        myLog.add("Order Before:" + util.stringUtils.Listar(notificables));
-        Collections.reverse(notificables);
-        myLog.add("Order After:" + util.stringUtils.Listar(notificables));
 
         String msg = Integer.toString(LogInManagement.getActiveWeacons().size()) + " weacons around you";
 
@@ -368,7 +365,8 @@ public abstract class Notifications {
         }
     }
 
-    //OLD
+    ///////OLD
+
     public static void sendNotificationOLD(final WeaconParse we) {
         try {
             if (!we.NotificationRequiresFetching() || we.NotificationAlreadyFetched()) {
@@ -478,6 +476,32 @@ public abstract class Notifications {
         return b;
     }
 
+    public static void notifyContabilidad(String contabilidadString) {
+        NotificationCompat.Builder notif;
+
+        notif = new NotificationCompat.Builder(acti)
+                .setSmallIcon(R.drawable.ic_media_pause)
+//                .setLargeIcon(we.getLogoRounded())
+                .setContentTitle("weacons table")
+//                .setContentText(we.getType())
+                .setAutoCancel(true)
+                .setOngoing(false)
+//                .setDefaults(Notification.DEFAULT_VIBRATE | Notification.DEFAULT_SOUND | Notification.FLAG_SHOW_LIGHTS)
+//                .setLights(0xE6D820, 300, 100)
+                .setTicker("Weacons situation");
+//                .setDeleteIntent(pendingDeleteIntent)
+//                .addAction(actionSilence);
+        //Bigtext style
+        NotificationCompat.BigTextStyle textStyle = new NotificationCompat.BigTextStyle();
+        textStyle.setBigContentTitle("Weacon contabilidad");
+        textStyle.bigText(contabilidadString);
+        notif.setStyle(textStyle);
+
+        mNotificationManager.notify(102, notif.build());
+
+    }
+
+    ///////END OLD
     static class FetchUrl extends AsyncTask<String, Void, ArrayList<CardWithList.DefaultListObject>> {
         private OnTaskCompleted onTaskCompletedListener;
 
