@@ -53,8 +53,8 @@ public class stringUtils {
 
         if (lineTimes.size() > 0) {
             try {
-                formatter form=new formatter(lineTimes);
-                HashMap<String, ArrayList<LineTime>> tableLines =form.getTable();
+                formatter form = new formatter(lineTimes);
+                HashMap<String, ArrayList<LineTime>> tableLines = form.getTable();
 
                 StringBuilder sb = new StringBuilder();
                 for (String name : tableLines.keySet()) {
@@ -79,19 +79,6 @@ public class stringUtils {
         String s = sb.toString();
         return (s.substring(0, s.length() - 2) + ".");
     }
-
-    public static ArrayList<String> formatedSummary(ArrayList<LineTime> lineTimes) {
-        if (lineTimes.size() == 0) return null;
-
-        ArrayList<String> arr = new ArrayList<>();
-        for (LineTime lt : lineTimes) {
-//TODO complete with spanformat
-            StringBuilder sb = new StringBuilder(lt.lineCode);
-
-        }
-        return arr;
-    }
-
 
     public static String Listar(HashSet<WeaconParse> weacons) {
         StringBuilder sb = new StringBuilder();

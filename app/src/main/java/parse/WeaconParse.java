@@ -254,6 +254,16 @@ public class WeaconParse extends ParseObject {
         return b;
     }
 
+    public String getOneLineSummary() {
+        StringBuilder sb = new StringBuilder(getName());
+        if (this.NotificationRequiresFetching()) {
+            formatter form = new formatter(fetchedElements);
+            sb.append(": " + form.summarizeAllLines(true));
+        }
+        return sb.toString();
+    }
+
+    //Fetching for notification
     public boolean NotificationRequiresFetching() {
         if (getType().equals("bus_stop")) {
             return true;
@@ -275,12 +285,5 @@ public class WeaconParse extends ParseObject {
         this.wasFetched = b;
     }
 
-    public String getOneLineSummary() {
-        StringBuilder sb = new StringBuilder(getName());
-        if (this.wasFetched) {
-            formatter form = new formatter(fetchedElements);
-            sb.append(": " + form.summarizeAllLines(true));
-        }
-        return sb.toString();
-    }
+
 }

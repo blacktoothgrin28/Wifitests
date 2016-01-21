@@ -162,7 +162,7 @@ public abstract class Notifications {
         if (we.getType().equals("bus_stop")) {
             formatter form = new formatter(we.getFetchedElements());
 
-            notif.setContentText("BUS STOP. " + form.summarizeAllLines());
+            notif.setContentText("BUS STOP. " + we.getOneLineSummary());
 
             //InboxStyle
             NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
@@ -232,41 +232,7 @@ public abstract class Notifications {
         return notif;
     }
 
-    public static void showNotification(final ArrayList<WeaconParse> notificables, boolean someWeaconRequiresFetching, boolean sound) {
-        if (notificables.size() == 0) {
-            mNotificationManager.cancel(mIdNoti);
-            myLog.add("Borrada la notifcacion porque no estamos en área de ninguno.", "LIM");
-            return;
-        }
-
-        if (!someWeaconRequiresFetching) {
-            showNotification(notificables, sound);
-        } else {
-//            String[] paradasIds = new String[notificables.size()];
-//            for (int i = 0; i < notificables.size(); i++) {
-//                WeaconParse we = notificables.get(i);
-//                if (we.NotificationRequiresFetching()) {
-//                    paradasIds[i] = we.getParadaId();
-//                } else {
-//                    paradasIds[i] = "";
-//                }
-//            }
-
-            fetchThenNotify((WeaconParse[]) notificables.toArray(), new OnTaskCompleted() {
-                @Override
-                public void OnTaskCompleted(ArrayList elements) {
-                    showNotification(elements, true);
-                }
-
-                @Override
-                public void OnError(Exception e) {
-
-                }
-            });
-        }
-    }
-
-    private static void showNotification(ArrayList<WeaconParse> notificables, boolean sound) {
+    public static void showNotification(ArrayList<WeaconParse> notificables, boolean sound) {
         try {
             if (notificables.size() > 0) {
                 if (notificables.size() == 1) {
@@ -274,6 +240,10 @@ public abstract class Notifications {
                 } else {
                     sendSeveralWeacons(notificables, sound);
                 }
+            } else {
+                mNotificationManager.cancel(mIdNoti);
+                myLog.add("Borrada la notifcacion porque no estamos en área de ninguno.", "LIM");
+
             }
         } catch (Exception e) {
             myLog.add("---Errod en shownotif: " + e.getLocalizedMessage());
@@ -309,7 +279,7 @@ public abstract class Notifications {
         inboxStyle.setSummaryText("Currently " + LogInManagement.getActiveWeacons().size() + " weacons active");
 
         for (WeaconParse weacon : notificables) {
-            inboxStyle.addLine(weacon.getName());
+            inboxStyle.addLine(weacon.getOneLineSummary());
         }
 
         notif.setStyle(inboxStyle);
@@ -504,9 +474,9 @@ public abstract class Notifications {
         }
 
         @Override
-        protected ArrayList<CardWithList.DefaultListObject> doInBackground(String... strings) {
+        protected ArrayList<CardWithList.DefaultListObject> doInBackground(String... paradasIds) {
             Connection.Response response = null;
-            String paradaId = strings[0];
+            String paradaId = paradasIds[0];
             String q2 = "http://www.santqbus.santcugat.cat/consultatr.php?idparada=" + paradaId + "&idliniasae=-1&codlinea=-1";
 
             try {
