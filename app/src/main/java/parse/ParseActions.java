@@ -265,26 +265,21 @@ public abstract class ParseActions {
             query.findInBackground(new FindCallback<ParseObject>() {
                 @Override
                 public void done(List<ParseObject> list, ParseException e) {
-                    if (list == null) {
-                        return;
-                    }
-                    if (list.size() == 0) { //create
-                        ParseObject hit = new ParseObject("w_hit");
-                        hit.put("ssid", spot);
-                        hit.put("user", ParseUser.getCurrentUser());
-                        hit.put("nhits", 1);
-                        hit.saveInBackground();
-                    } else {//update
-                        ParseObject hit = list.get(0);
-                        hit.increment("nhits");
-                        hit.saveInBackground();
+                    if (list != null) {
+                        if (list.size() == 0) { //create
+                            ParseObject hit = new ParseObject("w_hit");
+                            hit.put("ssid", spot);
+                            hit.put("user", ParseUser.getCurrentUser());
+                            hit.put("nhits", 1);
+                            hit.saveInBackground();
+                        } else {//update
+                            ParseObject hit = list.get(0);
+                            hit.increment("nhits");
+                            hit.saveInBackground();
+                        }
                     }
                 }
-
-
             });
-
-
         } catch (Exception e) {
             myLog.add("--error en subir hit: " + e.getMessage());
         }

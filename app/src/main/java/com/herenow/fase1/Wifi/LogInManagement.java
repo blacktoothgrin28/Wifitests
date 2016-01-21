@@ -1,6 +1,7 @@
 package com.herenow.fase1.Wifi;
 
 import android.content.Context;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.herenow.fase1.Notifications.Notifications;
@@ -205,28 +206,16 @@ public abstract class LogInManagement {
 
             //Notify or change notification
             if (anychange) {
-//                ArrayList<WeaconParse> notificables = new ArrayList();
-//                myLog.add("We Will notify: ", "LIM");
-//
-//                if (contabilidad.keySet().size() == 0) {
-//                    myLog.add("Remove all notified weacons", "LIM");
-//                }
-//
-//                for (WeaconParse we : contabilidad.keySet()) {
-//                    if (contabilidad.get(we) > 0) {
-//                        notificables.add(we);
-//                        myLog.add("     ->" + we.getName(), "LIM");
-//                    }
-//                }
-
-//                Notifications.showNotification(notificables, someWeaconRequiresFetching, sound);
+                myLog.add("Will Notify: " + stringUtils.Listar(onNotification));
                 Notifications.showNotification(onNotification, someWeaconRequiresFetching, sound);
-                Notifications.notifyContabilidad(getContabilidadString());
             }
+
+            Notifications.notifyContabilidad(getContabilidadString());
             myLog.add("****************************", "LIM");
 
         } catch (Exception e) {
-            myLog.add("----error in login management: " + e.getLocalizedMessage());
+            myLog.add("----error in login management: " + e);
+            myLog.add("     ---details: \n" + Log.getStackTraceString(e));
         }
     }
 

@@ -95,6 +95,7 @@ public class myLog {
                     try {
                         pw = new PrintWriter(
                                 new FileWriter(Environment.getExternalStorageDirectory() + "/WCLOG//rt.txt", true));
+                        pw.append("*******" + currentDate() + "\n");
                         ex.printStackTrace(pw);
                         pw.flush();
                         pw.close();

@@ -71,6 +71,15 @@ public class formatter {
     }
 
     /**
+     * Shows only the first arrival by line in compact version:  L1:10|B3:5|R4:18
+     *
+     * @return
+     */
+    public String summarizeAllLinesCompact() {
+        return null;
+    }
+
+    /**
      * Array with strings that summarizes each line: L1: 12 min, 18 min, 35 min
      *
      * @return

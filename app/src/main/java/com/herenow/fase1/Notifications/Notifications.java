@@ -220,7 +220,7 @@ public abstract class Notifications {
                 + " weacons active");//TODO Add a meaningfull summary, probably containing the number of weacons in app
 
         for (WeaconParse weacon : showedNotifications) {
-            inboxStyle.addLine(weacon.getName());
+            inboxStyle.addLine(weacon.getOneLineSummary());
         }
 
         notif.setStyle(inboxStyle);

@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import util.RoundImage;
+import util.formatter;
 import util.myLog;
 
 /**
@@ -32,20 +33,6 @@ public class WeaconParse extends ParseObject {
     private ArrayList fetchedElements;
 
     public WeaconParse() {
-    }
-
-    @Override
-    public int hashCode() {
-        return getObjectId().hashCode();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o == null) return false;
-        if (!(o instanceof WeaconParse)) return false;
-
-        WeaconParse other = (WeaconParse) o;
-        return this.getObjectId() == other.getObjectId();
     }
 
     public WeaconParse(String name, String mainUrl, String phone, String url2, String url3, String description,
@@ -81,6 +68,20 @@ public class WeaconParse extends ParseObject {
         drawable.draw(canvas);
 
         return bitmap;
+    }
+
+    @Override
+    public int hashCode() {
+        return getObjectId().hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null) return false;
+        if (!(o instanceof WeaconParse)) return false;
+
+        WeaconParse other = (WeaconParse) o;
+        return this.getObjectId() == other.getObjectId();
     }
 
     public String getName() {
@@ -124,6 +125,10 @@ public class WeaconParse extends ParseObject {
     public String getMessage() {
         String message = getString("Description");
         return message;
+    }
+
+    public void setMessage(String message) {
+        put("Description", message);
     }
 
     public Bitmap getLogo() {
@@ -249,10 +254,6 @@ public class WeaconParse extends ParseObject {
         return b;
     }
 
-    public void setMessage(String message) {
-        put("Description", message);
-    }
-
     public boolean NotificationRequiresFetching() {
         if (getType().equals("bus_stop")) {
             return true;
@@ -272,5 +273,14 @@ public class WeaconParse extends ParseObject {
 
     public void setAlreadyFetched(boolean b) {
         this.wasFetched = b;
+    }
+
+    public String getOneLineSummary() {
+        StringBuilder sb = new StringBuilder(getName());
+        if (this.wasFetched) {
+            formatter form = new formatter(fetchedElements);
+            sb.append(": " + form.summarizeAllLinesCompact());
+        }
+        return sb.toString();
     }
 }
