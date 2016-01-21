@@ -52,31 +52,36 @@ public class formatter {
     /**
      * Shows only the first arrival by line:  L1:10m | B3: 5m | R4:18m
      *
+     * @param compact for having L1:10|B3:5|R4:18
      * @return
      */
-    public String summarizeAllLines() {
+    public String summarizeAllLines(boolean compact) {
         String substring = "No info";
+        int del = 0;
 
-        StringBuilder sb = new StringBuilder();
+        if (tableLines.size() > 0) {
+            StringBuilder sb = new StringBuilder();
 
-        for (String name : tableLines.keySet()) {
-            String roundedTime = tableLines.get(name).get(0).roundedTime;
-            int pos = roundedTime.indexOf(" ");
-            sb.append(name + ": " + roundedTime.substring(0, pos) + "m | ");
+            for (String name : tableLines.keySet()) {
+                String roundedTime = tableLines.get(name).get(0).roundedTime;
+                int pos = roundedTime.indexOf(" ");
+                if (compact) {
+                    sb.append(name + ":" + roundedTime.substring(0, pos) + "|");
+                    del = 1;
+                } else {
+                    sb.append(name + ": " + roundedTime.substring(0, pos) + "m | ");
+                    del = 2;
+                }
+            }
+            String s = sb.toString();
+            substring = s.substring(0, s.length() - del);
         }
-        String s = sb.toString();
-        substring = s.substring(0, s.length() - 2);
 
         return substring;
     }
 
-    /**
-     * Shows only the first arrival by line in compact version:  L1:10|B3:5|R4:18
-     *
-     * @return
-     */
-    public String summarizeAllLinesCompact() {
-        return null;
+    public String summarizeAllLines() {
+        return summarizeAllLines(false);
     }
 
     /**

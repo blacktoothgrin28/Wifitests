@@ -279,7 +279,7 @@ public class WeaconParse extends ParseObject {
         StringBuilder sb = new StringBuilder(getName());
         if (this.wasFetched) {
             formatter form = new formatter(fetchedElements);
-            sb.append(": " + form.summarizeAllLinesCompact());
+            sb.append(": " + form.summarizeAllLines(true));
         }
         return sb.toString();
     }

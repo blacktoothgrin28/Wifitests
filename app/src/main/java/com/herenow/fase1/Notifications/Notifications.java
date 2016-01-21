@@ -17,8 +17,6 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 import android.text.SpannableString;
 
-import com.google.android.gms.internal.zzeo;
-import com.google.android.gms.tagmanager.Container;
 import com.herenow.fase1.Activities.BrowserActivity;
 import com.herenow.fase1.Activities.CardsActivity;
 import com.herenow.fase1.Activities.ConnectToWifi;
@@ -33,17 +31,13 @@ import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 
 import java.io.IOException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
-import javax.sql.RowSet;
-
 import it.gmariotti.cardslib.library.prototypes.CardWithList;
 import parse.WeaconParse;
 import util.OnTaskCompleted;
-import util.Weacon;
 import util.formatter;
 import util.myLog;
 
