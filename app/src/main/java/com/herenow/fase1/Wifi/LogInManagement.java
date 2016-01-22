@@ -70,7 +70,7 @@ public abstract class LogInManagement {
             checkAppearing();
 
             myLog.add("conta: " + stringUtils.Listar(contabilidad), "LIM");
-            myLog.add("has changed?" + anychange, "LIM");
+            myLog.add("anychange?" + anychange + "| anyfetchable?" + anyFetchable + "| should fetch?" + shouldFetch(weaconsDetected), "LIM");
 
             //Notify or change notification
             if (anychange || (anyFetchable && shouldFetch(weaconsDetected))) {
@@ -142,7 +142,6 @@ public abstract class LogInManagement {
             WeaconParse we = it.next();
             if (we.NotificationRequiresFetching()) {
                 res = true;
-                myLog.add(we.getName() + " requires fetching", "fetch");
             }
         }
         return res;
@@ -443,11 +442,8 @@ public abstract class LogInManagement {
 
         @Override
         protected void onPostExecute(ArrayList elements) {
-            myLog.add("post exe INI: " + mWe.getName(), "fetch");
-//            workCounter.taskFinished();
             super.onPostExecute(elements);
             mWe.setFetchingResults(elements);
-            myLog.add("post exe FIN: " + mWe.getName(), "fetch");
             multiTaskCompleted.OneTaskCompleted(mWe);
         }
     }

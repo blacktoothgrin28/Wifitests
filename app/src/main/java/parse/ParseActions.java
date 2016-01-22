@@ -239,9 +239,10 @@ public abstract class ParseActions {
                         }
                         myLog.add(sb.toString(), "WE");
                     }
-                    LogInManagement.setNewWeacons(weaconHashSet);
                     myLog.add("Detected spots: " + spots.size() + " | Different weacons: " + weaconHashSet.size(), "LIM");
                     myLog.add(" " + stringUtils.Listar(weaconHashSet), "LIM");
+
+                    LogInManagement.setNewWeacons(weaconHashSet);
 
                 } else {
                     myLog.addError(this.getClass(), e);
