@@ -2,8 +2,10 @@ package com.herenow.fase1.Activities;
 
 import android.annotation.TargetApi;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.wifi.ScanResult;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -58,18 +60,19 @@ import util.myLog;
 import util.parameters;
 
 import static util.myLog.WriteUnhandledErrors;
+import static util.stringUtils.Listar;
 
 
 public class MainActivity extends ActionBarActivity implements TextToSpeech.OnInitListener {
 
+    private static final int TIME_DELAY = 2000;
     public static Position mPos; //WARN. Lo he hecho static para poder usarlo en SAPO
-
     private static TextView tv;
     private static int im = 1;
     private static long newTime = System.currentTimeMillis();
+    private static long back_pressed;
     Intent intentWifiObs;
     private Intent intentAddWeacon;
-
     private Intent intentCards;
     //Todo solve reporting time between scannings
     //Report on screen
@@ -79,9 +82,6 @@ public class MainActivity extends ActionBarActivity implements TextToSpeech.OnIn
     private ArrayList<String> listaObj;
     private TextToSpeech myTTS;
 
-    private static final int TIME_DELAY = 2000;
-    private static long back_pressed;
-
     /***
      * Write in the main activity
      *
@@ -90,7 +90,6 @@ public class MainActivity extends ActionBarActivity implements TextToSpeech.OnIn
     public static void writeOnScreen(String s) {
         tv.append("\n> " + s);
     }
-    //    private boolean isSapoActive = true; //TODO activate /deactivate sapo remotely
 
     public static void reportScanning(int found, int total) {
         long oldTime = newTime;
@@ -100,6 +99,7 @@ public class MainActivity extends ActionBarActivity implements TextToSpeech.OnIn
         writeOnScreen("+++ " + im + "  .(" + +diff + "s|found=" + found + "/" + total + ") ");
         im++;
     }
+    //    private boolean isSapoActive = true; //TODO activate /deactivate sapo remotely
 
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -128,6 +128,8 @@ public class MainActivity extends ActionBarActivity implements TextToSpeech.OnIn
         //TEST
 //   clickCards(null);
 
+        MytipodeReceiver myreciver = new MytipodeReceiver();
+        registerReceiver(myreciver, new IntentFilter("popo"));
     }
 
     @Override
@@ -355,6 +357,20 @@ public class MainActivity extends ActionBarActivity implements TextToSpeech.OnIn
         }, this);
     }
 
+    private class MytipodeReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            try {
+                myLog.add("hemos recibido algo!", "bc");
+                myLog.add("estos son los weacons que habia n=" + LogInManagement.lastWeaconsDetected.size(), "bc");
+                myLog.add("estos son los weacons que habia" + Listar(LogInManagement.lastWeaconsDetected), "bc");
+                LogInManagement.refresh();
+            } catch (Exception e) {
+                myLog.add("--error en experimento " + e.getLocalizedMessage());
+            }
+        }
+    }
 
 //    class WifiReceiver extends BroadcastReceiver {
 //

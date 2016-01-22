@@ -254,7 +254,10 @@ public abstract class Notifications {
 
     private static void sendSeveralWeacons(ArrayList<WeaconParse> notificables, boolean sound, boolean anyFetchable) {
 
-//        NotificationCompat.Action actionRefresh = new NotificationCompat.Action(R.drawable.ic_refresh_white_24dp, "Refresh", resultPendingIntentRefresh);
+        Intent refreshIntent = new Intent("popo");
+        PendingIntent resultPendingIntentRefresh = PendingIntent.getBroadcast(acti, 1, refreshIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        NotificationCompat.Action actionRefresh = new NotificationCompat.Action(R.drawable.ic_refresh_white_24dp, "Refresh", resultPendingIntentRefresh);
 
         NotificationCompat.Builder notif;
         Collections.reverse(notificables);
@@ -274,7 +277,7 @@ public abstract class Notifications {
                 .setDeleteIntent(pendingDeleteIntent)
                 .setTicker(msg);
 
-//        if (anyFetchable) notif.addAction(actionRefresh);
+        if (anyFetchable) notif.addAction(actionRefresh);
 
         if (sound) {
             notif.setLights(0xE6D820, 300, 100)

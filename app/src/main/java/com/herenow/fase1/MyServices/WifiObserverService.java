@@ -77,9 +77,6 @@ public class WifiObserverService extends Service {
      */
     public void CheckScanResults(final List<ScanResult> sr) {
         iScan++;
-//        if (iScan % 8 == 0) {
-//            ReportLocalPlaces();
-//        }
 
         ArrayList<String> bssids = new ArrayList<>();
         ArrayList<String> ssids = new ArrayList<>();

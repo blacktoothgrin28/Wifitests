@@ -35,11 +35,11 @@ import util.stringUtils;
  * Created by Milenko on 10/08/2015.
  */
 public abstract class LogInManagement {
-    private static HashSet<WeaconParse> lastWeaconsDetected;
+    public static HashSet<WeaconParse> lastWeaconsDetected;
     private static ArrayList<WeaconParse> onNotification = new ArrayList<>();//Will be notified
     private static HashMap<WeaconParse, Integer> contabilidad = new HashMap<>(); //{we,n=appeared in a row}
 
-    private static boolean anychange = false;  //is there any changes for send or modify notification?
+    private static boolean anyChange = false;  //is there any changes for send or modify notification?
     private static boolean sound;//should the notification be silent?
     private static ArrayList<WeaconParse> onChat = new ArrayList<>();
     private static boolean anyFetchable;
@@ -58,7 +58,7 @@ public abstract class LogInManagement {
     public static void setNewWeacons(HashSet<WeaconParse> weaconsDetected) {
 
         lastWeaconsDetected = weaconsDetected;
-        anychange = false;
+        anyChange = false;
         sound = false;
         anyFetchable = anyFetchable(weaconsDetected);
 
@@ -70,45 +70,11 @@ public abstract class LogInManagement {
             checkAppearing();
 
             myLog.add("conta: " + stringUtils.Listar(contabilidad), "LIM");
-            myLog.add("anychange?" + anychange + "| anyfetchable?" + anyFetchable + "| should fetch?" + shouldFetch(weaconsDetected), "LIM");
+            myLog.add("anyChange?" + anyChange + "| anyfetchable?" + anyFetchable + "| should fetch?" + shouldFetch(weaconsDetected), "LIM");
 
             //Notify or change notification
-            if (anychange || (anyFetchable && shouldFetch(weaconsDetected))) {
-                myLog.add("Will Notify: " + stringUtils.Listar(onNotification), "LIM");
-                myLog.add("**Se requiere fetch:" + anyFetchable, "fetch");
-
-                if (!anyFetchable) {
-                    Notifications.showNotification(onNotification, sound, anyFetchable);
-                } else {
-                    MultiTaskCompleted listener = new MultiTaskCompleted() {
-                        int i = 0;
-                        ArrayList<WeaconParse> updatedWeacons = new ArrayList<>();
-
-                        @Override
-                        public void OneTaskCompleted(WeaconParse updatedWeacon) {
-                            i += 1;
-                            updatedWeacons.add(updatedWeacon);
-                            if (updatedWeacons.size() == onNotification.size()) {
-//                                // Experimental: sorting updated weacons
-//                                ArrayList sortedUpdated = new ArrayList();
-//                                for (WeaconParse weBuff : onNotification) {
-//                                    sortedUpdated.add(updatedWeacons.get(updatedWeacons.indexOf(weBuff)));
-//                                }
-                                Notifications.showNotification(updatedWeacons, sound, anyFetchable);
-                            }
-                        }
-
-                        @Override
-                        public void OnError(Exception e) {
-                            myLog.add("---err " + e.getLocalizedMessage(), "fetch");
-                        }
-
-                    };
-
-                    for (final WeaconParse we : onNotification) {
-                        (new FetchWeacon(listener, we)).execute(we.getParadaId());
-                    }
-                }
+            if (anyChange || (anyFetchable && shouldFetch(weaconsDetected))) {
+                Notify();
             }
 
             Notifications.notifyContabilidad(stringUtils.Listar(contabilidad));
@@ -117,6 +83,44 @@ public abstract class LogInManagement {
         } catch (Exception e) {
             myLog.add("----error in login management: " + e);
             myLog.add("     ---details: \n" + Log.getStackTraceString(e));
+        }
+    }
+
+    private static void Notify() {
+        myLog.add("Will Notify: " + stringUtils.Listar(onNotification), "LIM");
+        myLog.add("**Se requiere fetch:" + anyFetchable, "fetch");
+
+        if (!anyFetchable) {
+            Notifications.showNotification(onNotification, sound, anyFetchable);
+        } else {
+            MultiTaskCompleted listener = new MultiTaskCompleted() {
+                int i = 0;
+                ArrayList<WeaconParse> updatedWeacons = new ArrayList<>();
+
+                @Override
+                public void OneTaskCompleted(WeaconParse updatedWeacon) {
+                    i += 1;
+                    updatedWeacons.add(updatedWeacon);
+                    if (updatedWeacons.size() == onNotification.size()) {
+//                                // Experimental: sorting updated weacons
+//                                ArrayList sortedUpdated = new ArrayList();
+//                                for (WeaconParse weBuff : onNotification) {
+//                                    sortedUpdated.add(updatedWeacons.get(updatedWeacons.indexOf(weBuff)));
+//                                }
+                        Notifications.showNotification(updatedWeacons, sound, anyFetchable);
+                    }
+                }
+
+                @Override
+                public void OnError(Exception e) {
+                    myLog.add("---err " + e.getLocalizedMessage(), "fetch");
+                }
+
+            };
+
+            for (final WeaconParse we : onNotification) {
+                (new FetchWeacon(listener, we)).execute(we.getParadaId());
+            }
         }
     }
 
@@ -314,7 +318,7 @@ public abstract class LogInManagement {
     private static void WeNotificationIn(WeaconParse we) {
         contabilidad.put(we, 1);
         myLog.add("Just entering in: " + we.getName(), "LIM");
-        anychange = true;//Just appeared this weacon
+        anyChange = true;//Just appeared this weacon
         sound = true;
         onNotification.add(we);
 
@@ -323,7 +327,7 @@ public abstract class LogInManagement {
     private static void WeNotificationOut(WeaconParse we) {
         onNotification.remove(we);
         myLog.add("Remove from notification:" + we.getName(), "LIM");
-        anychange = true;
+        anyChange = true;
 
     }
 
@@ -381,6 +385,11 @@ public abstract class LogInManagement {
         } catch (Exception e) {
             myLog.add("---error en logout: " + e.getLocalizedMessage());
         }
+    }
+
+    public static void refresh() {
+        myLog.add("refresing the notification");
+        Notify();
     }
 
     public HashMap getCurrentlyLogged() {
