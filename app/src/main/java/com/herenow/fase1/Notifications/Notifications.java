@@ -16,6 +16,7 @@ import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 import android.text.SpannableString;
+import android.util.Log;
 
 import com.herenow.fase1.Activities.BrowserActivity;
 import com.herenow.fase1.Activities.CardsActivity;
@@ -246,7 +247,7 @@ public abstract class Notifications {
 
             }
         } catch (Exception e) {
-            myLog.add("---Errod en shownotif: " + e.getLocalizedMessage());
+            myLog.add("---Errod en shownotif: " + e.getLocalizedMessage() + "\n" + Log.getStackTraceString(e));
         }
     }
 

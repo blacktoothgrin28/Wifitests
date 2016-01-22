@@ -28,7 +28,6 @@ import java.util.Map;
 import parse.WeaconParse;
 import parse.WifiSpot;
 import util.MultiTaskCompleted;
-import util.formatter;
 import util.myLog;
 import util.parameters;
 import util.stringUtils;
@@ -37,10 +36,6 @@ import util.stringUtils;
  * Created by Milenko on 10/08/2015.
  */
 public abstract class LogInManagement {
-    static int repeatedOffToDisappear = 10;
-    static int repeatedOffRemoveFromNotification = 5;
-    static int repeatedOffToChatOff = 4;
-    static int repeatedOnToChatOn = 3;
     private static HashMap<WeaconParse, Integer> contabilidad = new HashMap<>(); //{we,n}
     private static HashMap<String, Integer> oldSpots = new HashMap<>();
     private static HashMap<String, Integer> newSpots;
@@ -63,8 +58,9 @@ public abstract class LogInManagement {
         anychange = false; //is there any changes for send or modify notification?
         sound = false;//should the notification be silent?
         boolean someWeaconRequiresFetching = false;
-        try {
+        myLog.add("******************", "fetch");
 
+        try {
             // DISAPPEARING (NOT IN NEW)
             Iterator<Map.Entry<WeaconParse, Integer>> itOld = contabilidad.entrySet().iterator();
 
@@ -73,27 +69,23 @@ public abstract class LogInManagement {
 
                 WeaconParse we = entry.getKey();
                 if (!weaconsDetected.contains(we)) {
-//                    int n = contabilidad.get(entry);
                     int n = entry.getValue();
 
                     // +++ -
                     if (n > 0) {
                         entry.setValue(-1);
-//                        contabilidad.put(entry.getKey(), -1);
                         myLog.add("just leaving " + we.getName(), "LIM");
 
                         // --- -
                     } else {
-//                        contabilidad.put(entry, n - 1);
                         entry.setValue(n - 1);
 
-                        if (n < -repeatedOffToDisappear) {
-//                            WeForget(entry.getKey()); //remove from consideration
+                        if (n < -parameters.repeatedOffToDisappear) {
                             myLog.add("Forget it, too far: " + we.getName(), "LIM");
                             itOld.remove();
-                        } else if (n == -repeatedOffRemoveFromNotification && IsInNotification(we)) {
+                        } else if (n == -we.getRepeatedOffRemoveFromNotification() && IsInNotification(we)) {
                             WeNotificationOut(we); //remove from notification
-                        } else if (n == -repeatedOffToChatOff && IsInChat(we)) {
+                        } else if (n == -parameters.repeatedOffToChatOff && IsInChat(we)) {
                             WeChatOut(we); // Log out from chat
                         }
                     }
@@ -108,7 +100,7 @@ public abstract class LogInManagement {
             while (it.hasNext()) {
                 WeaconParse we = it.next();
 
-                if (we.NotificationRequiresFetching()) {
+                if (we.NotificationRequiresFetching() && contabilidad.get(we) < 3) {//avoid keep fetching if you live near a bus stop
                     someWeaconRequiresFetching = true;
                     myLog.add(we.getName() + " requires feticn", "fetch");
                 }
@@ -118,7 +110,7 @@ public abstract class LogInManagement {
                     // +++ +
                     if (n >= 0) {
                         contabilidad.put(we, n + 1);
-                        if (n == repeatedOnToChatOn && !IsInChat(we)) {
+                        if (n == parameters.repeatedOnToChatOn && !IsInChat(we)) {
                             WeChatIn(we);
                         }
                         // ++-- +

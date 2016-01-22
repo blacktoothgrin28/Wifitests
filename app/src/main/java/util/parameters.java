@@ -29,6 +29,12 @@ public class parameters {
     public static boolean isSapoActive = false;
     public static int spaceBetweenCards = 30; //in pixels
 
+    //Default values to repetition of weacon detection
+    public static int repeatedOffRemoveFromNotification = 5;
+    public static int repeatedOffToDisappear = 10;
+    public static int repeatedOffToChatOff = 4;
+    public static int repeatedOnToChatOn = 3;
+
 
     public enum CardType {COMPANY, SCHEDULE, LINKEDIN, NEWS, FLIGHTS}
 

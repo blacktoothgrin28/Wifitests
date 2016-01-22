@@ -65,6 +65,17 @@ public class formatter {
             for (String name : tableLines.keySet()) {
                 String roundedTime = tableLines.get(name).get(0).roundedTime;
                 int pos = roundedTime.indexOf(" ");
+
+                if (pos == 0) {//case "IMMINENT"
+                    if (compact) {
+                        sb.append(name + ":IM|");
+                        del = 1;
+                    } else {
+                        sb.append(name + ": IMM | ");
+                        del = 2;
+                    }
+                    continue;
+                }
                 if (compact) {
                     sb.append(name + ":" + roundedTime.substring(0, pos) + "|");
                     del = 1;

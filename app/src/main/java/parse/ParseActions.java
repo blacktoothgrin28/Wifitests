@@ -221,14 +221,15 @@ public abstract class ParseActions {
                 if (e == null) {
                     int n = spots.size();
 //                    LogInManagement.ReportDetectedSpots(spots, mContext);
+                    HashSet<WeaconParse> weaconHashSet = new HashSet<>();
+
                     if (n == 0) {
                         myLog.add("MegaQuery no match", "WE");
                     } else { //There are matches
                         myLog.add("From megaquery we have several matches: " + n, "WE");
 
-                        HashSet<WeaconParse> weaconHashSet = new HashSet<>();
-
                         StringBuilder sb = new StringBuilder("***********\n");
+                        myLog.add("****", "HIT");
                         for (WifiSpot spot : spots) {
                             sb.append(spot.toString() + "\n");
                             registerHitSSID(spot);
@@ -237,12 +238,11 @@ public abstract class ParseActions {
                             weaconHashSet.add(we);
                         }
                         myLog.add(sb.toString(), "WE");
-
-                        myLog.add("Detected spots: " + spots.size() + " | Different weacons: " + weaconHashSet.size(), "LIM");
-                        myLog.add(" " + stringUtils.Listar(weaconHashSet), "LIM");
-
-                        LogInManagement.setNewWeacons(weaconHashSet);
                     }
+                    LogInManagement.setNewWeacons(weaconHashSet);
+                    myLog.add("Detected spots: " + spots.size() + " | Different weacons: " + weaconHashSet.size(), "LIM");
+                    myLog.add(" " + stringUtils.Listar(weaconHashSet), "LIM");
+
                 } else {
                     myLog.addError(this.getClass(), e);
                 }

@@ -21,6 +21,7 @@ import java.util.List;
 import util.RoundImage;
 import util.formatter;
 import util.myLog;
+import util.parameters;
 
 /**
  * Created by Milenko on 30/07/2015.
@@ -31,6 +32,7 @@ public class WeaconParse extends ParseObject {
     private String[] cards;
     private boolean wasFetched = false;
     private ArrayList fetchedElements;
+    private int consecutiveFetchs = 0;
 
     public WeaconParse() {
     }
@@ -278,11 +280,22 @@ public class WeaconParse extends ParseObject {
 
     public void setFetchingResults(ArrayList elements) {
         this.wasFetched = true;
+        consecutiveFetchs++;
         this.fetchedElements = elements;
     }
 
     public void setAlreadyFetched(boolean b) {
         this.wasFetched = b;
+    }
+
+    public int getRepeatedOffRemoveFromNotification() {
+        int res;
+        if (getType().equals("bus_stop")) {
+            res = 1;
+        } else {
+            res = parameters.repeatedOffRemoveFromNotification;
+        }
+        return res;
     }
 
 
