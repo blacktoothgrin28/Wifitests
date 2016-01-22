@@ -81,18 +81,16 @@ public abstract class Notifications {
 
     }
 
-    private static void fetchThenNotify(WeaconParse[] weacons, OnTaskCompleted listener) {
-        (new FetchUrlsParadas(listener)).execute(weacons);
-    }
-
     private static void getInfoBuses(OnTaskCompleted listener, String paradaId) {
         (new FetchUrl(listener)).execute(paradaId);
     }
 
-    private static NotificationCompat.Builder buildSingleNotification(WeaconParse we, Intent resultIntent, PendingIntent resultPendingIntent, boolean sound) {
+    private static NotificationCompat.Builder buildSingleNotification(WeaconParse we, Intent resultIntent, PendingIntent resultPendingIntent, boolean sound, boolean anyFetchable) {
         NotificationCompat.Builder notif;
 
         NotificationCompat.Action actionSilence = new NotificationCompat.Action(R.drawable.ic_silence, "Turn Off", resultPendingIntent);//TODO to create the silence intent
+
+//        NotificationCompat.Action actionRefresh = new NotificationCompat.Action(R.drawable.ic_refresh_white_24dp, "Refresh", resultPendingIntentRefresh);
 
         notif = new NotificationCompat.Builder(acti)
                 .setSmallIcon(R.drawable.ic_stat_name_hn)
@@ -103,6 +101,9 @@ public abstract class Notifications {
                 .setTicker("Weacon detected\n" + we.getName())
                 .setDeleteIntent(pendingDeleteIntent)
                 .addAction(actionSilence);
+
+//        if (anyFetchable) notif.addAction(actionRefresh);
+
         if (sound) {
             notif.setLights(0xE6D820, 300, 100)
                     .setDefaults(Notification.DEFAULT_VIBRATE | Notification.DEFAULT_SOUND | Notification.FLAG_SHOW_LIGHTS);
@@ -233,13 +234,13 @@ public abstract class Notifications {
         return notif;
     }
 
-    public static void showNotification(ArrayList<WeaconParse> notificables, boolean sound) {
+    public static void showNotification(ArrayList<WeaconParse> notificables, boolean sound, boolean anyFetchable) {
         try {
             if (notificables.size() > 0) {
                 if (notificables.size() == 1) {
-                    sendOneWeacon(notificables.get(0), sound);
+                    sendOneWeacon(notificables.get(0), sound, anyFetchable);
                 } else {
-                    sendSeveralWeacons(notificables, sound);
+                    sendSeveralWeacons(notificables, sound, anyFetchable);
                 }
             } else {
                 mNotificationManager.cancel(mIdNoti);
@@ -251,7 +252,10 @@ public abstract class Notifications {
         }
     }
 
-    private static void sendSeveralWeacons(ArrayList<WeaconParse> notificables, boolean sound) {
+    private static void sendSeveralWeacons(ArrayList<WeaconParse> notificables, boolean sound, boolean anyFetchable) {
+
+//        NotificationCompat.Action actionRefresh = new NotificationCompat.Action(R.drawable.ic_refresh_white_24dp, "Refresh", resultPendingIntentRefresh);
+
         NotificationCompat.Builder notif;
         Collections.reverse(notificables);
 
@@ -269,6 +273,8 @@ public abstract class Notifications {
                 .setAutoCancel(true)
                 .setDeleteIntent(pendingDeleteIntent)
                 .setTicker(msg);
+
+//        if (anyFetchable) notif.addAction(actionRefresh);
 
         if (sound) {
             notif.setLights(0xE6D820, 300, 100)
@@ -295,7 +301,7 @@ public abstract class Notifications {
         mNotificationManager.notify(mIdNoti, notif.build());
     }
 
-    private static void sendOneWeacon(WeaconParse we, boolean sound) {
+    private static void sendOneWeacon(WeaconParse we, boolean sound, boolean anyFetchable) {
         try {
             Intent resultIntent;
             TaskStackBuilder stackBuilder;
@@ -322,7 +328,7 @@ public abstract class Notifications {
             stackBuilder.addNextIntent(resultIntent);
             resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT); //Todo solve the stack for going back from cards
 
-            notification = buildSingleNotification(we, resultIntent, resultPendingIntent, sound);
+            notification = buildSingleNotification(we, resultIntent, resultPendingIntent, sound, anyFetchable);
 
             mNotificationManager.notify(mIdNoti, notification.build());
         } catch (Exception e) {
@@ -408,7 +414,7 @@ public abstract class Notifications {
         stackBuilder.addNextIntent(resultIntent);
         resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT); //Todo solve the stack for going back from cards
 
-        notification = buildSingleNotification(we, resultIntent, resultPendingIntent, true);
+        notification = buildSingleNotification(we, resultIntent, resultPendingIntent, true, false);
 
         mNotificationManager.notify(mIdSingle, notification.build());
     }
@@ -523,62 +529,4 @@ public abstract class Notifications {
         }
     }
 
-    private static class FetchUrlsParadas extends AsyncTask<WeaconParse, Void, ArrayList<WeaconParse>> {
-        private OnTaskCompleted onTaskCompletedListener;
-        private ArrayList<WeaconParse> updatedWeacons;
-
-        FetchUrlsParadas(OnTaskCompleted listener) {
-            this.onTaskCompletedListener = listener;
-        }
-
-        @Override
-        protected ArrayList<WeaconParse> doInBackground(WeaconParse... params) {
-            for (WeaconParse we : params) {
-                if (we.NotificationRequiresFetching()) {
-                    Connection.Response response = null;
-                    String paradaId = we.getParadaId();
-                    String q2 = "http://www.santqbus.santcugat.cat/consultatr.php?idparada=" + paradaId + "&idliniasae=-1&codlinea=-1";
-
-                    try {
-                        response = Jsoup.connect(q2)
-                                .ignoreContentType(true)
-                                .referrer("http://www.google.com")
-                                .timeout(5000)
-                                .followRedirects(true)
-                                .execute();
-                    } catch (IOException e) {
-                        onTaskCompletedListener.OnError(e);
-                    }
-                    if (response == null) return null;
-
-                    String s = response.body();
-                    String[] partes = s.split("\\}\\,\\{|\\[\\{|\\}\\]");
-
-                    ArrayList lineTimes = new ArrayList();
-
-                    for (String parte : partes) {
-                        if (parte.length() > 3) {
-                            LineTime lineTime = null;
-                            try {
-                                lineTime = new LineTime(new JSONObject("{" + parte + "}"));
-                            } catch (JSONException e) {
-                                onTaskCompletedListener.OnError(e);
-                            }
-                            lineTimes.add(lineTime);
-                            myLog.add(lineTime.toString());
-                        }
-                    }
-                    we.setFetchingResults(lineTimes);
-                }
-                updatedWeacons.add(we);
-            }
-            return updatedWeacons;
-        }
-
-        @Override
-        protected void onPostExecute(ArrayList<WeaconParse> updatedWeacons) {
-            super.onPostExecute(updatedWeacons);
-            onTaskCompletedListener.OnTaskCompleted(updatedWeacons);
-        }
-    }
 }

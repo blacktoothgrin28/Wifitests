@@ -7,7 +7,6 @@ import android.widget.Toast;
 
 import com.herenow.fase1.LineTime;
 import com.herenow.fase1.Notifications.Notifications;
-import com.herenow.fase1.WorkCounter;
 import com.parse.ParseException;
 import com.parse.ParsePush;
 import com.parse.SaveCallback;
@@ -36,16 +35,19 @@ import util.stringUtils;
  * Created by Milenko on 10/08/2015.
  */
 public abstract class LogInManagement {
-    private static HashMap<WeaconParse, Integer> contabilidad = new HashMap<>(); //{we,n}
+    private static HashSet<WeaconParse> lastWeaconsDetected;
+    private static ArrayList<WeaconParse> onNotification = new ArrayList<>();//Will be notified
+    private static HashMap<WeaconParse, Integer> contabilidad = new HashMap<>(); //{we,n=appeared in a row}
+
+    private static boolean anychange = false;  //is there any changes for send or modify notification?
+    private static boolean sound;//should the notification be silent?
+    private static ArrayList<WeaconParse> onChat = new ArrayList<>();
+    private static boolean anyFetchable;
+    private static Context mContext;
+    //old stuff
     private static HashMap<String, Integer> oldSpots = new HashMap<>();
     private static HashMap<String, Integer> newSpots;
     private static HashMap<String, Integer> loggedWeacons = new HashMap<>();
-    private static Context mContext;
-    private static boolean anychange = false;
-    private static ArrayList<WeaconParse> onNotification = new ArrayList<>();
-    private static ArrayList<WeaconParse> onChat = new ArrayList<>();
-    private static boolean sound;
-    private static WorkCounter workCounter;
 
     /**
      * Informs the weacons detected, in order to send/update/remove  notification
@@ -55,84 +57,28 @@ public abstract class LogInManagement {
      */
     public static void setNewWeacons(HashSet<WeaconParse> weaconsDetected) {
 
-        anychange = false; //is there any changes for send or modify notification?
-        sound = false;//should the notification be silent?
-        boolean someWeaconRequiresFetching = false;
+        lastWeaconsDetected = weaconsDetected;
+        anychange = false;
+        sound = false;
+        anyFetchable = anyFetchable(weaconsDetected);
+
         myLog.add("******************", "fetch");
 
         try {
-            // DISAPPEARING (NOT IN NEW)
-            Iterator<Map.Entry<WeaconParse, Integer>> itOld = contabilidad.entrySet().iterator();
-
-            while (itOld.hasNext()) {
-                Map.Entry<WeaconParse, Integer> entry = itOld.next();
-
-                WeaconParse we = entry.getKey();
-                if (!weaconsDetected.contains(we)) {
-                    int n = entry.getValue();
-
-                    // +++ -
-                    if (n > 0) {
-                        entry.setValue(-1);
-                        myLog.add("just leaving " + we.getName(), "LIM");
-
-                        // --- -
-                    } else {
-                        entry.setValue(n - 1);
-
-                        if (n < -parameters.repeatedOffToDisappear) {
-                            myLog.add("Forget it, too far: " + we.getName(), "LIM");
-                            itOld.remove();
-                        } else if (n == -we.getRepeatedOffRemoveFromNotification() && IsInNotification(we)) {
-                            WeNotificationOut(we); //remove from notification
-                        } else if (n == -parameters.repeatedOffToChatOff && IsInChat(we)) {
-                            WeChatOut(we); // Log out from chat
-                        }
-                    }
-                }
-            }
-
-            //APPEARING (YES IN NEW)
-            // por cada uno de los nuevos
-            //si no está o es negativo lo agregamos con un uno
-            //si está, le sumamos uno
-            Iterator<WeaconParse> it = weaconsDetected.iterator();
-            while (it.hasNext()) {
-                WeaconParse we = it.next();
-
-                if (we.NotificationRequiresFetching() && contabilidad.get(we) < 3) {//avoid keep fetching if you live near a bus stop
-                    someWeaconRequiresFetching = true;
-                    myLog.add(we.getName() + " requires feticn", "fetch");
-                }
-
-                if (contabilidad.containsKey(we)) {
-                    int n = contabilidad.get(we);
-                    // +++ +
-                    if (n >= 0) {
-                        contabilidad.put(we, n + 1);
-                        if (n == parameters.repeatedOnToChatOn && !IsInChat(we)) {
-                            WeChatIn(we);
-                        }
-                        // ++-- +
-                    } else {
-                        contabilidad.put(we, 1);
-                        myLog.add("Entering Again: " + we.getName(), "LIM");
-                    }
-                } else {
-                    //First time
-                    WeNotificationIn(we);
-                }
-            }
+            //Check differences with last scanning and keep accumulation history
+            checkDisappearing();
+            checkAppearing();
 
             myLog.add("conta: " + stringUtils.Listar(contabilidad), "LIM");
             myLog.add("has changed?" + anychange, "LIM");
 
             //Notify or change notification
-            if (anychange || someWeaconRequiresFetching) {
+            if (anychange || (anyFetchable && shouldFetch(weaconsDetected))) {
                 myLog.add("Will Notify: " + stringUtils.Listar(onNotification), "LIM");
-                myLog.add("**Se requiere fetch:" + someWeaconRequiresFetching, "fetch");
-                if (!someWeaconRequiresFetching) {
-                    Notifications.showNotification(onNotification, sound);
+                myLog.add("**Se requiere fetch:" + anyFetchable, "fetch");
+
+                if (!anyFetchable) {
+                    Notifications.showNotification(onNotification, sound, anyFetchable);
                 } else {
                     MultiTaskCompleted listener = new MultiTaskCompleted() {
                         int i = 0;
@@ -143,7 +89,12 @@ public abstract class LogInManagement {
                             i += 1;
                             updatedWeacons.add(updatedWeacon);
                             if (updatedWeacons.size() == onNotification.size()) {
-                                Notifications.showNotification(updatedWeacons, sound);
+//                                // Experimental: sorting updated weacons
+//                                ArrayList sortedUpdated = new ArrayList();
+//                                for (WeaconParse weBuff : onNotification) {
+//                                    sortedUpdated.add(updatedWeacons.get(updatedWeacons.indexOf(weBuff)));
+//                                }
+                                Notifications.showNotification(updatedWeacons, sound, anyFetchable);
                             }
                         }
 
@@ -166,6 +117,101 @@ public abstract class LogInManagement {
         } catch (Exception e) {
             myLog.add("----error in login management: " + e);
             myLog.add("     ---details: \n" + Log.getStackTraceString(e));
+        }
+    }
+
+    private static boolean shouldFetch(HashSet<WeaconParse> weacons) {
+        boolean res = false;
+
+        Iterator<WeaconParse> it = weacons.iterator();
+        while (it.hasNext() && !res) {
+            WeaconParse we = it.next();
+            if (we.NotificationRequiresFetching() && contabilidad.get(we) < 3) {//avoid keep fetching if you live near a bus stop
+                res = true;
+                myLog.add(we.getName() + " requires feticn. this is the " + contabilidad.get(we) + "time", "fetch");
+            }
+        }
+        return res;
+    }
+
+    private static boolean anyFetchable(HashSet<WeaconParse> weacons) {
+        boolean res = false;
+
+        Iterator<WeaconParse> it = weacons.iterator();
+        while (it.hasNext() && !res) {
+            WeaconParse we = it.next();
+            if (we.NotificationRequiresFetching()) {
+                res = true;
+                myLog.add(we.getName() + " requires fetching", "fetch");
+            }
+        }
+        return res;
+    }
+
+    /**
+     * APPEARING (YES IN NEW)
+     * por cada uno de los nuevos
+     * si no está o es negativo lo agregamos con un uno
+     * si está, le sumamos uno
+     */
+    private static void checkAppearing() {
+
+        Iterator<WeaconParse> it = lastWeaconsDetected.iterator();
+        while (it.hasNext()) {
+            WeaconParse we = it.next();
+
+            if (contabilidad.containsKey(we)) {
+                int n = contabilidad.get(we);
+                // +++ +
+                if (n >= 0) {
+                    contabilidad.put(we, n + 1);
+                    if (n == parameters.repeatedOnToChatOn && !IsInChat(we)) {
+                        WeChatIn(we);
+                    }
+                    // ++-- +
+                } else {
+                    contabilidad.put(we, 1);
+                    myLog.add("Entering Again: " + we.getName(), "LIM");
+                }
+            } else {
+                //First time
+                WeNotificationIn(we);
+            }
+        }
+    }
+
+    /**
+     * DISAPPEARING (NOT IN NEW)
+     */
+    private static void checkDisappearing() {
+        Iterator<Map.Entry<WeaconParse, Integer>> itOld = contabilidad.entrySet().iterator();
+
+        while (itOld.hasNext()) {
+            Map.Entry<WeaconParse, Integer> entry = itOld.next();
+
+            WeaconParse we = entry.getKey();
+            if (!lastWeaconsDetected.contains(we)) {
+                int n = entry.getValue();
+
+                // +++ -
+                if (n > 0) {
+                    entry.setValue(-1);
+                    myLog.add("just leaving " + we.getName(), "LIM");
+
+                    // --- -
+                } else {
+                    entry.setValue(n - 1);
+
+                    if (n < -parameters.repeatedOffToDisappear) {
+                        myLog.add("Forget it, too far: " + we.getName(), "LIM");
+                        itOld.remove();
+                    } else if (n == -we.getRepeatedOffRemoveFromNotification() && IsInNotification(we)) {
+                        WeNotificationOut(we); //remove from notification
+                    } else if (n == -parameters.repeatedOffToChatOff && IsInChat(we)) {
+                        WeChatOut(we); // Log out from chat
+                    }
+                }
+            }
         }
     }
 
