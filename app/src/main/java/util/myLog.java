@@ -111,4 +111,8 @@ public class myLog {
     public static void addError(Class<?> clase, Exception e) {
         add("-----Error en " + clase.getSimpleName() + ": " + e.getLocalizedMessage());
     }
+
+    public static void notificationMultiple(String title, String body, String summary) {
+        myLog.add("***********MULTIPLE************************\n" + title + "\n" + body + summary, "NOTI");
+    }
 }

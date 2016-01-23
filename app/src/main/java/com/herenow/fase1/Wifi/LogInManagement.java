@@ -36,7 +36,7 @@ import util.stringUtils;
  */
 public abstract class LogInManagement {
     public static HashSet<WeaconParse> lastWeaconsDetected;
-    private static ArrayList<WeaconParse> onNotification = new ArrayList<>();//Will be notified
+    private static ArrayList<WeaconParse> weaconsToNotify = new ArrayList<>();//Will be notified
     private static HashMap<WeaconParse, Integer> contabilidad = new HashMap<>(); //{we,n=appeared in a row}
 
     private static boolean anyChange = false;  //is there any changes for send or modify notification?
@@ -48,6 +48,7 @@ public abstract class LogInManagement {
     private static HashMap<String, Integer> oldSpots = new HashMap<>();
     private static HashMap<String, Integer> newSpots;
     private static HashMap<String, Integer> loggedWeacons = new HashMap<>();
+    private static boolean lastTimeWeFetched;
 
     /**
      * Informs the weacons detected, in order to send/update/remove  notification
@@ -69,12 +70,19 @@ public abstract class LogInManagement {
             checkDisappearing();
             checkAppearing();
 
+            boolean shouldFetch = shouldFetch(weaconsDetected);
+
             myLog.add("conta: " + stringUtils.Listar(contabilidad), "LIM");
-            myLog.add("anyChange?" + anyChange + "| anyfetchable?" + anyFetchable + "| should fetch?" + shouldFetch(weaconsDetected), "LIM");
+            myLog.add("anyChange?" + anyChange + "| anyfetchable?" + anyFetchable + "| should fetch?" + shouldFetch, "LIM");
 
             //Notify or change notification
-            if (anyChange || (anyFetchable && shouldFetch(weaconsDetected))) {
+            if (anyChange || (anyFetchable && shouldFetch)) {
                 Notify();
+
+                // para que cuando deje de fetchear, al siguiente tick mande notificación borrando los tiempos obsolets
+                // esta ntificación es igual, pero quita los tiempos
+            } else if (!anyChange && anyFetchable && !shouldFetch && lastTimeWeFetched) {
+                NotifyWOFetching();
             }
 
             Notifications.notifyContabilidad(stringUtils.Listar(contabilidad));
@@ -86,13 +94,20 @@ public abstract class LogInManagement {
         }
     }
 
+    private static void NotifyWOFetching() {
+        Notifications.showNotification(weaconsToNotify, false, false);
+        lastTimeWeFetched = false;
+    }
+
     private static void Notify() {
-        myLog.add("Will Notify: " + stringUtils.Listar(onNotification), "LIM");
-        myLog.add("**Se requiere fetch:" + anyFetchable, "fetch");
+        myLog.add("Will Notify: " + stringUtils.Listar(weaconsToNotify), "LIM");
+        myLog.add("**Vamos a notificar. Se requiere fetch:" + anyFetchable, "fetch");
 
         if (!anyFetchable) {
-            Notifications.showNotification(onNotification, sound, anyFetchable);
+            Notifications.showNotification(weaconsToNotify, sound, anyFetchable);
+            lastTimeWeFetched = false;
         } else {
+            lastTimeWeFetched = true;
             MultiTaskCompleted listener = new MultiTaskCompleted() {
                 int i = 0;
                 ArrayList<WeaconParse> updatedWeacons = new ArrayList<>();
@@ -101,10 +116,10 @@ public abstract class LogInManagement {
                 public void OneTaskCompleted(WeaconParse updatedWeacon) {
                     i += 1;
                     updatedWeacons.add(updatedWeacon);
-                    if (updatedWeacons.size() == onNotification.size()) {
+                    if (updatedWeacons.size() == weaconsToNotify.size()) {
 //                                // Experimental: sorting updated weacons
 //                                ArrayList sortedUpdated = new ArrayList();
-//                                for (WeaconParse weBuff : onNotification) {
+//                                for (WeaconParse weBuff : weaconsToNotify) {
 //                                    sortedUpdated.add(updatedWeacons.get(updatedWeacons.indexOf(weBuff)));
 //                                }
                         Notifications.showNotification(updatedWeacons, sound, anyFetchable);
@@ -115,22 +130,28 @@ public abstract class LogInManagement {
                 public void OnError(Exception e) {
                     myLog.add("---err " + e.getLocalizedMessage(), "fetch");
                 }
-
             };
 
-            for (final WeaconParse we : onNotification) {
+            for (final WeaconParse we : weaconsToNotify) {
                 (new FetchWeacon(listener, we)).execute(we.getParadaId());
             }
         }
     }
 
+    /**
+     * Indicates if should fetch. The criteria is "if has been active by more than n scanners, then no.
+     *
+     * @param weacons
+     * @return
+     */
     private static boolean shouldFetch(HashSet<WeaconParse> weacons) {
         boolean res = false;
+        int repetitionsTurnOffFetching = 3;
 
         Iterator<WeaconParse> it = weacons.iterator();
         while (it.hasNext() && !res) {
             WeaconParse we = it.next();
-            if (we.NotificationRequiresFetching() && contabilidad.get(we) < 3) {//avoid keep fetching if you live near a bus stop
+            if (we.NotificationRequiresFetching() && contabilidad.get(we) < repetitionsTurnOffFetching) {//avoid keep fetching if you live near a bus stop
                 res = true;
                 myLog.add(we.getName() + " requires feticn. this is the " + contabilidad.get(we) + "time", "fetch");
             }
@@ -312,7 +333,7 @@ public abstract class LogInManagement {
 
     //NOTIFICATIONS
     private static boolean IsInNotification(WeaconParse we) {
-        return onNotification.contains(we);
+        return weaconsToNotify.contains(we);
     }
 
     private static void WeNotificationIn(WeaconParse we) {
@@ -320,12 +341,12 @@ public abstract class LogInManagement {
         myLog.add("Just entering in: " + we.getName(), "LIM");
         anyChange = true;//Just appeared this weacon
         sound = true;
-        onNotification.add(we);
+        weaconsToNotify.add(we);
 
     }
 
     private static void WeNotificationOut(WeaconParse we) {
-        onNotification.remove(we);
+        weaconsToNotify.remove(we);
         myLog.add("Remove from notification:" + we.getName(), "LIM");
         anyChange = true;
 

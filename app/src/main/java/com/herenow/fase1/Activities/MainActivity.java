@@ -1,17 +1,13 @@
 package com.herenow.fase1.Activities;
 
 import android.annotation.TargetApi;
-import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.net.wifi.ScanResult;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
-import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.text.method.ScrollingMovementMethod;
 import android.view.Menu;
@@ -27,29 +23,15 @@ import android.widget.Toast;
 
 import com.herenow.fase1.MyServices.WifiObserverService;
 import com.herenow.fase1.Notifications.Notifications;
-import com.herenow.fase1.Parada;
 import com.herenow.fase1.Position;
 import com.herenow.fase1.R;
 import com.herenow.fase1.Wifi.LocationAsker;
 import com.herenow.fase1.Wifi.LogInManagement;
-import com.herenow.fase1.Wifi.WifiAsker;
-import com.herenow.fase1.Wifi.WifiUpdater;
-import com.herenow.fase1.Wifi.preguntaWifi;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.jsoup.Connection;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -72,6 +54,7 @@ public class MainActivity extends ActionBarActivity implements TextToSpeech.OnIn
     private static long newTime = System.currentTimeMillis();
     private static long back_pressed;
     Intent intentWifiObs;
+    RefreshReceiver refreshReceiver;
     private Intent intentAddWeacon;
     private Intent intentCards;
     //Todo solve reporting time between scannings
@@ -128,8 +111,9 @@ public class MainActivity extends ActionBarActivity implements TextToSpeech.OnIn
         //TEST
 //   clickCards(null);
 
-        MytipodeReceiver myreciver = new MytipodeReceiver();
-        registerReceiver(myreciver, new IntentFilter("popo"));
+
+        refreshReceiver = new RefreshReceiver();
+        registerReceiver(refreshReceiver, new IntentFilter("popo"));
     }
 
     @Override
@@ -138,6 +122,7 @@ public class MainActivity extends ActionBarActivity implements TextToSpeech.OnIn
             Context mContext = getApplicationContext();
             mContext.stopService(new Intent(mContext, WifiObserverService.class));
             myLog.add("cerrando el servicio wifiobserver porque se cierrra la app");
+            unregisterReceiver(refreshReceiver);
             super.onDestroy();
         } catch (Exception e) {
             myLog.add("---serrror al destroy app");
@@ -357,7 +342,7 @@ public class MainActivity extends ActionBarActivity implements TextToSpeech.OnIn
         }, this);
     }
 
-    private class MytipodeReceiver extends BroadcastReceiver {
+    private class RefreshReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
 

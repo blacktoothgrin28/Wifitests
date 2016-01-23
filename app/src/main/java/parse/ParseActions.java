@@ -229,9 +229,9 @@ public abstract class ParseActions {
                         myLog.add("From megaquery we have several matches: " + n, "WE");
 
                         StringBuilder sb = new StringBuilder("***********\n");
-                        myLog.add("****", "HIT");
                         for (WifiSpot spot : spots) {
-                            sb.append(spot.toString() + "\n");
+//                            sb.append(spot.toString() + "\n");
+                            sb.append(spot.summarizeWithWeacon() + "\n");
                             registerHitSSID(spot);
                             WeaconParse we = spot.getWeacon();
 
@@ -258,7 +258,6 @@ public abstract class ParseActions {
      */
     public static void registerHitSSID(final WifiSpot spot) {
         // Check if already upladed
-        myLog.add(spot.toString(), "HIT");
         try {
             ParseQuery query = ParseQuery.getQuery("w_hit");
             query.whereEqualTo("user", ParseUser.getCurrentUser());

@@ -191,7 +191,7 @@ public abstract class SAPO2 {
     }
 
     private static void app(String msg) {
-        myLog.add(msg, "SAPOA");
+//        myLog.add(msg, "SAPOA");
     }
 
     public static void uploadIfRequired() {

@@ -103,26 +103,30 @@ public class formatter {
     public ArrayList<SpannableString> summarizeByOneLine() {
         ArrayList<SpannableString> arr = new ArrayList<>();
 
-        for (String name : tableLines.keySet()) {
-            ArrayList<LineTime> arrTimes = tableLines.get(name);
-            StringBuilder sb = new StringBuilder(name + " ");
+        if (tableLines.keySet().size() == 0) {
+            arr.add(new SpannableString("No info for this stop by now."));
+        } else {
 
-            for (LineTime lineTime : arrTimes) {
-                sb.append(lineTime.roundedTime + ", ");
+            for (String name : tableLines.keySet()) {
+                ArrayList<LineTime> arrTimes = tableLines.get(name);
+                StringBuilder sb = new StringBuilder(name + " ");
+
+                for (LineTime lineTime : arrTimes) {
+                    sb.append(lineTime.roundedTime + ", ");
+                }
+
+                String s = sb.toString();
+                String sub = s.substring(0, s.length() - 2);
+
+                //add format
+                SpannableString span = new SpannableString(sub);
+                span.setSpan(new ForegroundColorSpan(Color.BLACK), 0, name.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                span.setSpan(new StyleSpan(android.graphics.Typeface.BOLD), 0, name.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                span.setSpan(new RelativeSizeSpan(1.1f), 0, name.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+                arr.add(span);
             }
-
-            String s = sb.toString();
-            String sub = s.substring(0, s.length() - 2);
-
-            //add format
-            SpannableString span = new SpannableString(sub);
-            span.setSpan(new ForegroundColorSpan(Color.BLACK), 0, name.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            span.setSpan(new StyleSpan(android.graphics.Typeface.BOLD), 0, name.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            span.setSpan(new RelativeSizeSpan(1.1f), 0, name.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-            arr.add(span);
         }
-
         return arr;
     }
 

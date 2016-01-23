@@ -129,10 +129,6 @@ public class WeaconParse extends ParseObject {
         return message;
     }
 
-    public void setMessage(String message) {
-        put("Description", message);
-    }
-
     public Bitmap getLogo() {
         Bitmap bm = null;
         try {

@@ -115,4 +115,8 @@ public class WifiSpot extends ParseObject {
             }
         });
     }
+
+    public String summarizeWithWeacon() {
+        return getSSID() + "(" + getBSSID() + ") -> \"" + getWeacon().getName() + "\"";
+    }
 }

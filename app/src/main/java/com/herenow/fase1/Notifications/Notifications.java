@@ -85,8 +85,13 @@ public abstract class Notifications {
         (new FetchUrl(listener)).execute(paradaId);
     }
 
-    private static NotificationCompat.Builder buildSingleNotification(WeaconParse we, Intent resultIntent, PendingIntent resultPendingIntent, boolean sound, boolean anyFetchable) {
+    private static NotificationCompat.Builder buildSingleNotification(WeaconParse we, Intent resultIntent,
+                                                                      PendingIntent resultPendingIntent, boolean sound, boolean anyFetchable) {
         NotificationCompat.Builder notif;
+
+        Intent refreshIntent = new Intent("popo");
+        PendingIntent resultPendingIntentRefresh = PendingIntent.getBroadcast(acti, 1, refreshIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        NotificationCompat.Action actionRefresh = new NotificationCompat.Action(R.drawable.ic_refresh_white_24dp, "Refresh", resultPendingIntentRefresh);
 
         NotificationCompat.Action actionSilence = new NotificationCompat.Action(R.drawable.ic_silence, "Turn Off", resultPendingIntent);//TODO to create the silence intent
 
@@ -102,7 +107,7 @@ public abstract class Notifications {
                 .setDeleteIntent(pendingDeleteIntent)
                 .addAction(actionSilence);
 
-//        if (anyFetchable) notif.addAction(actionRefresh);
+        if (anyFetchable) notif.addAction(actionRefresh);
 
         if (sound) {
             notif.setLights(0xE6D820, 300, 100)
@@ -168,20 +173,26 @@ public abstract class Notifications {
 
             //InboxStyle
             NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
-            inboxStyle.setBigContentTitle(we.getMessage());
-//            inboxStyle.setSummaryText("Deciding what to put here ");
+            inboxStyle.setBigContentTitle(we.getName());
+            inboxStyle.setSummaryText("Currently " + LogInManagement.getActiveWeacons().size() + " weacons active");
 
+            StringBuilder sb = new StringBuilder();
             for (SpannableString s : form.summarizeByOneLine()) {
                 inboxStyle.addLine(s);
+                sb.append("   " + s + "\n");
             }
             notif.setStyle(inboxStyle);
-
+            myLog.notificationMultiple(we.getName(), sb.toString(), "Currently " + LogInManagement.getActiveWeacons().size() + " weacons active");
         } else {
             //Bigtext style
             NotificationCompat.BigTextStyle textStyle = new NotificationCompat.BigTextStyle();
             textStyle.setBigContentTitle(we.getName());
             textStyle.bigText(we.getMessage());
+            textStyle.setSummaryText("Currently " + LogInManagement.getActiveWeacons().size() + " weacons active");
             notif.setStyle(textStyle);
+
+            myLog.notificationMultiple(we.getName(), we.getMessage(), "Currently " + LogInManagement.getActiveWeacons().size() + " weacons active");
+
         }
 
         notif.setContentIntent(resultPendingIntent);
@@ -256,7 +267,6 @@ public abstract class Notifications {
 
         Intent refreshIntent = new Intent("popo");
         PendingIntent resultPendingIntentRefresh = PendingIntent.getBroadcast(acti, 1, refreshIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-
         NotificationCompat.Action actionRefresh = new NotificationCompat.Action(R.drawable.ic_refresh_white_24dp, "Refresh", resultPendingIntentRefresh);
 
         NotificationCompat.Builder notif;
@@ -266,7 +276,7 @@ public abstract class Notifications {
         TaskStackBuilder stackBuilder;
         PendingIntent resultPendingIntent;
 
-        String msg = Integer.toString(LogInManagement.getActiveWeacons().size()) + " weacons around you";
+        String msg = Integer.toString(notificables.size()) + " weacons around you";
 
         notif = new NotificationCompat.Builder(acti)
                 .setSmallIcon(R.drawable.ic_stat_name_dup)
@@ -281,15 +291,19 @@ public abstract class Notifications {
 
         if (sound) {
             notif.setLights(0xE6D820, 300, 100)
-                    .setDefaults(Notification.DEFAULT_VIBRATE | Notification.DEFAULT_SOUND | Notification.FLAG_SHOW_LIGHTS);
+                    .setVibrate(new long[]{0, 300, 150, 400, 100})
+                    .setDefaults(Notification.DEFAULT_SOUND | Notification.FLAG_SHOW_LIGHTS);
+//            .setDefaults(Notification.DEFAULT_VIBRATE | Notification.DEFAULT_SOUND | Notification.FLAG_SHOW_LIGHTS);
         }
 
         NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
         inboxStyle.setBigContentTitle(msg);
         inboxStyle.setSummaryText("Currently " + LogInManagement.getActiveWeacons().size() + " weacons active");
 
+        StringBuilder sb = new StringBuilder();
         for (WeaconParse weacon : notificables) {
             inboxStyle.addLine(weacon.getOneLineSummary());
+            sb.append("  " + weacon.getOneLineSummary() + "\n");
         }
 
         notif.setStyle(inboxStyle);
@@ -301,6 +315,7 @@ public abstract class Notifications {
         resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
         notif.setContentIntent(resultPendingIntent);
 
+        myLog.notificationMultiple(msg, sb.toString(), "Currently " + LogInManagement.getActiveWeacons().size() + " weacons active");
         mNotificationManager.notify(mIdNoti, notif.build());
     }
 
@@ -332,7 +347,6 @@ public abstract class Notifications {
             resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT); //Todo solve the stack for going back from cards
 
             notification = buildSingleNotification(we, resultIntent, resultPendingIntent, sound, anyFetchable);
-
             mNotificationManager.notify(mIdNoti, notification.build());
         } catch (Exception e) {
             myLog.add("---error en send one notif" + e.getLocalizedMessage());
