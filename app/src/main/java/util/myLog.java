@@ -17,7 +17,7 @@ import java.util.Date;
  * Created by Milenko on 16/07/2015.
  */
 public class myLog {
-    private static String fileName;
+    //    private static String fileName;
     private static String currentDateandTime;
 
     public static void initialize(String filePath) {
@@ -25,7 +25,7 @@ public class myLog {
 
         currentDateandTime = currentDate();
 
-        fileName = currentDateandTime + "_mhp.txt";
+//        fileName = currentDateandTime + "_mhp.txt";
         File logFile = new File(Environment.getExternalStorageDirectory() + filePath);
         file_size = Integer.parseInt(String.valueOf(logFile.length() / 1024));
         if (file_size > parameters.LogFileSize) logFile.delete();
@@ -39,7 +39,6 @@ public class myLog {
     }
 
     public static void add(String text) {
-
 //        try {
 //            MainActivity.writeOnScreen(text);
 //        } catch (Exception e) {
@@ -106,7 +105,6 @@ public class myLog {
             });
         }
     }
-
 
     public static void addError(Class<?> clase, Exception e) {
         add("-----Error en " + clase.getSimpleName() + ": " + e.getLocalizedMessage());
