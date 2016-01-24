@@ -31,6 +31,7 @@ public class formatter {
         HashMap<String, ArrayList<LineTime>> tableLines = new HashMap<>();
         ArrayList arr;
 
+        if (lineTimes == null) return null;
 
         for (LineTime lineTime : lineTimes) {
             String lc = lineTime.lineCode;
@@ -58,6 +59,8 @@ public class formatter {
     public String summarizeAllLines(boolean compact) {
         String substring = "No info";
         int del = 0;
+
+        if (tableLines == null) return "No lines available";
 
         if (tableLines.size() > 0) {
             StringBuilder sb = new StringBuilder();
@@ -103,7 +106,7 @@ public class formatter {
     public ArrayList<SpannableString> summarizeByOneLine() {
         ArrayList<SpannableString> arr = new ArrayList<>();
 
-        if (tableLines.keySet().size() == 0) {
+        if (tableLines == null || tableLines.keySet().size() == 0) {
             arr.add(new SpannableString("No info for this stop by now."));
         } else {
 

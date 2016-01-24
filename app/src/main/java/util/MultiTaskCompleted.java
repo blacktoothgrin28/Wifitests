@@ -10,7 +10,7 @@ import parse.WeaconParse;
 public interface MultiTaskCompleted {
     int i = 0;
 
-    void OneTaskCompleted(WeaconParse updatedWeacon);
+    void OneTaskCompleted();
 
     void OnError(Exception e);
 }

@@ -362,4 +362,19 @@ public abstract class ParseActions {
             }
         });
     }
+
+
+    public static void getParadas(FindCallback<WeaconParse> call) {
+        try {
+            myLog.add("getting Paradas sant cugat");
+            ParseQuery<WeaconParse> query = ParseQuery.getQuery(WeaconParse.class);
+            query.whereEqualTo("Type", "bus_stop");
+
+            query.findInBackground(call);
+
+        } catch (Exception e) {
+            myLog.add("----ellooos", e.getLocalizedMessage());
+        }
+
+    }
 }

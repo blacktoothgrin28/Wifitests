@@ -6,6 +6,7 @@ import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.parse.ParseClassName;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -15,6 +16,7 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
 import java.io.ByteArrayOutputStream;
+import java.text.ParsePosition;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -86,6 +88,9 @@ public class WeaconParse extends ParseObject {
         return this.getObjectId() == other.getObjectId();
     }
 
+
+    //GETTERS
+
     public String getName() {
         String name = getString("Name");
         return name;
@@ -93,6 +98,33 @@ public class WeaconParse extends ParseObject {
 
     public void setName(String name) {
         put("Name", name);
+    }
+
+    public String getCompanyDataObjectId() {
+
+        ParseObject po = getParseObject("CardCompany");
+        if (po == null) {
+            return null;
+        } else {
+            return po.getObjectId();
+        }
+    }
+
+    //SETTERS
+    public void setCompanyDataObjectId(String value) {
+        put("CardCompany", value);
+    }
+
+    public ParseGeoPoint getGPS() {
+        return getParseGeoPoint("GPS");
+    }
+
+    public void setGPS(ParseGeoPoint GPS) {
+        put("GPS", GPS);
+    }
+
+    public LatLng getGPSLatLng() {
+        return new LatLng(getGPS().getLatitude(), getGPS().getLongitude());
     }
 
     public String getUrl() {
@@ -146,20 +178,6 @@ public class WeaconParse extends ParseObject {
         put("Logo", fileLogo);
     }
 
-    public String getCompanyDataObjectId() {
-
-        ParseObject po = getParseObject("CardCompany");
-        if (po == null) {
-            return null;
-        } else {
-            return po.getObjectId();
-        }
-    }
-
-    public void setCompanyDataObjectId(String value) {
-        put("CardCompany", value);
-    }
-
     public String getImageParseUrl() {
         return getParseFile("Logo").getUrl();
     }
@@ -206,10 +224,6 @@ public class WeaconParse extends ParseObject {
         put("AirportCode", airportCode);
     }
 
-    public void setGPS(ParseGeoPoint GPS) {
-        put("GPS", GPS);
-    }
-
     public void setRating(int rating) {
         put("Rating", rating);
     }
@@ -224,6 +238,7 @@ public class WeaconParse extends ParseObject {
 
     }
 
+    // OTHER
     public boolean isAirport() {
         return getType().equals("AIRPORT");
     }

@@ -9,6 +9,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.support.v7.app.ActionBarActivity;
+//import android.support.v7.app.AppCompatActivity;
 import android.text.method.ScrollingMovementMethod;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -342,13 +343,20 @@ public class MainActivity extends ActionBarActivity implements TextToSpeech.OnIn
         }, this);
     }
 
+    public void clickMap(View view) {
+        Intent intentMap = new Intent(getBaseContext(), MapsActivity.class);
+//        intentMap.putExtra("wLatitude", gps.getLatitude());
+//        intentMap.putExtra("wLongitude", gps.getLongitude());
+//        intentMap.putExtra("wCards", new String[]{"parada"});
+        startActivity(intentMap);
+    }
+
     private class RefreshReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
 
             try {
                 myLog.add("hemos recibido algo!", "bc");
-                myLog.add("estos son los weacons que habia n=" + LogInManagement.lastWeaconsDetected.size(), "bc");
                 myLog.add("estos son los weacons que habia" + Listar(LogInManagement.lastWeaconsDetected), "bc");
                 LogInManagement.refresh();
             } catch (Exception e) {

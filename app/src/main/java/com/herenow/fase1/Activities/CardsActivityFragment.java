@@ -66,6 +66,7 @@ import util.myLog;
 import util.parameters;
 
 import static com.google.android.gms.internal.zzhl.runOnUiThread;
+//import static com.google.android.gms.internal.zzip.runOnUiThread;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -580,6 +581,7 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
                 myLog.add("tenemos ya procesasdo aviones partiendo//llegando: " + departures.size());
 
                 airportCard.setData(departures);
+//                runOnUiThread(new Runnable() {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {

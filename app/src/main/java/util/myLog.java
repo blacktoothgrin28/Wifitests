@@ -111,6 +111,6 @@ public class myLog {
     }
 
     public static void notificationMultiple(String title, String body, String summary) {
-        myLog.add("***********MULTIPLE************************\n" + title + "\n" + body + summary, "NOTI");
+        myLog.add("\n***********************************\n" + title + "\n" + body + summary, "NOTI");
     }
 }

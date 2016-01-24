@@ -353,7 +353,44 @@ public abstract class Notifications {
         }
     }
 
+    public static void notifyContabilidad(String contabilidadString) {
+        NotificationCompat.Builder notif;
+
+        notif = new NotificationCompat.Builder(acti)
+                .setSmallIcon(R.drawable.ic_media_pause)
+//                .setLargeIcon(we.getLogoRounded())
+                .setContentTitle("weacons table")
+//                .setContentText(we.getType())
+                .setAutoCancel(true)
+                .setOngoing(false)
+//                .setDefaults(Notification.DEFAULT_VIBRATE | Notification.DEFAULT_SOUND | Notification.FLAG_SHOW_LIGHTS)
+//                .setLights(0xE6D820, 300, 100)
+                .setTicker("Weacons situation");
+//                .setDeleteIntent(pendingDeleteIntent)
+//                .addAction(actionSilence);
+        //Bigtext style
+        NotificationCompat.BigTextStyle textStyle = new NotificationCompat.BigTextStyle();
+        textStyle.setBigContentTitle("Weacon contabilidad");
+        textStyle.bigText(contabilidadString);
+        notif.setStyle(textStyle);
+
+        mNotificationManager.notify(102, notif.build());
+
+    }
+
     ///////OLD
+    private static void updateNotificationOLD(WeaconParse we) {
+
+        NotificationCompat.Builder notif;
+
+        mNotificationManager.cancel(mIdSingle);
+        mIdGroup = mIdSingle + 1;
+        showedNotifications.add(we);
+
+        notif = buildMultipleNotification(we);
+
+        mNotificationManager.notify(mIdGroup, notif.build());
+    }
 
     public static void sendNotificationOLD(final WeaconParse we) {
         try {
@@ -436,61 +473,10 @@ public abstract class Notifications {
         mNotificationManager.notify(mIdSingle, notification.build());
     }
 
-    private static void updateNotificationOLD(WeaconParse we) {
-
-        NotificationCompat.Builder notif;
-
-        mNotificationManager.cancel(mIdSingle);
-        mIdGroup = mIdSingle + 1;
-        showedNotifications.add(we);
-
-        notif = buildMultipleNotification(we);
-
-        mNotificationManager.notify(mIdGroup, notif.build());
-    }
-
-    public static boolean shouldBeLaunched(WeaconParse we) {
-        //TODO decide from online info
-        boolean b = false;
-
-        try {
-            myLog.add("***hashlaunched has keys : " + weaconsLaunchedTable.keySet().toString());
-            myLog.add("buscando enl a tabala de lanzados el el weacon:" + we.getName());
-            b = !weaconsLaunchedTable.containsKey(we.getObjectId());
-        } catch (Exception e) {
-            myLog.add(" --should be launched" + e.getLocalizedMessage());
-        }
-
-        return b;
-    }
-
-    public static void notifyContabilidad(String contabilidadString) {
-        NotificationCompat.Builder notif;
-
-        notif = new NotificationCompat.Builder(acti)
-                .setSmallIcon(R.drawable.ic_media_pause)
-//                .setLargeIcon(we.getLogoRounded())
-                .setContentTitle("weacons table")
-//                .setContentText(we.getType())
-                .setAutoCancel(true)
-                .setOngoing(false)
-//                .setDefaults(Notification.DEFAULT_VIBRATE | Notification.DEFAULT_SOUND | Notification.FLAG_SHOW_LIGHTS)
-//                .setLights(0xE6D820, 300, 100)
-                .setTicker("Weacons situation");
-//                .setDeleteIntent(pendingDeleteIntent)
-//                .addAction(actionSilence);
-        //Bigtext style
-        NotificationCompat.BigTextStyle textStyle = new NotificationCompat.BigTextStyle();
-        textStyle.setBigContentTitle("Weacon contabilidad");
-        textStyle.bigText(contabilidadString);
-        notif.setStyle(textStyle);
-
-        mNotificationManager.notify(102, notif.build());
-
-    }
-
     ///////END OLD
+
     static class FetchUrl extends AsyncTask<String, Void, ArrayList<CardWithList.DefaultListObject>> {
+
         private OnTaskCompleted onTaskCompletedListener;
 
         FetchUrl(OnTaskCompleted listener) {
@@ -544,6 +530,8 @@ public abstract class Notifications {
             super.onPostExecute(elements);
             if (elements != null) onTaskCompletedListener.OnTaskCompleted(elements);
         }
+
     }
+
 
 }

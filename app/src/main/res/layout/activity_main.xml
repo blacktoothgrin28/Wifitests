@@ -148,6 +148,16 @@
                 android:text="CARDS"
                 android:visibility="visible" />
 
+            <Button
+                android:id="@+id/bt_map"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal|bottom"
+                android:onClick="clickMap"
+                android:text="Map"
+                android:visibility="visible" />
+
         </LinearLayout>
 
         <TextView

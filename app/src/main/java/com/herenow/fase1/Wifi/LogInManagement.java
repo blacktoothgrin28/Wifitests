@@ -44,11 +44,12 @@ public abstract class LogInManagement {
     private static ArrayList<WeaconParse> onChat = new ArrayList<>();
     private static boolean anyFetchable;
     private static Context mContext;
-    //old stuff
-    private static HashMap<String, Integer> oldSpots = new HashMap<>();
-    private static HashMap<String, Integer> newSpots;
-    private static HashMap<String, Integer> loggedWeacons = new HashMap<>();
     private static boolean lastTimeWeFetched;
+
+    //old stuff
+//    private static HashMap<String, Integer> oldSpots = new HashMap<>();
+//    private static HashMap<String, Integer> newSpots;
+//    private static HashMap<String, Integer> loggedWeacons = new HashMap<>();
 
     /**
      * Informs the weacons detected, in order to send/update/remove  notification
@@ -82,11 +83,12 @@ public abstract class LogInManagement {
                 // para que cuando deje de fetchear, al siguiente tick mande notificación borrando los tiempos obsolets
                 // esta ntificación es igual, pero quita los tiempos
             } else if (!anyChange && anyFetchable && !shouldFetch && lastTimeWeFetched) {
+                myLog.add("Notifying WO fetching", "LIM");
                 NotifyWOFetching();
             }
 
             Notifications.notifyContabilidad(stringUtils.Listar(contabilidad));
-            myLog.add("****************************", "LIM");
+            myLog.add("****************************\n", "LIM");
 
         } catch (Exception e) {
             myLog.add("----error in login management: " + e);
@@ -95,7 +97,7 @@ public abstract class LogInManagement {
     }
 
     private static void NotifyWOFetching() {
-        Notifications.showNotification(weaconsToNotify, false, false);
+        Notifications.showNotification(weaconsToNotify, false, true);
         lastTimeWeFetched = false;
     }
 
@@ -107,22 +109,20 @@ public abstract class LogInManagement {
             Notifications.showNotification(weaconsToNotify, sound, anyFetchable);
             lastTimeWeFetched = false;
         } else {
-            lastTimeWeFetched = true;
             MultiTaskCompleted listener = new MultiTaskCompleted() {
                 int i = 0;
-                ArrayList<WeaconParse> updatedWeacons = new ArrayList<>();
 
                 @Override
-                public void OneTaskCompleted(WeaconParse updatedWeacon) {
+                public void OneTaskCompleted() {
                     i += 1;
-                    updatedWeacons.add(updatedWeacon);
-                    if (updatedWeacons.size() == weaconsToNotify.size()) {
+                    if (i == weaconsToNotify.size()) {
 //                                // Experimental: sorting updated weacons
 //                                ArrayList sortedUpdated = new ArrayList();
 //                                for (WeaconParse weBuff : weaconsToNotify) {
 //                                    sortedUpdated.add(updatedWeacons.get(updatedWeacons.indexOf(weBuff)));
 //                                }
-                        Notifications.showNotification(updatedWeacons, sound, anyFetchable);
+                        Notifications.showNotification(weaconsToNotify, sound, anyFetchable);
+                        lastTimeWeFetched = true;
                     }
                 }
 
@@ -251,7 +251,7 @@ public abstract class LogInManagement {
 
     private static void LogInOld(WifiSpot spot) {
         //TODO Register in parse or is automatic to kwnow how many subscribers?
-        loggedWeacons.put(spot.getBSSID(), 0);
+//        loggedWeacons.put(spot.getBSSID(), 0);
 
         final String channelName = ChannelName(spot.getBSSID());
         String msg = "Logged in:" + spot + "\n" + "channel name=" + channelName;
@@ -273,7 +273,7 @@ public abstract class LogInManagement {
         //TODO inform parse
 
         try {
-            loggedWeacons.remove(bssid);
+//            loggedWeacons.remove(bssid);
             myLog.add("Logged out:" + bssid);
             ParsePush.unsubscribeInBackground(ChannelName(bssid));
         } catch (Exception e) {
@@ -342,7 +342,6 @@ public abstract class LogInManagement {
         anyChange = true;//Just appeared this weacon
         sound = true;
         weaconsToNotify.add(we);
-
     }
 
     private static void WeNotificationOut(WeaconParse we) {
@@ -352,70 +351,14 @@ public abstract class LogInManagement {
 
     }
 
-    //OLD
-
-    /***
-     * Monitors the scan results to check if logged in a Weacon.
-     * Should receive each Scan Result
-     *
-     * @param spots
-     */
-    public static void ReportDetectedSpots(List<WifiSpot> spots, Context context) {
-        mContext = context;
-        //1. Check for new login
-        newSpots = new HashMap<>();
-        for (WifiSpot spot : spots) {
-            int n = 0;
-            String b = spot.getBSSID();
-
-            if (oldSpots.containsKey(b)) {
-                n = oldSpots.get(b);
-            }
-            newSpots.put(b, n + 1);
-            if (n + 1 == parameters.nHitsForLogIn) LogInOld(spot);
-        }
-        oldSpots = newSpots;
-
-        //2. Check for logout
-        //los logged que estan en lista, quedan en cero
-        //los que no, se les resta uno
-
-        try {
-            for (WifiSpot spot : spots) {
-                String b = spot.getBSSID();
-                if (loggedWeacons.containsKey(b)) {
-                    int n = loggedWeacons.get(b);
-                    loggedWeacons.put(b, n + 1);
-                }
-            }
-
-            Iterator<String> it = loggedWeacons.keySet().iterator();
-            while (it.hasNext()) {
-                String b = it.next();
-                int n = loggedWeacons.get(b);
-                loggedWeacons.put(b, n - 1);
-                if (n - 1 == -3) LogOutOld(b);
-            }
-
-//            for (String b : loggedWeacons.keySet()) {
-//                //BUG concurrent modification
-//                int n = loggedWeacons.get(b);
-//                loggedWeacons.put(b, n - 1);
-//                if (n - 1 == -3) LogOut(b);
-//            }
-        } catch (Exception e) {
-            myLog.add("---error en logout: " + e.getLocalizedMessage());
-        }
-    }
-
     public static void refresh() {
         myLog.add("refresing the notification");
         Notify();
     }
 
-    public HashMap getCurrentlyLogged() {
-        return loggedWeacons;
-    }
+//    public HashMap getCurrentlyLogged() {
+//        return loggedWeacons;
+//    }
 
     private static class FetchWeacon extends AsyncTask<String, Void, ArrayList> {
         private final MultiTaskCompleted multiTaskCompleted;
@@ -474,7 +417,18 @@ public abstract class LogInManagement {
         protected void onPostExecute(ArrayList elements) {
             super.onPostExecute(elements);
             mWe.setFetchingResults(elements);
-            multiTaskCompleted.OneTaskCompleted(mWe);
+//            //TEST
+//            if (weaconsToNotify != null) {
+//                myLog.add("updating " + mWe.getName() + " " + mWe.getOneLineSummary(), "TEST");
+//                myLog.add(" ** weaconstonotify table:", "TEST");
+//                for (WeaconParse we : weaconsToNotify) {
+//                    myLog.add("     " + we.getName() + "| summary: " + we.getOneLineSummary(), "TEST");
+//                }
+//            }
+//            //END TEST
+
+            multiTaskCompleted.OneTaskCompleted();
         }
     }
+
 }
