@@ -1,6 +1,5 @@
 package com.herenow.fase1.Notifications;
 
-import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -51,7 +50,7 @@ public abstract class Notifications {
     static String tag = "noti";
     private static ArrayList<WeaconParse> showedNotifications; //list of weacosn currently showed in a notification
     private static NotificationManager mNotificationManager;
-    private static Activity acti;
+    private static Context ctx;
     private static int mIdSingle, mIdGroup;
     private static int mIdNoti = 103;
 
@@ -72,8 +71,9 @@ public abstract class Notifications {
     };
     private static PendingIntent pendingDeleteIntent;
 
-    public static void Initialize(Activity act) {
-        acti = act;
+    //    public static void Initialize(Activity act) {
+    public static void Initialize(Context act) {
+        ctx = act;
         weaconsLaunchedTable = new HashMap<>();
         showedNotifications = new ArrayList<>(); //Weacons showed in notification
 //        myLog.add("showedNotif created in initialization", tag);
@@ -90,14 +90,14 @@ public abstract class Notifications {
         NotificationCompat.Builder notif;
 
         Intent refreshIntent = new Intent("popo");
-        PendingIntent resultPendingIntentRefresh = PendingIntent.getBroadcast(acti, 1, refreshIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent resultPendingIntentRefresh = PendingIntent.getBroadcast(ctx, 1, refreshIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         NotificationCompat.Action actionRefresh = new NotificationCompat.Action(R.drawable.ic_refresh_white_24dp, "Refresh", resultPendingIntentRefresh);
 
         NotificationCompat.Action actionSilence = new NotificationCompat.Action(R.drawable.ic_silence, "Turn Off", resultPendingIntent);//TODO to create the silence intent
 
 //        NotificationCompat.Action actionRefresh = new NotificationCompat.Action(R.drawable.ic_refresh_white_24dp, "Refresh", resultPendingIntentRefresh);
 
-        notif = new NotificationCompat.Builder(acti)
+        notif = new NotificationCompat.Builder(ctx)
                 .setSmallIcon(R.drawable.ic_stat_name_hn)
                 .setLargeIcon(we.getLogoRounded())
                 .setContentTitle(we.getName())
@@ -118,7 +118,7 @@ public abstract class Notifications {
         if (we.isAirport()) {
             Intent arrivalsIntent = new Intent(resultIntent);
             arrivalsIntent.putExtra("typeOfAiportCard", "Arrivals");
-            PendingIntent pendingArrivals = PendingIntent.getActivity(acti.getBaseContext(), 1, arrivalsIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent pendingArrivals = PendingIntent.getActivity(ctx, 1, arrivalsIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
             NotificationCompat.Action DepartureAction = new NotificationCompat.Action(R.drawable.ic_flight_takeoff_white_24dp, "Departures", resultPendingIntent);
             NotificationCompat.Action ArrivalAction = new NotificationCompat.Action(R.drawable.ic_flight_land_white_24dp, "Arrivals", pendingArrivals);
@@ -138,7 +138,7 @@ public abstract class Notifications {
                 myLog.add("app no found: " + anfe.getLocalizedMessage());
             }
 
-            PendingIntent pendingGetApp = PendingIntent.getActivity(acti.getBaseContext(), 1, getAppIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent pendingGetApp = PendingIntent.getActivity(ctx, 1, getAppIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
             NotificationCompat.Action getAppAction = new NotificationCompat.Action(R.drawable.ic_market, "Get App", pendingGetApp);
             notif.addAction(getAppAction);
@@ -148,7 +148,7 @@ public abstract class Notifications {
         if (we.getType().equals("restaurant")) {
             //TODO replace
             Intent connectToWifi = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=hola"));
-            PendingIntent pendingWIFIConnect = PendingIntent.getActivity(acti.getBaseContext(), 1, connectToWifi, PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent pendingWIFIConnect = PendingIntent.getActivity(ctx, 1, connectToWifi, PendingIntent.FLAG_UPDATE_CURRENT);
 
             NotificationCompat.Action getAppAction = new NotificationCompat.Action(R.drawable.ic_waiter, "Waiter", pendingWIFIConnect);
             notif.addAction(getAppAction);
@@ -158,8 +158,8 @@ public abstract class Notifications {
         if (we.getName().startsWith("Conj")) {
             //TODO replace, doesn't do anything
 //            Intent connectToWifi = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=hola"));
-            Intent connectToWifi = new Intent(acti, ConnectToWifi.class);
-            PendingIntent pendingWIFIConnect = PendingIntent.getService(acti.getBaseContext(), 1, connectToWifi, PendingIntent.FLAG_UPDATE_CURRENT);
+            Intent connectToWifi = new Intent(ctx, ConnectToWifi.class);
+            PendingIntent pendingWIFIConnect = PendingIntent.getService(ctx, 1, connectToWifi, PendingIntent.FLAG_UPDATE_CURRENT);
 
             NotificationCompat.Action getAppAction = new NotificationCompat.Action(R.drawable.ic_wifi, "Connect", pendingWIFIConnect);
             notif.addAction(getAppAction);
@@ -205,11 +205,11 @@ public abstract class Notifications {
         Intent resultIntent;
         TaskStackBuilder stackBuilder;
         PendingIntent resultPendingIntent;
-        Bitmap bm = BitmapFactory.decodeResource(acti.getResources(), R.mipmap.ic_launcher);
+        Bitmap bm = BitmapFactory.decodeResource(ctx.getResources(), R.mipmap.ic_launcher);
 
         String msg = Integer.toString(showedNotifications.size()) + " weacons around you";
 
-        NotificationCompat.Builder notif = new NotificationCompat.Builder(acti) //TODO put the hour in extended notification
+        NotificationCompat.Builder notif = new NotificationCompat.Builder(ctx) //TODO put the hour in extended notification
                 .setSmallIcon(R.drawable.ic_stat_name_dup)
                 .setLargeIcon(bm)
                 .setContentTitle(msg)
@@ -231,12 +231,12 @@ public abstract class Notifications {
         }
 
         notif.setStyle(inboxStyle);
-        resultIntent = new Intent(acti.getBaseContext(), WeaconListActivity.class);
+        resultIntent = new Intent(ctx, WeaconListActivity.class);
         resultIntent.putExtra("wName", we.getName());
         resultIntent.putExtra("wUrl", we.getUrl());
         resultIntent.putExtra("wLogo", we.getLogoRounded());
 
-        stackBuilder = TaskStackBuilder.create(acti.getBaseContext());
+        stackBuilder = TaskStackBuilder.create(ctx);
         stackBuilder.addParentStack(WeaconListActivity.class);
         stackBuilder.addNextIntent(resultIntent);
         resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -266,7 +266,7 @@ public abstract class Notifications {
     private static void sendSeveralWeacons(ArrayList<WeaconParse> notificables, boolean sound, boolean anyFetchable) {
 
         Intent refreshIntent = new Intent("popo");
-        PendingIntent resultPendingIntentRefresh = PendingIntent.getBroadcast(acti, 1, refreshIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent resultPendingIntentRefresh = PendingIntent.getBroadcast(ctx, 1, refreshIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         NotificationCompat.Action actionRefresh = new NotificationCompat.Action(R.drawable.ic_refresh_white_24dp, "Refresh", resultPendingIntentRefresh);
 
         NotificationCompat.Builder notif;
@@ -278,7 +278,7 @@ public abstract class Notifications {
 
         String msg = Integer.toString(notificables.size()) + " weacons around you";
 
-        notif = new NotificationCompat.Builder(acti)
+        notif = new NotificationCompat.Builder(ctx)
                 .setSmallIcon(R.drawable.ic_stat_name_dup)
                 .setLargeIcon(notificables.get(0).getLogoRounded())
                 .setContentTitle(msg)
@@ -307,9 +307,9 @@ public abstract class Notifications {
         }
 
         notif.setStyle(inboxStyle);
-        resultIntent = new Intent(acti.getBaseContext(), WeaconListActivity.class);
+        resultIntent = new Intent(ctx, WeaconListActivity.class);
 
-        stackBuilder = TaskStackBuilder.create(acti.getBaseContext());
+        stackBuilder = TaskStackBuilder.create(ctx);
         stackBuilder.addParentStack(WeaconListActivity.class);
         stackBuilder.addNextIntent(resultIntent);
         resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -333,7 +333,7 @@ public abstract class Notifications {
                 cls = CardsActivity.class;
             }
 
-            resultIntent = new Intent(acti.getBaseContext(), cls)
+            resultIntent = new Intent(ctx, cls)
                     .putExtra("wUrl", we.getUrl())
                     .putExtra("wName", we.getName())
                     .putExtra("wLogo", we.getLogoRounded())
@@ -341,7 +341,7 @@ public abstract class Notifications {
                     .putExtra("wCards", we.getCards())
                     .putExtra("typeOfAiportCard", "Departures");
 
-            stackBuilder = TaskStackBuilder.create(acti.getBaseContext());
+            stackBuilder = TaskStackBuilder.create(ctx);
             stackBuilder.addParentStack(cls);
             stackBuilder.addNextIntent(resultIntent);
             resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT); //Todo solve the stack for going back from cards
@@ -356,7 +356,7 @@ public abstract class Notifications {
     public static void notifyContabilidad(String contabilidadString) {
         NotificationCompat.Builder notif;
 
-        notif = new NotificationCompat.Builder(acti)
+        notif = new NotificationCompat.Builder(ctx)
                 .setSmallIcon(R.drawable.ic_media_pause)
 //                .setLargeIcon(we.getLogoRounded())
                 .setContentTitle("weacons table")
@@ -398,7 +398,7 @@ public abstract class Notifications {
                 we.setAlreadyFetched(false);
                 myLog.add("no requiere o ya fetched", tag);
                 Intent intent = new Intent(NOTIFICATION_DELETED_ACTION);
-                pendingDeleteIntent = PendingIntent.getBroadcast(acti.getBaseContext(), 0, intent, 0);
+                pendingDeleteIntent = PendingIntent.getBroadcast(ctx, 0, intent, 0);
 
                 //TODO put in parse that this weacon was notified
                 if (showedNotifications == null) {
@@ -446,7 +446,7 @@ public abstract class Notifications {
         mIdSingle = currentId;
         showedNotifications.add(we);
         myLog.add("sendign new notif", tag);
-        acti.registerReceiver(receiverDeleteNotification, new IntentFilter(NOTIFICATION_DELETED_ACTION));
+        ctx.registerReceiver(receiverDeleteNotification, new IntentFilter(NOTIFICATION_DELETED_ACTION));
 
         if (we.isBrowser()) {
             myLog.add("este weacon es de tipo browser", tag);
@@ -455,7 +455,7 @@ public abstract class Notifications {
             cls = CardsActivity.class;
         }
 
-        resultIntent = new Intent(acti.getBaseContext(), cls)
+        resultIntent = new Intent(ctx, cls)
                 .putExtra("wUrl", we.getUrl())
                 .putExtra("wName", we.getName())
                 .putExtra("wLogo", we.getLogoRounded())
@@ -463,7 +463,7 @@ public abstract class Notifications {
                 .putExtra("wCards", we.getCards())
                 .putExtra("typeOfAiportCard", "Departures");
 
-        stackBuilder = TaskStackBuilder.create(acti.getBaseContext());
+        stackBuilder = TaskStackBuilder.create(ctx);
         stackBuilder.addParentStack(cls);
         stackBuilder.addNextIntent(resultIntent);
         resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT); //Todo solve the stack for going back from cards

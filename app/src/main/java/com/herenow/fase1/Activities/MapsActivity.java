@@ -1,7 +1,7 @@
 package com.herenow.fase1.Activities;
 
-import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -9,28 +9,31 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.herenow.fase1.R;
 import com.herenow.fase1.Wifi.LocationAsker;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 
+import java.util.HashMap;
 import java.util.List;
 
 import parse.WeaconParse;
-import parse.WifiSpot;
 import util.GPSCoordinates;
+import util.myLog;
 
-import static parse.ParseActions.getParadasDone;
-import static parse.ParseActions.getParadasDone2;
+import static parse.ParseActions.getParadasFree;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
+    HashMap<String, String> hashMarkers;
     private GoogleMap mMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        hashMarkers = new HashMap<>();
         setContentView(R.layout.activity_maps);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -52,6 +55,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
+        //click on marker event
+        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                String paradaId = hashMarkers.get(marker.getId());
+
+
+                return false;
+            }
+        });
+
         //Own position
         (new LocationAsker()).DoSomethingWithPosition(new LocationCallback() {
 
@@ -63,12 +77,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(aqui, 15));
 
-                getParadasDone2(new FindCallback<WifiSpot>() {
+                getParadasFree(new FindCallback<WeaconParse>() {
                     @Override
-                    public void done(List<WifiSpot> list, ParseException e) {
-                        for (WifiSpot ws : list) {
-                            WeaconParse we = ws.getWeacon();
-                            mMap.addMarker(new MarkerOptions().position(we.getGPSLatLng()).title(we.getName()));
+                    public void done(List<WeaconParse> list, ParseException e) {
+                        myLog.add("puntos a pintar: " + list.size());
+                        for (WeaconParse we : list) {
+                            Marker marker = mMap.addMarker(new MarkerOptions().position(we.getGPSLatLng()).title(we.getName()));
+                            hashMarkers.put(marker.getId(), we.getParadaId());
+                            myLog.add("hemos puesto el marker(" + we.getName() + ") idmarker=" +
+                                    marker.getId() + "| parada=" + we.getParadaId());
                         }
                     }
                 }, gps.getGeoPoint());

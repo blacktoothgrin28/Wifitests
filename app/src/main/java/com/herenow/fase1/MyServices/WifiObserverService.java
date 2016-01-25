@@ -14,9 +14,9 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.widget.Toast;
 
+import com.herenow.fase1.Notifications.Notifications;
 import com.herenow.fase1.R;
 import com.herenow.fase1.Sapo.SAPO2;
-import com.herenow.fase1.Wifi.LogInManagement;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,6 +50,7 @@ public class WifiObserverService extends Service {
 
         try {
             showRecordingNotification();
+            Notifications.Initialize(this);
 
             mContext = getApplicationContext();
             mainWifi = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);

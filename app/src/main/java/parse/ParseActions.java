@@ -18,7 +18,6 @@ import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
@@ -365,39 +364,14 @@ public abstract class ParseActions {
     }
 
 
-    public static void getParadasDone(FindCallback<WifiSpot> call, ParseGeoPoint center) {
-        try {
-            myLog.add("getting Paradas Free sant cugat");
-            ParseQuery<WeaconParse> innerQuery = ParseQuery.getQuery(WeaconParse.class);
-            innerQuery.whereEqualTo("Type", "bus_stop");
-            innerQuery.whereNear("GPS", center);
-            innerQuery.setLimit(300);
-
-            ParseQuery<WifiSpot> query = ParseQuery.getQuery(WifiSpot.class);
-//            query.whereDoesNotMatchQuery("associated_place", innerQuery);
-            query.whereMatchesQuery("associated_place", innerQuery);
-//            query.selectKeys(Arrays.asList("associated_place"));
-
-            query.findInBackground(call);
-
-        } catch (Exception e) {
-            myLog.add("----ellooos", e.getLocalizedMessage());
-        }
-
-    }
-
-    public static void getParadasDone2(FindCallback<WifiSpot> call, ParseGeoPoint center) {
+    public static void getParadasFree(FindCallback<WeaconParse> call, ParseGeoPoint center) {
         try {
             myLog.add("getting Paradas Done 2  sant cugat");
-            ParseQuery<WeaconParse> innerQuery = ParseQuery.getQuery(WeaconParse.class);
-            innerQuery.whereEqualTo("Type", "bus_stop");
-            innerQuery.whereNear("GPS", center);
-            innerQuery.setLimit(300);
-
-            ParseQuery<WifiSpot> query = ParseQuery.getQuery(WifiSpot.class);
-//            query.whereDoesNotMatchQuery("associated_place", innerQuery);
-            query.whereMatchesQuery("associated_place", innerQuery);
-//            query.selectKeys(Arrays.asList("associated_place"));
+            ParseQuery<WeaconParse> query = ParseQuery.getQuery(WeaconParse.class);
+            query.whereEqualTo("Type", "bus_stop");
+            query.whereDoesNotExist("n_scannings");
+            query.whereNear("GPS", center);
+            query.setLimit(300);
 
             query.findInBackground(call);
 

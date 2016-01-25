@@ -9,7 +9,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.support.v7.app.ActionBarActivity;
-//import android.support.v7.app.AppCompatActivity;
 import android.text.method.ScrollingMovementMethod;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,7 +22,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.herenow.fase1.MyServices.WifiObserverService;
-import com.herenow.fase1.Notifications.Notifications;
 import com.herenow.fase1.Position;
 import com.herenow.fase1.R;
 import com.herenow.fase1.Wifi.LocationAsker;
@@ -44,6 +42,8 @@ import util.parameters;
 
 import static util.myLog.WriteUnhandledErrors;
 import static util.stringUtils.Listar;
+
+//import android.support.v7.app.AppCompatActivity;
 
 
 public class MainActivity extends ActionBarActivity implements TextToSpeech.OnInitListener {
@@ -97,7 +97,7 @@ public class MainActivity extends ActionBarActivity implements TextToSpeech.OnIn
 
         WriteUnhandledErrors(true);
         myLog.initialize("/WCLOG/rt.txt"); //Log in a file on the phone
-        Notifications.Initialize(this); //TODO: Really needed to initialize?
+//        Notifications.Initialize(this); //TODO: Really needed to initialize?
 
         retrieveSpotsAround(false, parameters.radioSpotsQuery);
 
