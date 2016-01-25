@@ -3,6 +3,7 @@ package util;
 import android.location.Location;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.parse.ParseGeoPoint;
 
 public class GPSCoordinates {
     private double latitude = 0;
@@ -36,6 +37,10 @@ public class GPSCoordinates {
 
     public void setLatitude(double latitude) {
         this.latitude = latitude;
+    }
+
+    public ParseGeoPoint getGeoPoint() {
+        return new ParseGeoPoint(latitude, longitude);
     }
 
     public LatLng getLatLng() {

@@ -1,6 +1,5 @@
 package com.herenow.fase1.Activities;
 
-import android.content.Intent;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 
@@ -8,6 +7,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.herenow.fase1.R;
@@ -18,9 +18,11 @@ import com.parse.ParseException;
 import java.util.List;
 
 import parse.WeaconParse;
+import parse.WifiSpot;
 import util.GPSCoordinates;
 
-import static parse.ParseActions.getParadas;
+import static parse.ParseActions.getParadasDone;
+import static parse.ParseActions.getParadasDone2;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -49,36 +51,33 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        getParadas(new FindCallback<WeaconParse>() {
-            @Override
-            public void done(List<WeaconParse> list, ParseException e) {
-                for (WeaconParse we : list) {
-                    mMap.addMarker(new MarkerOptions().position(we.getGPSLatLng()).title(we.getName()));
 
-                }
-            }
-        });
-        // Add a marker in Sydney and move the camera
-//        LatLng sydney = new LatLng(-34, 151);
-//        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
+        //Own position
         (new LocationAsker()).DoSomethingWithPosition(new LocationCallback() {
 
             @Override
             public void LocationReceived(GPSCoordinates gps) {
-                LatLng aqui = gps.getLatLng();
-                mMap.addMarker(new MarkerOptions().position(aqui).title("Yo"));
-                mMap.moveCamera(CameraUpdateFactory.newLatLng(aqui));
+                LatLng aqui;
+                aqui = gps.getLatLng();
+                mMap.addMarker(new MarkerOptions().position(aqui).title("Yo")
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(aqui, 15));
+
+                getParadasDone2(new FindCallback<WifiSpot>() {
+                    @Override
+                    public void done(List<WifiSpot> list, ParseException e) {
+                        for (WifiSpot ws : list) {
+                            WeaconParse we = ws.getWeacon();
+                            mMap.addMarker(new MarkerOptions().position(we.getGPSLatLng()).title(we.getName()));
+                        }
+                    }
+                }, gps.getGeoPoint());
+
             }
         }, this);
 
-    }
-
-    private void getParadasTodo() {
 
     }
 
-    private void getParadasDone() {
-
-    }
 
 }
