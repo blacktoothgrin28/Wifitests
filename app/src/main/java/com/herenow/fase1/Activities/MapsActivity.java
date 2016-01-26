@@ -1,7 +1,11 @@
 package com.herenow.fase1.Activities;
 
+import android.content.Context;
+import android.net.wifi.ScanResult;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.view.View;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -13,12 +17,15 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.herenow.fase1.R;
 import com.herenow.fase1.Wifi.LocationAsker;
+import com.herenow.fase1.Wifi.WifiAsker;
+import com.herenow.fase1.Wifi.preguntaWifi;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 
 import java.util.HashMap;
 import java.util.List;
 
+import parse.ParseActions;
 import parse.WeaconParse;
 import util.GPSCoordinates;
 import util.myLog;
@@ -29,6 +36,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     HashMap<String, String> hashMarkers;
     private GoogleMap mMap;
+    private GPSCoordinates mGps;
+    private String paradaId;
+    private Context mContext;
+    private Marker selectedMarker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,13 +65,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        mContext = this;
 
         //click on marker event
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-                String paradaId = hashMarkers.get(marker.getId());
-
+                selectedMarker = marker;
+                paradaId = hashMarkers.get(marker.getId());
 
                 return false;
             }
@@ -71,6 +83,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             @Override
             public void LocationReceived(GPSCoordinates gps) {
+                mGps = gps;
                 LatLng aqui;
                 aqui = gps.getLatLng();
                 mMap.addMarker(new MarkerOptions().position(aqui).title("Yo")
@@ -97,4 +110,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
+    public void onClickSendWifis(View view) {
+        new WifiAsker(mContext, new preguntaWifi() {
+            @Override
+            public void OnReceiveWifis(List<ScanResult> sr) {
+                Toast.makeText(mContext, "Recibidos " + sr.size() + "wifis", Toast.LENGTH_SHORT).show();
+                myLog.add("Recibidos los wifis forzados para parada");
+
+                try {
+                    ParseActions.assignSpotsToWeacon(paradaId, sr, mGps);
+                    selectedMarker.setVisible(false);
+                } catch (Exception e) {
+                    myLog.add("error in assign spot to weacon:" + e.getLocalizedMessage());
+                }
+            }
+
+            @Override
+            public void noWifiDetected() {
+                myLog.add("error recibiendo los sopotsde manera forzasa");
+            }
+        });
+    }
 }

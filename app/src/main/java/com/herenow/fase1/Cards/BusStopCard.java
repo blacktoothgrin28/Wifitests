@@ -146,6 +146,11 @@ public class BusStopCard extends FetchingCard implements preguntaWifi {
         GPSCoordinates gps;
         private ArrayList<LineTime> lineTimes;
 
+        public BusStop(Card parentCard) {
+            super(parentCard);
+            init();
+        }
+
         @Override
         public String toString() {
             return "BusStop{" +
@@ -156,11 +161,6 @@ public class BusStopCard extends FetchingCard implements preguntaWifi {
                     ", gps=" + gps +
                     ", lineTimes=" + lineTimes +
                     '}';
-        }
-
-        public BusStop(Card parentCard) {
-            super(parentCard);
-            init();
         }
 
         //        public String TimesSummary() {
@@ -186,31 +186,7 @@ public class BusStopCard extends FetchingCard implements preguntaWifi {
             setOnItemClickListener(new OnItemClickListener() {
                 @Override
                 public void onItemClick(LinearListView parent, View view, int position, ListObject object) {
-                    Toast.makeText(getContext(), "Clicked on " + getObjectId(), Toast.LENGTH_SHORT).show();
-
-                    new WifiAsker(mContext, new preguntaWifi() {
-                        @Override
-                        public void OnReceiveWifis(List<ScanResult> sr) {
-                            Toast.makeText(mContext, "recibidos " + sr.size() + "wifis", Toast.LENGTH_SHORT).show();
-                            myLog.add("recibidos los wifis forzados para autobus");
-
-                            try {
-                                ParseActions.assignSpotsToWeacon(getObjectId(), sr, gps);
-                            } catch (Exception e) {
-                                myLog.add("error in assign spot to weacon:" + e.getLocalizedMessage());
-                            }
-
-                        }
-
-                        @Override
-                        public void noWifiDetected() {
-                            myLog.add("error recibiendo los sopotsde manera forzasa");
-                        }
-                    });
-
-//                    SaveWifis(getObjectId());
-//                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(getObjectId()));
-//                    mContext.startActivity(browserIntent);
+                    SaveWifisOfParada();
                 }
             });
 
@@ -221,6 +197,34 @@ public class BusStopCard extends FetchingCard implements preguntaWifi {
                     Toast.makeText(getContext(), "Swipe on " + object.getObjectId(), Toast.LENGTH_SHORT).show();
                 }
             });
+        }
+
+        private void SaveWifisOfParada() {
+            Toast.makeText(getContext(), "Clicked on " + getObjectId(), Toast.LENGTH_SHORT).show();
+
+            new WifiAsker(mContext, new preguntaWifi() {
+                @Override
+                public void OnReceiveWifis(List<ScanResult> sr) {
+                    Toast.makeText(mContext, "recibidos " + sr.size() + "wifis", Toast.LENGTH_SHORT).show();
+                    myLog.add("recibidos los wifis forzados para autobus");
+
+                    try {
+                        ParseActions.assignSpotsToWeacon(getObjectId(), sr, gps);
+                    } catch (Exception e) {
+                        myLog.add("error in assign spot to weacon:" + e.getLocalizedMessage());
+                    }
+
+                }
+
+                @Override
+                public void noWifiDetected() {
+                    myLog.add("error recibiendo los sopotsde manera forzasa");
+                }
+            });
+
+//                    SaveWifis(getObjectId());
+//                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(getObjectId()));
+//                    mContext.startActivity(browserIntent);
         }
 
 

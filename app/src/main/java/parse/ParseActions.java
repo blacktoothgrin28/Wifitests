@@ -106,6 +106,17 @@ public abstract class ParseActions {
                                                             public void done(ParseException e) {
                                                                 if (e == null) {
                                                                     myLog.add("saved several intensities " + intiensities.size());
+                                                                    // aumentar el n_scannings del weacon  en uno
+                                                                    we.increment("n_scanning");
+                                                                    we.saveInBackground(new SaveCallback() {
+                                                                        @Override
+                                                                        public void done(ParseException e) {
+                                                                            if (e == null) {
+                                                                                myLog.add("incrementado el we de parada en uno");
+                                                                            } else
+                                                                                myLog.add("--EERROR incrementado el we de parada en uno " + e.getLocalizedMessage());
+                                                                        }
+                                                                    });
                                                                 } else {
                                                                     myLog.add("---error in saving inteisintes " + e.getLocalizedMessage());
                                                                 }
