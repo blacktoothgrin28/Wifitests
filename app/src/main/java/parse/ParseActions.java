@@ -237,9 +237,8 @@ public abstract class ParseActions {
                     if (n == 0) {
                         myLog.add("MegaQuery no match", "WE");
                     } else { //There are matches
-                        myLog.add("From megaquery we have several matches: " + n, "WE");
 
-                        StringBuilder sb = new StringBuilder("***********\n");
+                        StringBuilder sb = new StringBuilder("***********\n" + "From megaquery we have several matches: " + n);
                         for (WifiSpot spot : spots) {
 //                            sb.append(spot.toString() + "\n");
                             sb.append(spot.summarizeWithWeacon() + "\n");

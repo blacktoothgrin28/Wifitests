@@ -7,9 +7,9 @@ import org.json.JSONObject;
  * Created by Milenko on 21/12/2015.
  */
 public class LineTime {
-    int arrivalTime;
     public String lineCode;
     public String roundedTime;
+    int arrivalTime;
     int stopCode;
 
     public LineTime(JSONObject json) throws JSONException {
@@ -27,6 +27,10 @@ public class LineTime {
                 ", roundedTime='" + roundedTime + '\'' +
                 ", stopCode=" + stopCode +
                 '}';
+    }
+
+    public void setRoundedTime(String roundedTime) {
+        this.roundedTime = roundedTime;
     }
 
     public String summary() {

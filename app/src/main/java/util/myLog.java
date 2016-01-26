@@ -3,8 +3,6 @@ package util;
 import android.os.Environment;
 import android.util.Log;
 
-import com.herenow.fase1.Activities.MainActivity;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -110,7 +108,7 @@ public class myLog {
         add("-----Error en " + clase.getSimpleName() + ": " + e.getLocalizedMessage());
     }
 
-    public static void notificationMultiple(String title, String body, String summary) {
-        myLog.add("\n***********************************\n" + title + "\n" + body + summary, "NOTI");
+    public static void notificationMultiple(String title, String body, String summary, String sound) {
+        myLog.add("***********************************SoUND:" + sound + "\n" + title + "\n" + body + summary + "\n", "NOTI");
     }
 }

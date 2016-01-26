@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import parse.WeaconParse;
@@ -97,6 +96,12 @@ public abstract class LogInManagement {
     }
 
     private static void NotifyWOFetching() {
+        //removing last info
+        myLog.add("Removing info of paradas (last feching) from everyweacon", "LIM");
+        for (WeaconParse we : weaconsToNotify) {
+            we.resetFetchingResults();
+        }
+
         Notifications.showNotification(weaconsToNotify, false, true);
         lastTimeWeFetched = false;
     }
@@ -408,7 +413,7 @@ public abstract class LogInManagement {
                     myLog.add(lineTime.toString());
                 }
             }
-            myLog.add("updated todas las lineas de la parada:" + paradaId, "fetch");
+            myLog.add("updated todas las lineas de la parada:" + paradaId + "\n", "fetch");
 
             return lineTimes;
         }

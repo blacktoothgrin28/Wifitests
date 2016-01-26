@@ -58,6 +58,7 @@ public class formatter {
      */
     public String summarizeAllLines(boolean compact) {
         String substring = "No info";
+
         int del = 0;
 
         if (tableLines == null) return "No lines available";
@@ -69,7 +70,7 @@ public class formatter {
                 String roundedTime = tableLines.get(name).get(0).roundedTime;
                 int pos = roundedTime.indexOf(" ");
 
-                if (pos == 0) {//case "IMMINENT"
+                if (pos == -1) {//case "IMMINENT"
                     if (compact) {
                         sb.append(name + ":IM|");
                         del = 1;
@@ -94,9 +95,6 @@ public class formatter {
         return substring;
     }
 
-    public String summarizeAllLines() {
-        return summarizeAllLines(false);
-    }
 
     /**
      * Array with strings that summarizes each line: L1: 12 min, 18 min, 35 min

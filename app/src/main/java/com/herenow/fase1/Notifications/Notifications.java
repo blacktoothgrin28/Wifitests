@@ -7,7 +7,6 @@ import android.app.TaskStackBuilder;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -182,7 +181,7 @@ public abstract class Notifications {
                 sb.append("   " + s + "\n");
             }
             notif.setStyle(inboxStyle);
-            myLog.notificationMultiple(we.getName(), sb.toString(), "Currently " + LogInManagement.getActiveWeacons().size() + " weacons active");
+            myLog.notificationMultiple(we.getName(), sb.toString(), "Currently " + LogInManagement.getActiveWeacons().size() + " weacons active", String.valueOf(sound));
         } else {
             //Bigtext style
             NotificationCompat.BigTextStyle textStyle = new NotificationCompat.BigTextStyle();
@@ -191,7 +190,7 @@ public abstract class Notifications {
             textStyle.setSummaryText("Currently " + LogInManagement.getActiveWeacons().size() + " weacons active");
             notif.setStyle(textStyle);
 
-            myLog.notificationMultiple(we.getName(), we.getMessage(), "Currently " + LogInManagement.getActiveWeacons().size() + " weacons active");
+            myLog.notificationMultiple(we.getName(), we.getMessage(), "Currently " + LogInManagement.getActiveWeacons().size() + " weacons active", String.valueOf(sound));
 
         }
 
@@ -315,7 +314,7 @@ public abstract class Notifications {
         resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
         notif.setContentIntent(resultPendingIntent);
 
-        myLog.notificationMultiple(msg, sb.toString(), "Currently " + LogInManagement.getActiveWeacons().size() + " weacons active");
+        myLog.notificationMultiple(msg, sb.toString(), "Currently " + LogInManagement.getActiveWeacons().size() + " weacons active", String.valueOf(sound));
         mNotificationManager.notify(mIdNoti, notif.build());
     }
 
@@ -377,103 +376,6 @@ public abstract class Notifications {
         mNotificationManager.notify(102, notif.build());
 
     }
-
-    ///////OLD
-    private static void updateNotificationOLD(WeaconParse we) {
-
-        NotificationCompat.Builder notif;
-
-        mNotificationManager.cancel(mIdSingle);
-        mIdGroup = mIdSingle + 1;
-        showedNotifications.add(we);
-
-        notif = buildMultipleNotification(we);
-
-        mNotificationManager.notify(mIdGroup, notif.build());
-    }
-
-    public static void sendNotificationOLD(final WeaconParse we) {
-        try {
-            if (!we.NotificationRequiresFetching() || we.NotificationAlreadyFetched()) {
-                we.setAlreadyFetched(false);
-                myLog.add("no requiere o ya fetched", tag);
-                Intent intent = new Intent(NOTIFICATION_DELETED_ACTION);
-                pendingDeleteIntent = PendingIntent.getBroadcast(ctx, 0, intent, 0);
-
-                //TODO put in parse that this weacon was notified
-                if (showedNotifications == null) {
-                    showedNotifications = new ArrayList<>();
-                    myLog.add("***hemos debido crear denuevo la showednotifications", tag);
-                }
-
-                if (showedNotifications.size() == 0) {
-                    sendNewNotificationOLD(we);
-                } else {
-                    updateNotificationOLD(we);
-                }
-                weaconsLaunchedTable.put(we.getObjectId(), we);
-
-            } else {
-                //Need to fetch info
-                myLog.add("need fetching", tag);
-                getInfoBuses(new OnTaskCompleted() {
-                    @Override
-                    public void OnTaskCompleted(ArrayList elements) {
-                        myLog.add("tenemos resultados de consulta de timepos en parada:" + elements.size(), tag);
-                        we.setFetchingResults(elements);
-                        sendNotificationOLD(we);
-                    }
-
-                    @Override
-                    public void OnError(Exception e) {
-                        myLog.add("Not possible to fecth info from parada *" + e);
-                    }
-                }, we.getParadaId());
-            }
-        } catch (Exception e) {
-            myLog.add("---ERROR in sendNotification: " + e.getMessage());
-        }
-    }
-
-    private static void sendNewNotificationOLD(WeaconParse we) {
-
-        Intent resultIntent;
-        TaskStackBuilder stackBuilder;
-        PendingIntent resultPendingIntent;
-        NotificationCompat.Builder notification;
-        Class<?> cls;
-
-        mIdSingle = currentId;
-        showedNotifications.add(we);
-        myLog.add("sendign new notif", tag);
-        ctx.registerReceiver(receiverDeleteNotification, new IntentFilter(NOTIFICATION_DELETED_ACTION));
-
-        if (we.isBrowser()) {
-            myLog.add("este weacon es de tipo browser", tag);
-            cls = BrowserActivity.class;
-        } else {
-            cls = CardsActivity.class;
-        }
-
-        resultIntent = new Intent(ctx, cls)
-                .putExtra("wUrl", we.getUrl())
-                .putExtra("wName", we.getName())
-                .putExtra("wLogo", we.getLogoRounded())
-                .putExtra("wComapanyDataObId", we.getCompanyDataObjectId())
-                .putExtra("wCards", we.getCards())
-                .putExtra("typeOfAiportCard", "Departures");
-
-        stackBuilder = TaskStackBuilder.create(ctx);
-        stackBuilder.addParentStack(cls);
-        stackBuilder.addNextIntent(resultIntent);
-        resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT); //Todo solve the stack for going back from cards
-
-        notification = buildSingleNotification(we, resultIntent, resultPendingIntent, true, false);
-
-        mNotificationManager.notify(mIdSingle, notification.build());
-    }
-
-    ///////END OLD
 
     static class FetchUrl extends AsyncTask<String, Void, ArrayList<CardWithList.DefaultListObject>> {
 

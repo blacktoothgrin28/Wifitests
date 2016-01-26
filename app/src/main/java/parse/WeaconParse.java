@@ -7,6 +7,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.herenow.fase1.LineTime;
 import com.parse.ParseClassName;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -16,7 +17,6 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
 import java.io.ByteArrayOutputStream;
-import java.text.ParsePosition;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,9 +32,7 @@ import util.parameters;
 public class WeaconParse extends ParseObject {
 
     private String[] cards;
-    private boolean wasFetched = false;
     private ArrayList fetchedElements;
-    private int consecutiveFetchs = 0;
 
     public WeaconParse() {
     }
@@ -251,9 +249,6 @@ public class WeaconParse extends ParseObject {
         put("Type", type);
     }
 
-    public ArrayList getFetchedElements() {
-        return fetchedElements;
-    }
 
     public boolean isBrowser() {
         boolean b = false;
@@ -285,18 +280,19 @@ public class WeaconParse extends ParseObject {
         }
     }
 
-    public boolean NotificationAlreadyFetched() {
-        return this.wasFetched;
+    public ArrayList getFetchedElements() {
+        return fetchedElements;
     }
 
     public void setFetchingResults(ArrayList elements) {
-        this.wasFetched = true;
-        consecutiveFetchs++;
         this.fetchedElements = elements;
     }
 
-    public void setAlreadyFetched(boolean b) {
-        this.wasFetched = b;
+    public void resetFetchingResults() {
+        for (Object o : fetchedElements) {
+            LineTime lineTime = (LineTime) o;
+            lineTime.setRoundedTime("-");
+        }
     }
 
     public int getRepeatedOffRemoveFromNotification() {
@@ -308,6 +304,4 @@ public class WeaconParse extends ParseObject {
         }
         return res;
     }
-
-
 }
