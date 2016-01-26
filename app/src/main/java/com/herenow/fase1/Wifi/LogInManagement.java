@@ -5,6 +5,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.herenow.fase1.Notifications.Notifications;
+import com.herenow.fase1.fetchers.fetchEsade;
 import com.herenow.fase1.fetchers.fetchParadaStCugat;
 import com.parse.ParseException;
 import com.parse.ParsePush;
@@ -130,11 +131,18 @@ public abstract class LogInManagement {
             };
 
             for (final WeaconParse we : weaconsToNotify) {
-                if (we.notificationRequiresFetching())
-                    (new fetchParadaStCugat(listener, we)).execute();
+                if (we.notificationRequiresFetching()) {
+                    if (we.getType().equals("bus_stop")) {
+                        (new fetchParadaStCugat(listener, we)).execute();
+                    } else if (we.getName().equals("ESADECREAPOLIS")) {
+                        (new fetchEsade(listener, we)).execute();
+                    }
+
+                }
             }
         }
     }
+
 
     /**
      * Indicates if should fetch. The criteria is "if has been active by more than n scanners, then no.

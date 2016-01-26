@@ -5,7 +5,6 @@ import android.net.wifi.ScanResult;
 import android.widget.Toast;
 
 import com.herenow.fase1.Activities.ParseCallback;
-import com.herenow.fase1.Notifications.Notifications;
 import com.herenow.fase1.Wifi.LogInManagement;
 import com.parse.DeleteCallback;
 import com.parse.FindCallback;
@@ -360,8 +359,9 @@ public abstract class ParseActions {
                     try {
                         Thread.sleep(1000 * secWait);
                         myLog.add("***FORCED se an recuperado:" + spots.size());
-                        WeaconParse we = spots.get(0).getWeacon();
-                        Notifications.sendOneWeacon(we, true, we.notificationRequiresFetching());
+                        HashSet<WeaconParse> tabla = new HashSet<>();
+                        tabla.add(spots.get(0).getWeacon());
+                        LogInManagement.setNewWeacons(tabla);
                     } catch (Exception e1) {
                         myLog.add("error waiting for launcihgn weacon" + e1);
                     }
