@@ -361,7 +361,7 @@ public abstract class ParseActions {
                         Thread.sleep(1000 * secWait);
                         myLog.add("***FORCED se an recuperado:" + spots.size());
                         WeaconParse we = spots.get(0).getWeacon();
-                        Notifications.sendNotificationOLD(we);
+                        Notifications.sendOneWeacon(we, true, we.notificationRequiresFetching());
                     } catch (Exception e1) {
                         myLog.add("error waiting for launcihgn weacon" + e1);
                     }

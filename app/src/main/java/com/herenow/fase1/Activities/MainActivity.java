@@ -22,6 +22,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.herenow.fase1.MyServices.WifiObserverService;
+import com.herenow.fase1.Notifications.Notifications;
 import com.herenow.fase1.Position;
 import com.herenow.fase1.R;
 import com.herenow.fase1.Wifi.LocationAsker;
@@ -57,7 +58,6 @@ public class MainActivity extends ActionBarActivity implements TextToSpeech.OnIn
     Intent intentWifiObs;
     RefreshReceiver refreshReceiver;
     private Intent intentAddWeacon;
-    private Intent intentCards;
     //Todo solve reporting time between scannings
     //Report on screen
     private Switch swDetection;// start or stot wifiservice detection
@@ -97,7 +97,7 @@ public class MainActivity extends ActionBarActivity implements TextToSpeech.OnIn
 
         WriteUnhandledErrors(true);
         myLog.initialize("/WCLOG/rt.txt"); //Log in a file on the phone
-//        Notifications.Initialize(this); //TODO: Really needed to initialize?
+        Notifications.Initialize(this);
 
         retrieveSpotsAround(false, parameters.radioSpotsQuery);
 

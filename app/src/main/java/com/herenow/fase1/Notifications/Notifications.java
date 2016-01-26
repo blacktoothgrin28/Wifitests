@@ -10,7 +10,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 import android.text.SpannableString;
@@ -20,23 +19,14 @@ import com.herenow.fase1.Activities.BrowserActivity;
 import com.herenow.fase1.Activities.CardsActivity;
 import com.herenow.fase1.Activities.ConnectToWifi;
 import com.herenow.fase1.Activities.WeaconListActivity;
-import com.herenow.fase1.LineTime;
 import com.herenow.fase1.R;
 import com.herenow.fase1.Wifi.LogInManagement;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.jsoup.Connection;
-import org.jsoup.Jsoup;
-
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
-import it.gmariotti.cardslib.library.prototypes.CardWithList;
 import parse.WeaconParse;
-import util.OnTaskCompleted;
 import util.formatter;
 import util.myLog;
 
@@ -50,7 +40,6 @@ public abstract class Notifications {
     private static ArrayList<WeaconParse> showedNotifications; //list of weacosn currently showed in a notification
     private static NotificationManager mNotificationManager;
     private static Context ctx;
-    private static int mIdSingle, mIdGroup;
     private static int mIdNoti = 103;
 
     private static int currentId = 1;
@@ -70,18 +59,11 @@ public abstract class Notifications {
     };
     private static PendingIntent pendingDeleteIntent;
 
-    //    public static void Initialize(Activity act) {
     public static void Initialize(Context act) {
         ctx = act;
         weaconsLaunchedTable = new HashMap<>();
         showedNotifications = new ArrayList<>(); //Weacons showed in notification
-//        myLog.add("showedNotif created in initialization", tag);
         mNotificationManager = (NotificationManager) act.getSystemService(Context.NOTIFICATION_SERVICE);
-
-    }
-
-    private static void getInfoBuses(OnTaskCompleted listener, String paradaId) {
-        (new FetchUrl(listener)).execute(paradaId);
     }
 
     private static NotificationCompat.Builder buildSingleNotification(WeaconParse we, Intent resultIntent,
@@ -156,7 +138,7 @@ public abstract class Notifications {
         //WIFI APP button
         if (we.getName().startsWith("Conj")) {
             //TODO replace, doesn't do anything
-//            Intent connectToWifi = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=hola"));
+//            Intent connectToWifi = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=hola"));_
             Intent connectToWifi = new Intent(ctx, ConnectToWifi.class);
             PendingIntent pendingWIFIConnect = PendingIntent.getService(ctx, 1, connectToWifi, PendingIntent.FLAG_UPDATE_CURRENT);
 
@@ -318,7 +300,7 @@ public abstract class Notifications {
         mNotificationManager.notify(mIdNoti, notif.build());
     }
 
-    private static void sendOneWeacon(WeaconParse we, boolean sound, boolean anyFetchable) {
+    public static void sendOneWeacon(WeaconParse we, boolean sound, boolean anyFetchable) {
         try {
             Intent resultIntent;
             TaskStackBuilder stackBuilder;
@@ -376,64 +358,5 @@ public abstract class Notifications {
         mNotificationManager.notify(102, notif.build());
 
     }
-
-    static class FetchUrl extends AsyncTask<String, Void, ArrayList<CardWithList.DefaultListObject>> {
-
-        private OnTaskCompleted onTaskCompletedListener;
-
-        FetchUrl(OnTaskCompleted listener) {
-            this.onTaskCompletedListener = listener;
-        }
-
-        @Override
-        protected ArrayList<CardWithList.DefaultListObject> doInBackground(String... paradasIds) {
-            Connection.Response response = null;
-            String paradaId = paradasIds[0];
-            String q2 = "http://www.santqbus.santcugat.cat/consultatr.php?idparada=" + paradaId + "&idliniasae=-1&codlinea=-1";
-
-            try {
-                response = Jsoup.connect(q2)
-                        .ignoreContentType(true)
-                        .referrer("http://www.google.com")
-                        .timeout(5000)
-                        .followRedirects(true)
-                        .execute();
-            } catch (IOException e) {
-//                e.printStackTrace();
-                onTaskCompletedListener.OnError(e);
-            }
-
-            if (response == null) return null;
-
-            String s = response.body();
-            String[] partes = s.split("\\}\\,\\{|\\[\\{|\\}\\]");
-
-            ArrayList lineTimes = new ArrayList();
-
-            for (String parte : partes) {
-                if (parte.length() > 3) {
-                    LineTime lineTime = null;
-                    try {
-                        lineTime = new LineTime(new JSONObject("{" + parte + "}"));
-                    } catch (JSONException e) {
-                        onTaskCompletedListener.OnError(e);
-                    }
-                    lineTimes.add(lineTime);
-                    myLog.add(lineTime.toString());
-                }
-            }
-            myLog.add("updated todas las lineas de la parada:" + paradaId);
-
-            return lineTimes;
-        }
-
-        @Override
-        protected void onPostExecute(ArrayList<CardWithList.DefaultListObject> elements) {
-            super.onPostExecute(elements);
-            if (elements != null) onTaskCompletedListener.OnTaskCompleted(elements);
-        }
-
-    }
-
 
 }

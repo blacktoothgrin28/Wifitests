@@ -1,22 +1,15 @@
 package com.herenow.fase1.Wifi;
 
 import android.content.Context;
-import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.herenow.fase1.LineTime;
 import com.herenow.fase1.Notifications.Notifications;
+import com.herenow.fase1.fetchers.fetchParadaStCugat;
 import com.parse.ParseException;
 import com.parse.ParsePush;
 import com.parse.SaveCallback;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.jsoup.Connection;
-import org.jsoup.Jsoup;
-
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -44,6 +37,7 @@ public abstract class LogInManagement {
     private static boolean anyFetchable;
     private static Context mContext;
     private static boolean lastTimeWeFetched;
+    private static int nFetchings;
 
     //old stuff
 //    private static HashMap<String, Integer> oldSpots = new HashMap<>();
@@ -120,12 +114,10 @@ public abstract class LogInManagement {
                 @Override
                 public void OneTaskCompleted() {
                     i += 1;
-                    if (i == weaconsToNotify.size()) {
-//                                // Experimental: sorting updated weacons
-//                                ArrayList sortedUpdated = new ArrayList();
-//                                for (WeaconParse weBuff : weaconsToNotify) {
-//                                    sortedUpdated.add(updatedWeacons.get(updatedWeacons.indexOf(weBuff)));
-//                                }
+                    myLog.add("terminada ina task=" + 1 + "/" + nFetchings);
+
+                    if (i == nFetchings) {
+                        myLog.add("a lazanr la notificaicno congunta");
                         Notifications.showNotification(weaconsToNotify, sound, anyFetchable);
                         lastTimeWeFetched = true;
                     }
@@ -138,7 +130,8 @@ public abstract class LogInManagement {
             };
 
             for (final WeaconParse we : weaconsToNotify) {
-                (new FetchWeacon(listener, we)).execute(we.getParadaId());
+                if (we.notificationRequiresFetching())
+                    (new fetchParadaStCugat(listener, we)).execute();
             }
         }
     }
@@ -156,7 +149,7 @@ public abstract class LogInManagement {
         Iterator<WeaconParse> it = weacons.iterator();
         while (it.hasNext() && !res) {
             WeaconParse we = it.next();
-            if (we.NotificationRequiresFetching() && contabilidad.get(we) < repetitionsTurnOffFetching) {//avoid keep fetching if you live near a bus stop
+            if (we.notificationRequiresFetching() && contabilidad.get(we) < repetitionsTurnOffFetching) {//avoid keep fetching if you live near a bus stop
                 res = true;
                 myLog.add(we.getName() + " requires feticn. this is the " + contabilidad.get(we) + "time", "fetch");
             }
@@ -165,16 +158,17 @@ public abstract class LogInManagement {
     }
 
     private static boolean anyFetchable(HashSet<WeaconParse> weacons) {
-        boolean res = false;
+        nFetchings = nFetchings(weacons);
+        return nFetchings > 0;
+    }
 
-        Iterator<WeaconParse> it = weacons.iterator();
-        while (it.hasNext() && !res) {
-            WeaconParse we = it.next();
-            if (we.NotificationRequiresFetching()) {
-                res = true;
-            }
+    private static int nFetchings(HashSet<WeaconParse> weacons) {
+        int i = 0;
+        for (WeaconParse we :
+                weacons) {
+            if (we.notificationRequiresFetching()) i++;
         }
-        return res;
+        return i;
     }
 
     /**
@@ -364,76 +358,5 @@ public abstract class LogInManagement {
 //    public HashMap getCurrentlyLogged() {
 //        return loggedWeacons;
 //    }
-
-    private static class FetchWeacon extends AsyncTask<String, Void, ArrayList> {
-        private final MultiTaskCompleted multiTaskCompleted;
-        WeaconParse mWe;
-
-        public FetchWeacon(MultiTaskCompleted listener, WeaconParse we) {
-            super();
-            multiTaskCompleted = listener;
-            mWe = we;
-        }
-
-        @Override
-        protected ArrayList doInBackground(String... paradasIds) {
-            Connection.Response response = null;
-            String paradaId = paradasIds[0];
-            String q2 = "http://www.santqbus.santcugat.cat/consultatr.php?idparada=" + paradaId + "&idliniasae=-1&codlinea=-1";
-
-            try {
-                myLog.add("starting fetching: " + mWe.getName(), "fetch");
-
-                response = Jsoup.connect(q2)
-                        .ignoreContentType(true)
-                        .referrer("http://www.google.com")
-                        .timeout(5000)
-                        .followRedirects(true)
-                        .execute();
-            } catch (IOException e) {
-                multiTaskCompleted.OnError(e);
-            }
-
-            if (response == null) return null;
-
-            String s = response.body();
-            String[] partes = s.split("\\}\\,\\{|\\[\\{|\\}\\]");
-
-            ArrayList lineTimes = new ArrayList();
-
-            for (String parte : partes) {
-                if (parte.length() > 3) {
-                    LineTime lineTime = null;
-                    try {
-                        lineTime = new LineTime(new JSONObject("{" + parte + "}"));
-                    } catch (JSONException e) {
-                        multiTaskCompleted.OnError(e);
-                    }
-                    lineTimes.add(lineTime);
-                    myLog.add(lineTime.toString());
-                }
-            }
-            myLog.add("updated todas las lineas de la parada:" + paradaId + "\n", "fetch");
-
-            return lineTimes;
-        }
-
-        @Override
-        protected void onPostExecute(ArrayList elements) {
-            super.onPostExecute(elements);
-            mWe.setFetchingResults(elements);
-//            //TEST
-//            if (weaconsToNotify != null) {
-//                myLog.add("updating " + mWe.getName() + " " + mWe.getOneLineSummary(), "TEST");
-//                myLog.add(" ** weaconstonotify table:", "TEST");
-//                for (WeaconParse we : weaconsToNotify) {
-//                    myLog.add("     " + we.getName() + "| summary: " + we.getOneLineSummary(), "TEST");
-//                }
-//            }
-//            //END TEST
-
-            multiTaskCompleted.OneTaskCompleted();
-        }
-    }
 
 }
