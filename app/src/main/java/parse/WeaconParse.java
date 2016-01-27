@@ -310,7 +310,7 @@ public class WeaconParse extends ParseObject {
         if (getType().equals("bus_stop")) {
             fetchingUrl = "http://www.santqbus.santcugat.cat/consultatr.php?idparada=" + getParadaId() + "&idliniasae=-1&codlinea=-1";
         } else if (getName().equals("ESADECREAPOLIS")) {
-            fetchingUrl = "http://intranet.esade.edu/web1/pkg_pantalles.info?alt=900&ample=1000&edifici=7";
+            fetchingUrl = "http://intranet.esade.edu/web1/pkg_pantalles.info_layer?ample=500&alt=901&segons=0&edifici=2";
         }
         return fetchingUrl;
     }
