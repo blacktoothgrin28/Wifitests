@@ -14,7 +14,7 @@ import util.myLog;
 /**
  * Created by Milenko on 26/01/2016.
  */
-public class fetchEsade extends myFetcher {
+public class fetchEsade extends notificationFetcher {
     public fetchEsade(MultiTaskCompleted listener, WeaconParse we) {
         super(listener, we);
     }

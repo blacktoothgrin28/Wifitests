@@ -15,7 +15,7 @@ import util.myLog;
 /**
  * Created by Milenko on 26/01/2016.
  */
-public class fetchParadaStCugat extends myFetcher {
+public class fetchParadaStCugat extends notificationFetcher {
 
     public fetchParadaStCugat(MultiTaskCompleted listener, WeaconParse we) {
         super(listener, we);
