@@ -54,13 +54,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-
 import it.gmariotti.cardslib.library.internal.Card;
 import it.gmariotti.cardslib.library.internal.CardExpand;
 import it.gmariotti.cardslib.library.internal.CardHeader;
 import it.gmariotti.cardslib.library.internal.ViewToClickToExpand;
 import parse.ParseActions;
-import util.GPSCoordinates;
 import util.dataExamples;
 import util.myLog;
 import util.parameters;
@@ -392,37 +390,37 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
                         CompanyData companyData = new CompanyData(po);
 
                         //COMPANY
-                        if (hashTypes.containsKey("Company")) initCompanyCard(companyData);
+                        if (hashTypes.containsKey(parameters.COMPANY)) initCompanyCard(companyData);
                         //RETAIL
-                        if (hashTypes.containsKey("Retail")) initRetailCard(companyData);
+                        if (hashTypes.containsKey(parameters.RETAIL)) initRetailCard(companyData);
 
                         //RESTAURANT
-                        if (hashTypes.containsKey("Restaurant")) initRestaurantCard(companyData);
+                        if (hashTypes.containsKey(parameters.RESTAURANT))
+                            initRestaurantCard(companyData);
                         //FOODMENU
-                        if (hashTypes.containsKey("FoodMenu")) {
+                        if (hashTypes.containsKey(parameters.FOOD_MENU)) {
                             initFoodMenuCard(dataExamples.getSampleFoodMenu());//TODO read from parse
                         }
                         //DAYMENU
-                        if (hashTypes.containsKey("DayMenu")) {
+                        if (hashTypes.containsKey(parameters.DAY_MENU)) {
                             initDayMenuCard(dataExamples.getSampleDayFoodMenu());//TODO read from parse
                         }
                         //CHEF
-                        if (hashTypes.containsKey("Chef")) {
+                        if (hashTypes.containsKey(parameters.CHEF)) {
                             initChefCard(dataExamples.getExampleChef());
                         }
 
-
                         //SCHEDULE  TODO read the schedule from parse
-                        if (hashTypes.containsKey("Schedule")) {
+                        if (hashTypes.containsKey(parameters.SCHEDULE)) {
                             initScheduleCard();
                         }
                         //Job offer
-                        if (hashTypes.containsKey("Job")) {
+                        if (hashTypes.containsKey(parameters.JOB)) {
                             initJobCard();
                         }
 
                         //AIRPORT
-                        if (companyData.isAirport() || hashTypes.containsKey("Airport")) {
+                        if (companyData.isAirport() || hashTypes.containsKey(parameters.AIRPORT)) {
                             initAirportCard(mTypeAirportCard, companyData.getAirportCode());
                         }
 
@@ -430,41 +428,39 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
                         if (hashTypes.containsKey("News")) initNewsCard(companyData.getNameClean());
 
                         //LINKEDIN
-                        if (hashTypes.containsKey("Linkedin")) {
+                        if (hashTypes.containsKey(parameters.LINKEDIN)) {
                             initLinkedinCard(companyData.getLinkedinUrl());
                         }
 
                         //TWITTER
-                        if (hashTypes.containsKey("Twitter")) {
+                        if (hashTypes.containsKey(parameters.TWITTER)) {
                             initTwitterCard(companyData.getTwitterUser());
                         }
 
                         //TRIPADVISOR
-                        if (hashTypes.containsKey("TripAdvisor")) {
+                        if (hashTypes.containsKey(parameters.TRIP_ADVISOR)) {
                             initTripAdvisorCard(companyData.getTripAdvisorUrl());
                         }
 
                         //PRODUCTS
-                        if (hashTypes.containsKey("Products")) {
+                        if (hashTypes.containsKey(parameters.PRODUCTS)) {
                             initProductsCard(dataExamples.getExampleProducts());
                         }
 
                         //Coupon
-                        if (hashTypes.containsKey("Coupon")) {
+                        if (hashTypes.containsKey(parameters.COUPON)) {
 //                            init_custom_card_expand_inside("http://vignette3.wikia.nocookie.net/inciclopedia/images/8/8a/Calamardo_Guapo.jpg", "");
-
                             String imageUrl = "http://3.bp.blogspot.com/_k4x5a3c1b_M/TGrvXN0KhPI/AAAAAAAASWc/8SGJ4EFnxHk/s800/zara3.png";
                             String codeImageUrl = "http://computadorasparacarros.yolasite.com/resources/codebar.png";
                             init_custom_card_expand_inside(imageUrl, codeImageUrl);
-
                         }
 
                         //MAP CARD
-                        if (hashTypes.containsKey("Map")) {
+                        if (hashTypes.containsKey(parameters.MAP)) {
                             init_card_expand_inside(R.drawable.building_map, "Map of the building");
                         }
                         //CHAT VERTICAL
-                        if (hashTypes.containsKey("Chat")) {
+                        if (hashTypes.containsKey(parameters.CHAT)) {
                             initVerticalChat();
                         }
                     } catch (Exception e) {

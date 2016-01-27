@@ -106,7 +106,7 @@ public abstract class ParseActions {
                                                                 if (e == null) {
                                                                     myLog.add("saved several intensities " + intiensities.size());
                                                                     // aumentar el n_scannings del weacon  en uno
-                                                                    we.increment("n_scanning");
+                                                                    we.increment("n_scannings");
                                                                     we.saveInBackground(new SaveCallback() {
                                                                         @Override
                                                                         public void done(ParseException e) {

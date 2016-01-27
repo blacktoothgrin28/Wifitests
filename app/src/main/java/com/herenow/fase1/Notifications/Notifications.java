@@ -7,10 +7,7 @@ import android.app.TaskStackBuilder;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 import android.text.SpannableString;
 import android.util.Log;
@@ -176,51 +173,6 @@ public abstract class Notifications {
 
         }
 
-        notif.setContentIntent(resultPendingIntent);
-
-        return notif;
-    }
-
-    @NonNull
-    private static NotificationCompat.Builder buildMultipleNotification(WeaconParse we) {
-        Intent resultIntent;
-        TaskStackBuilder stackBuilder;
-        PendingIntent resultPendingIntent;
-        Bitmap bm = BitmapFactory.decodeResource(ctx.getResources(), R.mipmap.ic_launcher);
-
-        String msg = Integer.toString(showedNotifications.size()) + " weacons around you";
-
-        NotificationCompat.Builder notif = new NotificationCompat.Builder(ctx) //TODO put the hour in extended notification
-                .setSmallIcon(R.drawable.ic_stat_name_dup)
-                .setLargeIcon(bm)
-                .setContentTitle(msg)
-                .setContentText(showedNotifications.get(0).getName() + " and others ")
-                .setAutoCancel(true)
-                        //                    .setDefaults(Notification.DEFAULT_VIBRATE | Notification.DEFAULT_SOUND | Notification.FLAG_SHOW_LIGHTS)
-                .setLights(0x36E629, 100, 100)
-                .setDeleteIntent(pendingDeleteIntent)
-                .setTicker(msg);
-
-
-        NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
-        inboxStyle.setBigContentTitle(msg);
-        inboxStyle.setSummaryText("Currently " + Integer.toString(showedNotifications.size() + 5)
-                + " weacons active");//TODO Add a meaningfull summary, probably containing the number of weacons in app
-
-        for (WeaconParse weacon : showedNotifications) {
-            inboxStyle.addLine(weacon.getOneLineSummary());
-        }
-
-        notif.setStyle(inboxStyle);
-        resultIntent = new Intent(ctx, WeaconListActivity.class);
-        resultIntent.putExtra("wName", we.getName());
-        resultIntent.putExtra("wUrl", we.getUrl());
-        resultIntent.putExtra("wLogo", we.getLogoRounded());
-
-        stackBuilder = TaskStackBuilder.create(ctx);
-        stackBuilder.addParentStack(WeaconListActivity.class);
-        stackBuilder.addNextIntent(resultIntent);
-        resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
         notif.setContentIntent(resultPendingIntent);
 
         return notif;

@@ -95,6 +95,7 @@ public class WeaconParse extends ParseObject {
         return name;
     }
 
+    //SETTERS
     public void setName(String name) {
         put("Name", name);
     }
@@ -109,21 +110,8 @@ public class WeaconParse extends ParseObject {
         }
     }
 
-    //SETTERS
     public void setCompanyDataObjectId(String value) {
         put("CardCompany", value);
-    }
-
-    public ParseGeoPoint getGPS() {
-        return getParseGeoPoint("GPS");
-    }
-
-    public void setGPS(ParseGeoPoint GPS) {
-        put("GPS", GPS);
-    }
-
-    public LatLng getGPSLatLng() {
-        return new LatLng(getGPS().getLatitude(), getGPS().getLongitude());
     }
 
     public String getUrl() {
@@ -176,25 +164,28 @@ public class WeaconParse extends ParseObject {
         put("Logo", fileLogo);
     }
 
+    public LatLng getGPSLatLng() {
+        return new LatLng(getGPS().getLatitude(), getGPS().getLongitude());
+    }
+
     public String getImageParseUrl() {
         return getParseFile("Logo").getUrl();
     }
 
-    private boolean isSpotFree(String bssid) throws ParseException {
-        boolean res;
-        ParseQuery query = ParseQuery.getQuery("SSIDS");
-        query.whereEqualTo("bssid", bssid);
-        query.whereDoesNotExist("associated_place");
+    public ParseGeoPoint getGPS() {
+        return getParseGeoPoint("GPS");
+    }
 
-        List elements = query.find();
-        if (elements.size() == 0) {
-            res = true;
-            myLog.add("this SSID is free");
-        } else {
-            res = false;
-            myLog.add("this SSID isn't free");
-        }
-        return res;
+    public void setGPS(ParseGeoPoint GPS) {
+        put("GPS", GPS);
+    }
+
+    public String getType() {
+        return getString("Type");
+    }
+
+    public void setType(String type) {
+        put("Type", type);
     }
 
     public void setMainUrl(String mainUrl) {
@@ -241,12 +232,21 @@ public class WeaconParse extends ParseObject {
         return getType().equals("AIRPORT");
     }
 
-    public String getType() {
-        return getString("Type");
-    }
+    private boolean isSpotFree(String bssid) throws ParseException {
+        boolean res;
+        ParseQuery query = ParseQuery.getQuery("SSIDS");
+        query.whereEqualTo("bssid", bssid);
+        query.whereDoesNotExist("associated_place");
 
-    public void setType(String type) {
-        put("Type", type);
+        List elements = query.find();
+        if (elements.size() == 0) {
+            res = true;
+            myLog.add("this SSID is free");
+        } else {
+            res = false;
+            myLog.add("this SSID isn't free");
+        }
+        return res;
     }
 
 

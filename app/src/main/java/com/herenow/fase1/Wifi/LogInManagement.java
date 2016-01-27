@@ -137,7 +137,6 @@ public abstract class LogInManagement {
                     } else if (we.getName().equals("ESADECREAPOLIS")) {
                         (new fetchEsade(listener, we)).execute();
                     }
-
                 }
             }
         }

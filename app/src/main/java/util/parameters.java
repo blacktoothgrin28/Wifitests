@@ -1,16 +1,5 @@
 package util;
 
-import com.herenow.fase1.CardData.ChefData;
-import com.herenow.fase1.CardData.CompanyData;
-import com.herenow.fase1.CardData.DayFoodMenu;
-import com.herenow.fase1.CardData.FoodMenu;
-import com.herenow.fase1.CardData.MenuSection;
-import com.herenow.fase1.CardData.Schedule;
-import com.herenow.fase1.R;
-
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-
 /**
  * Created by Milenko on 20/07/2015.
  */
@@ -18,6 +7,22 @@ public class parameters {
     final public static int defaultThreshold = -100; //For weacon detection
     public static final String pinWeacons = "Weacons";
     public static final String pinSapo = "SAPO2";
+    public static final String COMPANY = "Company";
+    public static final String RETAIL = "Retail";
+    public static final String RESTAURANT = "Restaurant";
+    public static final String FOOD_MENU = "FoodMenu";
+    public static final String DAY_MENU = "DayMenu";
+    public static final String CHEF = "Chef";
+    public static final String SCHEDULE = "Schedule";
+    public static final String JOB = "Job";
+    public static final String AIRPORT = "Airport";
+    public static final String LINKEDIN = "Linkedin";
+    public static final String TWITTER = "Twitter";
+    public static final String TRIP_ADVISOR = "TripAdvisor";
+    public static final String PRODUCTS = "Products";
+    public static final String COUPON = "Coupon";
+    public static final String MAP = "Map";
+    public static final String CHAT = "Chat";
     //SAPO
     final static int LogFileSize = 100; //in kilobytes, after that, new is started
     public static Integer hitRepetitions = 20; //number of HitSapo in SAPO for considering a SSID important
