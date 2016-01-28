@@ -4,7 +4,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.widget.Toast;
 
-import com.herenow.fase1.Activities.cardLoadedListener;
+import com.herenow.fase1.Activities.CardLoadedListener;
 import com.herenow.fase1.R;
 
 import java.util.ArrayList;
@@ -24,7 +24,7 @@ public abstract class FetchingCard extends CardWithList implements OnTaskComplet
 
     private String mUrl, mTitle;
     private ArrayList<ListObject> mElementsToShow;
-    private cardLoadedListener cardLoadedListener;
+    private CardLoadedListener cardLoadedListener;
     private int myInnerLayout;
 
     public FetchingCard(Context context, String url, String title, int innerLayout) {
@@ -85,7 +85,7 @@ public abstract class FetchingCard extends CardWithList implements OnTaskComplet
         }
     }
 
-    public void setListener(cardLoadedListener listener) {
+    public void setListener(CardLoadedListener listener) {
         myLog.add("setting listener on fechtinc card (card loaded)");
         this.cardLoadedListener = listener;
     }
