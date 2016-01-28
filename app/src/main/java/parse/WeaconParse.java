@@ -115,8 +115,16 @@ public class WeaconParse extends ParseObject {
     }
 
     public String getUrl() {
-        String url = getString("MainUrl");
-        return url;
+        return getString("MainUrl");
+    }
+
+    /**
+     * If true, it shows a separated notification if has been fetched
+     *
+     * @return
+     */
+    public boolean getOwnNotif() {
+        return (getBoolean("OwnNotif") && fetchedElements.size() > 0);
     }
 
     public String[] getCards() {
@@ -307,11 +315,16 @@ public class WeaconParse extends ParseObject {
 
     public String getFetchingUrl() {
         //TODO fetching url should be on database
-        if (getType().equals("bus_stop")) {
-            fetchingUrl = "http://www.santqbus.santcugat.cat/consultatr.php?idparada=" + getParadaId() + "&idliniasae=-1&codlinea=-1";
-        } else if (getName().equals("ESADECREAPOLIS")) {
-            fetchingUrl = "http://intranet.esade.edu/web1/pkg_pantalles.info_layer?ample=500&alt=901&segons=0&edifici=2";
-        }
+        fetchingUrl = "http://intranet.esade.edu/web1/pkg_pantalles.info_layer?ample=500&alt=901&segons=0&edifici=2";
+//        if (getName().startsWith("ESADE F")) {
+//            fetchingUrl = "http://intranet.esade.edu/web1/pkg_pantalles.info_layer?ample=500&alt=901&segons=0&edifici=2";
+//        } else if (getType().equals("bus_stop")) {
+//            fetchingUrl = "http://www.santqbus.santcugat.cat/consultatr.php?idparada=" + getParadaId() + "&idliniasae=-1&codlinea=-1";
+//        }
         return fetchingUrl;
+    }
+
+    public void setFetchingUrl(String fetchingUrl) {
+        this.fetchingUrl = fetchingUrl;
     }
 }

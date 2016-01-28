@@ -13,7 +13,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.herenow.fase1.Activities.cardLoadedListener;
+import com.herenow.fase1.Activities.CardLoadedInterface;
 import com.herenow.fase1.CardData.GoogleFlight;
 import com.herenow.fase1.Cards.Components.CardViewNative2;
 import com.herenow.fase1.FlightData;
@@ -53,7 +53,7 @@ public class AirportCard extends CardWithList implements OnTaskCompleted {
     private FlightData mSelectedFlight;
     private String mAirportCode = "Airport code";
     private CardViewNative2 mCardViewAir;
-    private cardLoadedListener listener;
+    private CardLoadedInterface listener;
 //    private cardLoadedListener listener;
 
     public AirportCard(Context context, TypeOfCard typeOfCard, String airportCode) {
@@ -89,7 +89,7 @@ public class AirportCard extends CardWithList implements OnTaskCompleted {
         return header;
     }
 
-    public void setListener(cardLoadedListener listener) {
+    public void setListener(CardLoadedInterface listener) {
         this.listener = listener;
     }
 

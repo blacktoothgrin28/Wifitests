@@ -19,6 +19,10 @@ public class fetchEsade extends notificationFetcher {
         super(listener, we);
     }
 
+    public fetchEsade() {
+        super();
+    }
+
     @Override
     protected ArrayList processResponse(Connection.Response response) {
         if (response == null) return null;
@@ -37,3 +41,4 @@ public class fetchEsade extends notificationFetcher {
         return arr;
     }
 }
+

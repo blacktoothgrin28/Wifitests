@@ -36,11 +36,12 @@ import com.herenow.fase1.Cards.ParadaCard;
 import com.herenow.fase1.Cards.ProductsCard;
 import com.herenow.fase1.Cards.RestaurantCard;
 import com.herenow.fase1.Cards.RetailCard;
-import com.herenow.fase1.Cards.ScheduleCard;
+import com.herenow.fase1.Cards.ScheduleCardFetch;
 import com.herenow.fase1.Cards.TripAdvisorCard;
 import com.herenow.fase1.Cards.TwitterCard;
 import com.herenow.fase1.FlightData;
 import com.herenow.fase1.R;
+import com.herenow.fase1.Wifi.LogInManagement;
 import com.parse.ParseObject;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
@@ -59,19 +60,21 @@ import it.gmariotti.cardslib.library.internal.CardExpand;
 import it.gmariotti.cardslib.library.internal.CardHeader;
 import it.gmariotti.cardslib.library.internal.ViewToClickToExpand;
 import parse.ParseActions;
+import parse.WeaconParse;
 import util.dataExamples;
 import util.myLog;
 import util.parameters;
 
 import static com.google.android.gms.internal.zzhl.runOnUiThread;
+import static util.stringUtils.Listar;
 //import static com.google.android.gms.internal.zzip.runOnUiThread;
 
 /**
  * A placeholder fragment containing a simple view.
  */
-public class CardsActivityFragment extends Fragment implements cardLoadedListener {
+public class CardsActivityFragment extends Fragment implements CardLoadedInterface {
     AirportCard airportCard;
-    ScheduleCard scheduleCard;
+    ScheduleCardFetch scheduleCard;
     JobOffersCard jobCard;
     ProductsCard productCard;
     MenuCard menuCard;
@@ -84,6 +87,7 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
     private String url;
     private HashMap<String, Integer> hashTypes;
     private ScrollView mScrollView;
+    private String weaconId;
 
 
     public CardsActivityFragment() {
@@ -175,11 +179,17 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
     }
 
     private void initScheduleCard() {
-        scheduleCard = new ScheduleCard(getActivity());
-        scheduleCard.setData(dataExamples.getExampleScheduleData());//it has 11 items
+//        scheduleCard = new ScheduleCard(getActivity());
+//        scheduleCard.setData(dataExamples.getExampleScheduleData());//it has 11 items
+        WeaconParse we = LogInManagement.getThisActiveWeacon(weaconId);
+        myLog.add("en init schedulke card ther iar active weacons:" + LogInManagement.getActiveWeacons().size(), "test");
+        myLog.add("en init schedulke card ther iar active weacons:" + Listar(LogInManagement.getActiveWeacons()), "test");
+        scheduleCard = new ScheduleCardFetch(getActivity(), we.getFetchingUrl(), we.getName(),
+                R.layout.schedule_card_inner_main_withfile, this);
+        //TODO poner un listener
         scheduleCard.init();
 
-        addCardToFragment(R.layout.native_cardwithlist_layout2, scheduleCard);
+//        addCardToFragment(R.layout.native_cardwithlist_layout2, scheduleCard);
     }
 
     private void initJobCard() {
@@ -244,7 +254,6 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
         tripAdvisorCard.setListener(this);
         tripAdvisorCard.init();
     }
-
 
     private void initTwitterCard(String twitterUrl) {
         TwitterCard twitterCard = new TwitterCard(getActivity(), twitterUrl);
@@ -380,7 +389,6 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
 
     public void setCardData(final String wCompanyDataObId, final AirportCard.TypeOfCard mTypeAirportCard) {
         if (wCompanyDataObId != null) {
-
             ParseActions.getCompanyData(wCompanyDataObId, new ParseCallback() {
                 @Override
                 public void DatafromParseReceived(List<ParseObject> datos) {
@@ -412,6 +420,7 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
 
                         //SCHEDULE  TODO read the schedule from parse
                         if (hashTypes.containsKey(parameters.SCHEDULE)) {
+                            myLog.add("tenemos tarjeta de tuipo scehedule", "test");
                             initScheduleCard();
                         }
                         //Job offer
@@ -474,7 +483,6 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
 
                 }
             });
-
         } else {
             myLog.add("-__No tiene cardObjectId");
         }
@@ -519,6 +527,11 @@ public class CardsActivityFragment extends Fragment implements cardLoadedListene
         BusStopCard busStopCard = new BusStopCard(getActivity(), urlGps, "Paradas cercanas", R.layout.busstop_inner_main);
         busStopCard.setListener(this);
         busStopCard.init();
+    }
+
+    public void setWeaconId(String wWeaconObId) {
+        myLog.add("setting ide weacon para pasar*" + wWeaconObId, "test");
+        this.weaconId = wWeaconObId;
     }
 
     class CardExpandInside extends CardExpand {

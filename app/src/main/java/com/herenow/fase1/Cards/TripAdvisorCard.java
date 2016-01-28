@@ -11,7 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.herenow.fase1.Activities.cardLoadedListener;
+import com.herenow.fase1.Activities.CardLoadedInterface;
 import com.herenow.fase1.CardData.TripData;
 import com.herenow.fase1.Cards.Components.CardHeader2;
 import com.herenow.fase1.R;
@@ -44,7 +44,7 @@ public class TripAdvisorCard extends CardWithList implements OnTaskCompleted {
 
     private String mTripUrl;
     private ArrayList<ListObject> mCommentsToShow;
-    private cardLoadedListener listener;
+    private CardLoadedInterface listener;
     private TripData mTripData;
 //    private CardViewNative mCardViewNews;
 
@@ -165,7 +165,7 @@ public class TripAdvisorCard extends CardWithList implements OnTaskCompleted {
 
     }
 
-    public void setListener(cardLoadedListener listener) {
+    public void setListener(CardLoadedInterface listener) {
         this.listener = listener;
     }
 //    public void setView(CardViewNative cardViewNews) {

@@ -16,13 +16,23 @@ import util.myLog;
  * Created by Milenko on 26/01/2016.
  */
 public abstract class notificationFetcher extends AsyncTask<Void, Void, ArrayList> {
-    protected final MultiTaskCompleted multiTaskCompleted;
+    protected MultiTaskCompleted multiTaskCompleted;
     protected WeaconParse mWe;
 
     public notificationFetcher(MultiTaskCompleted listener, WeaconParse we) {
         super();
         multiTaskCompleted = listener;
         mWe = we;
+    }
+
+    public notificationFetcher() {
+        super();
+    }
+
+    public notificationFetcher setListener(MultiTaskCompleted listener, WeaconParse we) {
+        multiTaskCompleted = listener;
+        mWe = we;
+        return this;
     }
 
     @Override

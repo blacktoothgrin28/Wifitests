@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.herenow.fase1.Activities.cardLoadedListener;
+import com.herenow.fase1.Activities.CardLoadedInterface;
 import com.herenow.fase1.R;
 
 import org.jsoup.Connection;
@@ -36,7 +36,7 @@ import util.myLog;
 public class TwitterCard extends CardWithList implements OnTaskCompleted {
     private String mCompanyTwitterUrl, mCompanyTwitterUser;
     private ArrayList<ListObject> mTweetsToShow;
-    private cardLoadedListener listener;
+    private CardLoadedInterface listener;
 
     public TwitterCard(Context context, String companyTwitterUser) {
         super(context);
@@ -161,7 +161,7 @@ public class TwitterCard extends CardWithList implements OnTaskCompleted {
         //TODO
     }
 
-    public void setListener(cardLoadedListener listener) {
+    public void setListener(CardLoadedInterface listener) {
         this.listener = listener;
     }
 //    public void setView(CardViewNative cardViewNews) {

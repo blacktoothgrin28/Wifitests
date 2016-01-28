@@ -163,13 +163,14 @@ public class MainActivity extends ActionBarActivity implements TextToSpeech.OnIn
         listaObj = new ArrayList<String>();
 
         listasAdd("Choose", "");
-        listasAdd("Creapolis", "esade");
+        listasAdd("Creapolis", "EsadeCreapolis");
         listasAdd("AIA", "AIA");
         listasAdd("El Prat", "WiFi");
         listasAdd("Monasterio", "wifip224");
         listasAdd("Vermell", "HotelsantcugatP1");
         listasAdd("ZARA", "WLAN_11F8");
         listasAdd("BUS", "CSE131U");
+        listasAdd("ESADE", "esade");
 
 //        listasAdd("Juan", "wifip224");
 

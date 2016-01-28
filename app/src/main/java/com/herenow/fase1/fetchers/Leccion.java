@@ -5,14 +5,12 @@ import org.jsoup.select.Elements;
 
 import util.myLog;
 
-/**
- * Created by Milenko on 27/01/2016.
- */
 public class Leccion {
     String otro = null, aula = null, imgUrl = null;
     String hora;
     String title;
     String assig;
+
 
     public Leccion(Element clase) {
 
@@ -36,5 +34,29 @@ public class Leccion {
         myLog.add("*******titulo " + title + " | " + hora + " | " + aula
                 + " | " + imgUrl + " | " + assig + " | " + otro);
 
+    }
+
+    public String getOtro() {
+        return otro;
+    }
+
+    public String getAula() {
+        return aula;
+    }
+
+    public String getImgUrl() {
+        return imgUrl;
+    }
+
+    public String getHora() {
+        return hora;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getAssig() {
+        return assig;
     }
 }

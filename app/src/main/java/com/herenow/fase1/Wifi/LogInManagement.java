@@ -73,7 +73,6 @@ public abstract class LogInManagement {
             //Notify or change notification
             if (anyChange || (anyFetchable && shouldFetch)) {
                 Notify();
-
                 // para que cuando deje de fetchear, al siguiente tick mande notificación borrando los tiempos obsolets
                 // esta ntificación es igual, pero quita los tiempos
             } else if (!anyChange && anyFetchable && !shouldFetch && lastTimeWeFetched) {
@@ -360,6 +359,26 @@ public abstract class LogInManagement {
     public static void refresh() {
         myLog.add("refresing the notification");
         Notify();
+    }
+
+    public static WeaconParse getThisActiveWeacon(String weaconId) {
+        boolean found = false;
+        WeaconParse wef = null;
+
+        Iterator<WeaconParse> it = getActiveWeacons().iterator();
+        while (it.hasNext() && !found) {
+            WeaconParse we = it.next();
+            if (we.getObjectId().equals(weaconId)) {
+                found = true;
+                myLog.add("hemos enconrtasdo al we en la lista de activos usando el id");
+                wef = we;
+            }
+
+        }
+        if (!found) {
+            myLog.add("NO hemos enconrtasdo al we en la lista de activos usando el id");
+        }
+        return wef;
     }
 
 //    public HashMap getCurrentlyLogged() {

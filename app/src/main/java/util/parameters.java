@@ -5,8 +5,10 @@ package util;
  */
 public class parameters {
     final public static int defaultThreshold = -100; //For weacon detection
+
     public static final String pinWeacons = "Weacons";
     public static final String pinSapo = "SAPO2";
+
     public static final String COMPANY = "Company";
     public static final String RETAIL = "Retail";
     public static final String RESTAURANT = "Restaurant";
@@ -23,6 +25,7 @@ public class parameters {
     public static final String COUPON = "Coupon";
     public static final String MAP = "Map";
     public static final String CHAT = "Chat";
+
     //SAPO
     final static int LogFileSize = 100; //in kilobytes, after that, new is started
     public static Integer hitRepetitions = 20; //number of HitSapo in SAPO for considering a SSID important
@@ -59,5 +62,7 @@ public class parameters {
     }
 
 
-}
+    public class typeOfCard {
 
+    }
+}

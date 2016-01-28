@@ -13,8 +13,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.herenow.fase1.Activities.CardsActivityFragment;
-import com.herenow.fase1.Activities.cardLoadedListener;
+import com.herenow.fase1.Activities.CardLoadedInterface;
 import com.herenow.fase1.CardData.Noticia;
 import com.herenow.fase1.R;
 import com.squareup.picasso.Picasso;
@@ -37,7 +36,6 @@ import it.gmariotti.cardslib.library.internal.Card;
 import it.gmariotti.cardslib.library.internal.CardHeader;
 import it.gmariotti.cardslib.library.prototypes.CardWithList;
 import it.gmariotti.cardslib.library.prototypes.LinearListView;
-import it.gmariotti.cardslib.library.view.CardViewNative;
 import util.OnTaskCompleted;
 import util.myLog;
 
@@ -53,7 +51,7 @@ public class NewsCard extends CardWithList implements OnTaskCompleted {
     private String siteUrl;
     //    private CardViewNative mCardViewNews;
     private int maxNews;
-    private cardLoadedListener listener;
+    private CardLoadedInterface listener;
 
     public NewsCard(Context context, String companyName) {
         super(context);
@@ -270,7 +268,7 @@ public class NewsCard extends CardWithList implements OnTaskCompleted {
 //        mCardViewNews = cardViewNews;
 //    }
 
-    public void setListener(cardLoadedListener listener) {
+    public void setListener(CardLoadedInterface listener) {
         this.listener = listener;
     }
 

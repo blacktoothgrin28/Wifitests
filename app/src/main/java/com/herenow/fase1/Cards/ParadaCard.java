@@ -8,10 +8,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.herenow.fase1.Activities.cardLoadedListener;
+import com.herenow.fase1.Activities.CardLoadedInterface;
 import com.herenow.fase1.CardData.ProductItem;
 import com.herenow.fase1.CardData.ProductsData;
-import com.herenow.fase1.Cards.Components.CardHeader2;
 import com.herenow.fase1.Parada;
 import com.herenow.fase1.R;
 import com.herenow.fase1.actions.Actions;
@@ -42,13 +41,18 @@ import util.myLog;
 public class ParadaCard extends CardWithList implements OnTaskCompleted {
 
     private GPSCoordinates mGps;
-    private cardLoadedListener listener;
+    private CardLoadedInterface listener;
 
     public ParadaCard(Context context, GPSCoordinates gps) {
         super(context);
         mGps = gps;
     }
 
+
+    //////////////
+    public ParadaCard(Context context, int innerLayout) {
+        super(context, innerLayout);
+    }
 
     @Override
     protected CardHeader initCardHeader() {
@@ -79,14 +83,11 @@ public class ParadaCard extends CardWithList implements OnTaskCompleted {
         (new readParada()).execute(new GPSCoordinates[]{mGps});//async
 
     }
+
     @Override
     protected List<ListObject> initChildren() {
 //        return mParadasToShow;
     return null;
-    }
-    //////////////
-    public ParadaCard(Context context, int innerLayout) {
-        super(context, innerLayout);
     }
 
     public void setData(ProductsData productsData) {
@@ -257,10 +258,6 @@ public class ParadaCard extends CardWithList implements OnTaskCompleted {
     class ProductObject extends DefaultListObject {
 
 
-        public ProductItem getProductItem() {
-            return productItem;
-        }
-
         private ProductItem productItem;
 
         public ProductObject(Card parentCard) {
@@ -273,6 +270,10 @@ public class ParadaCard extends CardWithList implements OnTaskCompleted {
             this.productItem = productItem;
 
             init();
+        }
+
+        public ProductItem getProductItem() {
+            return productItem;
         }
 
         private void init() {

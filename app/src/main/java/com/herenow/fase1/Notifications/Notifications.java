@@ -63,8 +63,8 @@ public abstract class Notifications {
         mNotificationManager = (NotificationManager) act.getSystemService(Context.NOTIFICATION_SERVICE);
     }
 
-    private static NotificationCompat.Builder buildSingleNotification(WeaconParse we, Intent resultIntent,
-                                                                      PendingIntent resultPendingIntent, boolean sound, boolean anyFetchable) {
+    private static NotificationCompat.Builder buildSingleNotification
+            (WeaconParse we, Intent resultIntent, PendingIntent resultPendingIntent, boolean sound, boolean anyFetchable) {
         NotificationCompat.Builder notif;
 
         Intent refreshIntent = new Intent("popo");
@@ -259,10 +259,11 @@ public abstract class Notifications {
             PendingIntent resultPendingIntent;
             NotificationCompat.Builder notification;
             Class<?> cls;
-
+            myLog.add("estanmos en send one weacon");
             if (we.isBrowser()) {
                 cls = BrowserActivity.class;
             } else {
+                myLog.add("Y vamos a usar la activudad cards activity");
                 cls = CardsActivity.class;
             }
 
@@ -272,7 +273,8 @@ public abstract class Notifications {
                     .putExtra("wLogo", we.getLogoRounded())
                     .putExtra("wComapanyDataObId", we.getCompanyDataObjectId())
                     .putExtra("wCards", we.getCards())
-                    .putExtra("typeOfAiportCard", "Departures");
+                    .putExtra("typeOfAiportCard", "Departures")
+                    .putExtra("wWeaconObId", we.getObjectId());
 
             stackBuilder = TaskStackBuilder.create(ctx);
             stackBuilder.addParentStack(cls);

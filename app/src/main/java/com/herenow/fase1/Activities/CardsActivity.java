@@ -20,11 +20,14 @@ public class CardsActivity extends ActionBarActivity {
 //        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         try {
+            myLog.add("Entrnando en activity cards");
             Bundle b = getIntent().getExtras();
 //            Bitmap wLogo = (Bitmap) b.get("wLogo");
 //            String wUrl = b.getString("wUrl");
             String wName = b.getString("wName");
             String wCompanyDataObId = b.getString("wComapanyDataObId");
+            String wWeaconObId = b.getString("wWeaconObId");
+
             double wLat = b.getDouble("wLatitude");
             double wLon = b.getDouble("wLongitude");
 
@@ -34,8 +37,8 @@ public class CardsActivity extends ActionBarActivity {
 
             String depOrArr = "";
             AirportCard.TypeOfCard mTypeAirportCard = AirportCard.TypeOfCard.departure;
-            try {
 
+            try {
                 depOrArr = b.getString("typeOfAiportCard");
                 if (depOrArr.equals("Arrivals")) {
                     mTypeAirportCard = AirportCard.TypeOfCard.arrival;
@@ -50,6 +53,7 @@ public class CardsActivity extends ActionBarActivity {
             CardsActivityFragment rf = (CardsActivityFragment) getSupportFragmentManager().findFragmentById(R.id.cards_fragment);
             if (rf != null) {
                 rf.setCardsType(wCards);
+                rf.setWeaconId(wWeaconObId);
                 if (wCompanyDataObId != null) rf.setCardData(wCompanyDataObId, mTypeAirportCard);
                 if (wLat != 0.0d) rf.launchBusCard(wLat, wLon);
             }

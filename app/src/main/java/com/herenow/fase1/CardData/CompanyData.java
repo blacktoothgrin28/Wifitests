@@ -51,6 +51,7 @@ public class CompanyData {
     private String horario;
     private String tripAdvisorUrl;
 
+    //Constructors
     public CompanyData(String name, int imageResId, int logoResId) {
         this.name = name;
         this.imageResId = imageResId;
@@ -91,12 +92,16 @@ public class CompanyData {
 
         //Images
         ParseFile parseFile = po.getParseFile("Logo");
-        logoUrl = parseFile.getUrl();
+        if (parseFile != null) {
+            logoUrl = parseFile.getUrl();
+        }
         byte[] bitmapdata = parseFile.getData();
         logo = BitmapFactory.decodeByteArray(bitmapdata, 0, bitmapdata.length);
 
         parseFile = po.getParseFile("MainImage");
-        mainImageUrl = parseFile.getUrl();
+        if (parseFile != null) {
+            mainImageUrl = parseFile.getUrl();
+        }
 //            bitmapdata = parseFile.getData();
 //            mainImage = BitmapFactory.decodeByteArray(bitmapdata, 0, bitmapdata.length);
         if (po.getList("Founders") != null) {
@@ -110,28 +115,25 @@ public class CompanyData {
         return new SetupWizard(context);
     }
 
-    public String getLogoUrl() {
-        return logoUrl;
+    private StringBuilder AddPair(StringBuilder sb, String type, String value) {
+        if (value != null) sb.append(type + ": " + value + "\n");
+        return sb;
     }
 
-    public String getMainImageUrl() {
-        return mainImageUrl;
+    public void setEmployeesNumber(int workers) {
+        this.nEmployees = workers;
     }
 
-    public String getWebsite() {
-        return website;
+    public void setFounders(String[] founders) {
+        this.founders = founders;
     }
 
-    public void setWebsite(String website) {
-        this.website = website;
+    public void setFoundationYear(String foundationYear) {
+        this.foundationYear = foundationYear;
     }
 
-    public String getLinkedinUrl() {
-        return linkedinUrl;
-    }
-
-    public void setLinkedinUrl(String linkedinUrl) {
-        this.linkedinUrl = linkedinUrl;
+    public void setDirector(String director) {
+        this.director = director;
     }
 
     public String getTwitterUser() {
@@ -140,10 +142,6 @@ public class CompanyData {
 
     public void setTwitterUser(String twitterUser) {
         this.twitterUser = twitterUser;
-    }
-
-    public void setEmployeesNumber(int workers) {
-        this.nEmployees = workers;
     }
 
     public String getLemma() {
@@ -160,10 +158,6 @@ public class CompanyData {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public String getName() {
-        return name;
     }
 
     /**
@@ -183,8 +177,30 @@ public class CompanyData {
         return nameClean;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    //GETTERS
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     public int getLogoResId() {
         return logoResId;
+    }
+
+    public String getLinkedinUrl() {
+        return linkedinUrl;
+    }
+
+    public void setLinkedinUrl(String linkedinUrl) {
+        this.linkedinUrl = linkedinUrl;
     }
 
     public int getImageResId() {
@@ -214,54 +230,8 @@ public class CompanyData {
         return sb.toString();
     }
 
-    private StringBuilder AddPair(StringBuilder sb, String type, String value) {
-        if (value != null) sb.append(type + ": " + value + "\n");
-        return sb;
-    }
-
-    public void setFounders(String[] founders) {
-        this.founders = founders;
-    }
-
-    public void setFoundationYear(String foundationYear) {
-        this.foundationYear = foundationYear;
-    }
-
-    public void setDirector(String director) {
-        this.director = director;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public Bitmap getLogo() {
-        return logo;
-    }
-
-    public Bitmap getMainImage() {
-        return mainImage;
-    }
-
     public String getAirportCode() {
         return airportCode;
-    }
-
-    public boolean isAirport() {
-
-        return getTypeOfBusiness().equals("Airport");
     }
 
     public String getTypeOfBusiness() {
@@ -279,10 +249,48 @@ public class CompanyData {
     public String getExpandInfo() {
         return expandInfo;
     }
+
     public String getTripAdvisorUrl() {
         return tripAdvisorUrl;
     }
 
+    public Bitmap getLogo() {
+        return logo;
+    }
+
+    public Bitmap getMainImage() {
+        return mainImage;
+    }
+
+    public String getPhone() {
+        return phone;
+        //SETTERS
+
+        //Questions
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getLogoUrl() {
+        return logoUrl;
+    }
+
+    public String getMainImageUrl() {
+        return mainImageUrl;
+    }
+
+    public String getWebsite() {
+        return website;
+    }
+
+    //SETTERS
+    public void setWebsite(String website) {
+        this.website = website;
+    }
+
+    //Questions
     public boolean isWebResponsive() {
         if (getName().startsWith("ZAR")) {
             myLog.add("WEB responsive");
@@ -290,6 +298,14 @@ public class CompanyData {
         } else {
             myLog.add("WEB NOT responsive");
             return false;
+        }
+    }
+
+    public boolean isAirport() {
+        if (getTypeOfBusiness() == null) {
+            return false;
+        } else {
+            return getTypeOfBusiness().equals("Airport");
         }
     }
 
@@ -305,5 +321,6 @@ public class CompanyData {
             mName = name;
             return this;
         }
+
     }
 }

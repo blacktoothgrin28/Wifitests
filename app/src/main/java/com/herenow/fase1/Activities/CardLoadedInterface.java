@@ -7,7 +7,8 @@ import it.gmariotti.cardslib.library.internal.Card;
 /**
  * Created by Milenko on 30/09/2015.
  */
-public interface cardLoadedListener {
-    void OnCardReady(Card card,@LayoutRes int CardLayout);
+public interface CardLoadedInterface {
+    void OnCardReady(Card card, @LayoutRes int CardLayout);
+
     void OnCardErrorLoadingData(Exception e);
 }

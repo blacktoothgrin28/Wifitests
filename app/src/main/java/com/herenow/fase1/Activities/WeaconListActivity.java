@@ -10,12 +10,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.herenow.fase1.Notifications.Notifications;
 import com.herenow.fase1.R;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import com.herenow.fase1.Wifi.LogInManagement;
 
 import parse.WeaconParse;
 import util.DividerItemDecoration;
@@ -27,7 +23,6 @@ public class WeaconListActivity extends ActionBarActivity {
     private RecyclerView mRecyclerView;
     private WeaconAdapter adapter;
     //    private List<WeaconItem> weaconItemList = new ArrayList<WeaconItem>();
-    private List<WeaconParse> weaconItemList = new ArrayList<>();
     private Intent intentWeb;
 
     @Override
@@ -51,13 +46,8 @@ public class WeaconListActivity extends ActionBarActivity {
 //            weaconItemList.add(wec);
 //        }
             //Fill the list with launched
-            Collection<WeaconParse> intermediate = Notifications.weaconsLaunchedTable.values();
-            for (Object obj : intermediate.toArray()) {
-                WeaconParse we = (WeaconParse) obj;
-                weaconItemList.add(we); //To the showed list.
-            }
 
-            adapter = new WeaconAdapter(this, weaconItemList);
+            adapter = new WeaconAdapter(this, LogInManagement.getActiveWeacons());
             adapter.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -90,10 +80,11 @@ public class WeaconListActivity extends ActionBarActivity {
             intent = new Intent(WeaconListActivity.this, BrowserActivity.class)
                     .putExtra("wUrl", we.getUrl());
         } else {
-            intent = new Intent(WeaconListActivity.this, CardsActivityOld.class)
+            intent = new Intent(WeaconListActivity.this, CardsActivity.class)
                     .putExtra("wComapanyDataObId", we.getCompanyDataObjectId())
                     .putExtra("wCards", we.getCards())
-                    .putExtra("typeOfAiportCard", "Departures");
+                    .putExtra("typeOfAiportCard", "Departures")
+                    .putExtra("wWeaconObId", we.getObjectId());
         }
 
         //In common
