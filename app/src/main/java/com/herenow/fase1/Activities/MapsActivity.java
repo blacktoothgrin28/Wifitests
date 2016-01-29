@@ -23,6 +23,7 @@ import com.parse.FindCallback;
 import com.parse.ParseException;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import parse.ParseActions;
@@ -40,6 +41,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private String paradaId;
     private Context mContext;
     private Marker selectedMarker;
+    private List<WeaconParse> places;
+    private HashSet<Marker> hashMarkersPlaces = new HashSet();
+    private boolean placesVisible;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,13 +83,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
 
         //Own position
-        (new LocationAsker()).DoSomethingWithPosition(new LocationCallback() {
+        LocationCallback call = new LocationCallback() {
 
             @Override
             public void LocationReceived(GPSCoordinates gps) {
                 mGps = gps;
                 LatLng aqui;
                 aqui = gps.getLatLng();
+                LoadPlaces();
                 mMap.addMarker(new MarkerOptions().position(aqui).title("Yo")
                         .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(aqui, 15));
@@ -97,18 +102,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         for (WeaconParse we : list) {
                             Marker marker = mMap.addMarker(new MarkerOptions().position(we.getGPSLatLng()).title(we.getName()));
                             hashMarkers.put(marker.getId(), we.getParadaId());
-                            myLog.add("hemos puesto el marker(" + we.getName() + ") idmarker=" +
-                                    marker.getId() + "| parada=" + we.getParadaId());
+//                            myLog.add("hemos puesto el marker(" + we.getName() + ") idmarker=" +
+//                                    marker.getId() + "| parada=" + we.getParadaId());
                         }
                     }
                 }, gps.getGeoPoint());
 
             }
-        }, this);
 
-
+            @Override
+            public void LocationReceived(GPSCoordinates gps, double accuracy) {
+                myLog.add("recibida con procision, pero no lo requerimamos" + accuracy, "aut");
+            }
+        };
+        new LocationAsker(mContext, call);
     }
-
 
     public void onClickSendWifis(View view) {
         new WifiAsker(mContext, new preguntaWifi() {
@@ -130,5 +138,56 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 myLog.add("error recibiendo los sopotsde manera forzasa");
             }
         });
+    }
+
+    public void onClickShowWeacons(View view) {
+        for (Marker ma : hashMarkersPlaces) {
+            ma.setVisible(!placesVisible);
+        }
+        placesVisible = !placesVisible;
+    }
+
+    private void LoadPlaces() {
+        ParseActions.getPlacesAround(mGps, 2, new FindCallback<WeaconParse>() {
+            @Override
+            public void done(List<WeaconParse> list, ParseException e) {
+                if (list != null) {
+                    for (WeaconParse we : list) {
+                        placesVisible = false;
+                        Marker marker = mMap.addMarker(new MarkerOptions().position(we.getGPSLatLng()).title(we.getName())
+                                .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_map_weacon)));
+                        marker.setVisible(placesVisible);
+                        hashMarkersPlaces.add(marker);
+//                        myLog.add("hemos puesto el marker(" + we.getName() + ") idmarker=" +
+//                                marker.getId() + "| parada=" + we.getParadaId());
+                    }
+
+                }
+            }
+        });
+    }
+
+    /**
+     * the user declares he is near a bus stop. THis verifieies if its true and then capture the wifis
+     *
+     * @param view
+     */
+    public void onClickImIn(View view) {
+        //TODO what if it is not near any bus // STOPSHIP: 29/01/2016
+        //todo What if we detect mor than one
+
+        LocationCallback locationCallback = new LocationCallback() {
+            @Override
+            public void LocationReceived(GPSCoordinates gps) {
+                myLog.add("tenemos localización  " + gps, "aut");
+                //TODO
+            }
+
+            @Override
+            public void LocationReceived(GPSCoordinates gps, double accuracy) {
+                myLog.add("en maps, ya tenemos la loclizacion con precicion:" + accuracy, "aut");
+            }
+        };
+        new LocationAsker(mContext, locationCallback, 10);
     }
 }

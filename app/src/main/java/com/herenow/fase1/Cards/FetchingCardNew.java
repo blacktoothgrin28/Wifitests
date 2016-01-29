@@ -31,14 +31,11 @@ public abstract class FetchingCardNew extends CardWithList {
     private String mTitle;
     private int myInnerLayout;
 
-    public FetchingCardNew(Context context, String url, String title, int innerLayout, CardLoadedInterface listener) {
+    public FetchingCardNew(Context context, WeaconParse we, int innerLayout, CardLoadedInterface listener) {
         super(context);
         cardLoadedListener = listener;
-        myLog.add("***entrando a fetchcardnew", "test");
-        myLog.add("***entrando a fetchcardnew url" + url, "test");
-        mWe.setFetchingUrl(url);
-        //
-        mTitle = title;
+        mWe = we;
+        mTitle = we.getName();
         myInnerLayout = innerLayout;
     }
 
@@ -54,13 +51,12 @@ public abstract class FetchingCardNew extends CardWithList {
             public void OnError(Exception e) {
                 //TODO
             }
-        }, mWe);
+        }, mWe); //mWe is an empty weacon that is used to store the results of fetching
 
         fetcher.execute();
     }
 
     private void AllReady() {
-        myLog.add("all ready", "test");
         myLog.add("ontaskcompleted:" + mWe.getFetchedElements().size() + " Elements");
         mElementsToShow = convertToListObjects(mWe.getFetchedElements());
         super.init();
@@ -84,7 +80,6 @@ public abstract class FetchingCardNew extends CardWithList {
 
     @Override
     protected void initCard() {
-        myLog.add("init card", "test");
         //Set the whole card as swipeable
         setSwipeable(true);
         setOnSwipeListener(new OnSwipeListener() {

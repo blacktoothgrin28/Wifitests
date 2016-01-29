@@ -2,7 +2,10 @@ package com.herenow.fase1.Wifi;
 
 import android.content.Context;
 import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -17,16 +20,90 @@ import util.myLog;
  */
 public class LocationAsker implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
-    LocationCallback locationCallback;
+    LocationCallback mLocationCallback;
     Context mContext;
     GoogleApiClient mGoogleApiClient;
+    private LocationManager locationManager;
+    private LocationListener locationListener;
+    private double mPrecision;
 
-    public void DoSomethingWithPosition(LocationCallback locationCallback, Context context) {
+    public LocationAsker(Context ctx, final LocationCallback locationCallback) {
+        mContext = ctx;
+        mLocationCallback = locationCallback;
+        buildGoogleApiClient();
+    }
 
-        this.locationCallback = locationCallback;
+    public LocationAsker(Context ctx, final LocationCallback locationCallback, final double accuracyNeeded) {
+        this(ctx, locationCallback);
+        myLog.add("entrando en locationascker con precisio", "aut");
+
+        locationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
+
+        locationListener = new LocationListener() {
+
+            @Override
+            public void onLocationChanged(Location location) {
+                myLog.add("ha cambiad loa localcixzacion , dentro de la precision. Tiene vleovidad:" + location.hasSpeed(), "aut");
+//                if (location.hasSpeed()) return;
+                if (location.hasAccuracy()) {
+                    double accuracy = location.getAccuracy();
+                    if (accuracy < accuracyNeeded) {
+
+                        String s = "estamos a con precision mejor de 5 mtes " + accuracy;
+                        myLog.add(s, "aut");
+
+                        Toast.makeText(mContext, s, Toast.LENGTH_SHORT).show();
+//                        mLocationCallback.LocationReceived(new GPSCoordinates(location), accuracy);
+                        removerListener(location);
+                    } else {
+                        String text = "estamos a con precision peor de 5 mtes " + accuracy;
+                        myLog.add(text, "aut");
+                        Toast.makeText(mContext, text, Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+                myLog.add("ha camnbiado del statusl de location: provider" + provider + "|stauss" + status, "aut");
+            }
+
+            @Override
+            public void onProviderEnabled(String provider) {
+                myLog.add("encendido el provider:" + provider, "aut");
+            }
+
+            @Override
+            public void onProviderDisabled(String provider) {
+                myLog.add("apagado el proivder" + provider, "aut");
+            }
+        };
+
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+    }
+
+
+    private void removerListener(Location location) {
+        locationManager.removeUpdates(locationListener);
+        mLocationCallback.LocationReceived(new GPSCoordinates(location), location.getAccuracy());
+        mGoogleApiClient.disconnect();
+    }
+
+    public void DoSomethingWithPosition(Context context) {
+
         mContext = context;
         buildGoogleApiClient();
     }
+
+    /**
+     * @param context
+     * @param precision in meters
+     */
+    public void DoSomethingWithPosition(Context context, double precision) {
+        mPrecision = precision;
+        DoSomethingWithPosition(context);
+    }
+
 
     @Override
     public void onConnected(Bundle bundle) {
@@ -35,12 +112,12 @@ public class LocationAsker implements GoogleApiClient.ConnectionCallbacks, Googl
 
         if (mLastLocation == null) {
             myLog.add("Last location is null");
-            locationCallback.LocationReceived(new GPSCoordinates(41.474722, 2.086667));
+            mLocationCallback.LocationReceived(new GPSCoordinates(41.474722, 2.086667));
         } else {
             GPSCoordinates gps = new GPSCoordinates(mLastLocation);
             myLog.add("Last location is: " + gps);
             mGoogleApiClient.disconnect();
-            locationCallback.LocationReceived(gps);
+            mLocationCallback.LocationReceived(gps);
         }
     }
 

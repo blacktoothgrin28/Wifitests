@@ -222,13 +222,19 @@ public class MainActivity extends ActionBarActivity implements TextToSpeech.OnIn
      * @param radio
      */
     private void retrieveSpotsAround(final boolean bLocal, final double radio) {
-        (new LocationAsker()).DoSomethingWithPosition(new LocationCallback() {
+        LocationCallback locationCallback = new LocationCallback() {
             @Override
             public void LocationReceived(GPSCoordinates gps) {
                 if (gps == null) gps = new GPSCoordinates(41.474722, 2.086667);
                 ParseActions.getSpots(bLocal, radio, gps, getApplicationContext());
             }
-        }, this);
+
+            @Override
+            public void LocationReceived(GPSCoordinates gps, double accuracy) {
+                myLog.add("recibido comprorecision, aunque no requrido", "aut");
+            }
+        };
+        new LocationAsker(this, locationCallback);
     }
 
     private void ParseUserLogIn() {
@@ -332,7 +338,7 @@ public class MainActivity extends ActionBarActivity implements TextToSpeech.OnIn
      * @param view
      */
     public void onClickParada(View view) {
-        (new LocationAsker()).DoSomethingWithPosition(new LocationCallback() {
+        LocationCallback locationCallback = new LocationCallback() {
             @Override
             public void LocationReceived(GPSCoordinates gps) {
                 Intent IntentCards = new Intent(getBaseContext(), CardsActivity.class);
@@ -341,7 +347,14 @@ public class MainActivity extends ActionBarActivity implements TextToSpeech.OnIn
                 IntentCards.putExtra("wCards", new String[]{"parada"});
                 startActivity(IntentCards);
             }
-        }, this);
+
+            @Override
+            public void LocationReceived(GPSCoordinates gps, double accuracy) {
+                myLog.add("recibida lprecision aunqueno  requerida", "aut");
+            }
+        };
+        new LocationAsker(this, locationCallback);
+//        (new LocationAsker()).DoSomethingWithPosition(locationCallback, this);
     }
 
     public void clickMap(View view) {

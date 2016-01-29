@@ -10,11 +10,14 @@ import android.net.wifi.WifiManager;
 
 import com.herenow.fase1.Activities.LocationCallback;
 import com.herenow.fase1.Sapo.SAPO2;
+import com.parse.FindCallback;
+import com.parse.ParseException;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import parse.ParseActions;
+import parse.WeaconParse;
 import util.GPSCoordinates;
 import util.myLog;
 import util.parameters;
@@ -75,12 +78,30 @@ public class WifiBoss {
      */
     private  void ReportLocalPlaces() {
 
-        (new LocationAsker()).DoSomethingWithPosition(new LocationCallback() {
+        LocationCallback locationCallback = new LocationCallback() {
             @Override
-            public void LocationReceived(GPSCoordinates gps) {
-                ParseActions.getPlacesAround(gps, 0.3);
+            public void LocationReceived(final GPSCoordinates gps) {
+                ParseActions.getPlacesAround(gps, 0.3, new FindCallback<WeaconParse>() {
+                    @Override
+                    public void done(List<WeaconParse> list, ParseException e) {
+                        StringBuilder sb = new StringBuilder("**** Places near: " + gps + "\n");
+                        for (WeaconParse we : list) {
+                            sb.append(we.getName() + "\n");
+                        }
+                        sb.append("******");
+                        myLog.add(sb.toString(), "places");
+                        //                MainActivity.writeOnScreen(sb.toString());
+                    }
+                });
             }
-        }, mContext);
+
+            @Override
+            public void LocationReceived(GPSCoordinates gps, double accuracy) {
+                myLog.add("conaccuraci auqnue no pediedo", "aut");
+            }
+        };
+        new LocationAsker(mContext, locationCallback);
+//        (new LocationAsker()).DoSomethingWithPosition(mLocationCallback, mContext);
     }
 
     class WifiReceiver extends BroadcastReceiver {

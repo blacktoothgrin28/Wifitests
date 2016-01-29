@@ -184,9 +184,7 @@ public class CardsActivityFragment extends Fragment implements CardLoadedInterfa
         WeaconParse we = LogInManagement.getThisActiveWeacon(weaconId);
         myLog.add("en init schedulke card ther iar active weacons:" + LogInManagement.getActiveWeacons().size(), "test");
         myLog.add("en init schedulke card ther iar active weacons:" + Listar(LogInManagement.getActiveWeacons()), "test");
-        scheduleCard = new ScheduleCardFetch(getActivity(), we.getFetchingUrl(), we.getName(),
-                R.layout.schedule_card_inner_main_withfile, this);
-        //TODO poner un listener
+        scheduleCard = new ScheduleCardFetch(getActivity(), we, R.layout.schedule_card_inner_main_withfile, this);
         scheduleCard.init();
 
 //        addCardToFragment(R.layout.native_cardwithlist_layout2, scheduleCard);

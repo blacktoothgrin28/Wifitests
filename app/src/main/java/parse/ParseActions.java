@@ -299,24 +299,14 @@ public abstract class ParseActions {
      *
      * @param gps
      * @param maxDistance in kilometeres
+     * @param findCallback
      */
-    public static void getPlacesAround(final GPSCoordinates gps, double maxDistance) {
+    public static void getPlacesAround(final GPSCoordinates gps, double maxDistance, FindCallback<WeaconParse> findCallback) {
 
         ParseQuery<WeaconParse> query = ParseQuery.getQuery(WeaconParse.class);
         query.fromPin(parameters.pinWeacons);
         query.whereWithinKilometers("GPS", new ParseGeoPoint(gps.getLatitude(), gps.getLongitude()), maxDistance);
-        query.findInBackground(new FindCallback<WeaconParse>() {
-            @Override
-            public void done(List<WeaconParse> list, ParseException e) {
-                StringBuilder sb = new StringBuilder("**** Places near: " + gps + "\n");
-                for (WeaconParse we : list) {
-                    sb.append(we.getName() + "\n");
-                }
-                sb.append("******");
-                myLog.add(sb.toString(), "places");
-//                MainActivity.writeOnScreen(sb.toString());
-            }
-        });
+        query.findInBackground(findCallback);
 
     }
 

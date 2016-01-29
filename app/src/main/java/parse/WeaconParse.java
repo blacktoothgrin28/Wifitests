@@ -314,8 +314,7 @@ public class WeaconParse extends ParseObject {
     }
 
     public String getFetchingUrl() {
-        //TODO fetching url should be on database
-        fetchingUrl = "http://intranet.esade.edu/web1/pkg_pantalles.info_layer?ample=500&alt=901&segons=0&edifici=2";
+        fetchingUrl = getString("FetchingUrl") + getParadaId();
 //        if (getName().startsWith("ESADE F")) {
 //            fetchingUrl = "http://intranet.esade.edu/web1/pkg_pantalles.info_layer?ample=500&alt=901&segons=0&edifici=2";
 //        } else if (getType().equals("bus_stop")) {
@@ -324,7 +323,8 @@ public class WeaconParse extends ParseObject {
         return fetchingUrl;
     }
 
-    public void setFetchingUrl(String fetchingUrl) {
-        this.fetchingUrl = fetchingUrl;
-    }
+
+//    public void setFetchingUrl(String fetchingUrl) {
+//        this.fetchingUrl = fetchingUrl;
+//    }
 }

@@ -26,7 +26,7 @@ import java.util.Calendar;
 import it.gmariotti.cardslib.library.internal.Card;
 import it.gmariotti.cardslib.library.prototypes.CardWithList;
 import it.gmariotti.cardslib.library.prototypes.LinearListView;
-import util.myLog;
+import parse.WeaconParse;
 
 /**
  * Created by Milenko on 19/09/2015.
@@ -35,19 +35,14 @@ import util.myLog;
 
 public class ScheduleCardFetch extends FetchingCardNew {
 
-    private Schedule mScheduleData;
-
-
-    public ScheduleCardFetch(Context context, String fetchingUrl, String title, @LayoutRes int innerLayout, CardLoadedInterface listener) {
-        super(context, fetchingUrl, title, innerLayout, listener);
-        myLog.add("***entrando a schedule fetch");
+    public ScheduleCardFetch(Context context, WeaconParse we, @LayoutRes int innerLayout, CardLoadedInterface listener) {
+        super(context, we, innerLayout, listener);
         setFetcher(new fetchEsade());
     }
 
     @Override
     protected ArrayList<ListObject> convertToListObjects(ArrayList fetchedElements) {
         ArrayList<ListObject> arr = new ArrayList<>();
-        myLog.add("eno converts to list ", "test");
         for (Object o : fetchedElements) {
             Leccion le = (Leccion) o;
             arr.add(new ScheduleObject(mParentCard, le));
