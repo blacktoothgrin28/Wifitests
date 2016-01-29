@@ -5,7 +5,6 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -52,13 +51,13 @@ public class LocationAsker implements GoogleApiClient.ConnectionCallbacks, Googl
                         String s = "estamos a con precision mejor de 5 mtes " + accuracy;
                         myLog.add(s, "aut");
 
-                        Toast.makeText(mContext, s, Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(mContext, s, Toast.LENGTH_SHORT).show();
 //                        mLocationCallback.LocationReceived(new GPSCoordinates(location), accuracy);
                         removerListener(location);
                     } else {
                         String text = "estamos a con precision peor de 5 mtes " + accuracy;
                         myLog.add(text, "aut");
-                        Toast.makeText(mContext, text, Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(mContext, text, Toast.LENGTH_SHORT).show();
                     }
                 }
             }

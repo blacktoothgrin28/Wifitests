@@ -380,4 +380,12 @@ public abstract class ParseActions {
         }
 
     }
+
+    public static void getParadaHere(GPSCoordinates gps, double accuracy, FindCallback<WeaconParse> oneParadaCallback) {
+        ParseQuery<WeaconParse> query = ParseQuery.getQuery(WeaconParse.class);
+        query.whereEqualTo("Type", "bus_stop");
+        query.whereWithinKilometers("GPS", gps.getGeoPoint(), accuracy / 1000);
+        query.fromPin(parameters.pinWeacons);
+        query.findInBackground(oneParadaCallback);
+    }
 }

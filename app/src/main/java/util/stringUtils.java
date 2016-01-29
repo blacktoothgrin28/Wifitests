@@ -7,6 +7,7 @@ import com.herenow.fase1.LineTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 
 import parse.WeaconParse;
@@ -99,6 +100,15 @@ public class stringUtils {
     public static String Listar(ArrayList<WeaconParse> weacons) {
         StringBuilder sb = new StringBuilder();
         for (WeaconParse we : weacons) {
+            sb.append(we.getName() + " | ");
+        }
+        return sb.toString();
+    }
+
+    public static String Listar(List<WeaconParse> list) {
+        StringBuilder sb = new StringBuilder();
+        for (WeaconParse we :
+                list) {
             sb.append(we.getName() + " | ");
         }
         return sb.toString();

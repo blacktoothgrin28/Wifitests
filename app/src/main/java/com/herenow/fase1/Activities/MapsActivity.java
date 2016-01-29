@@ -30,6 +30,7 @@ import parse.ParseActions;
 import parse.WeaconParse;
 import util.GPSCoordinates;
 import util.myLog;
+import util.stringUtils;
 
 import static parse.ParseActions.getParadasFree;
 
@@ -44,6 +45,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private List<WeaconParse> places;
     private HashSet<Marker> hashMarkersPlaces = new HashSet();
     private boolean placesVisible;
+    private Marker yo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +58,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
     }
 
+    public void UpdateMyPosition(GPSCoordinates gps) {
+        mGps = gps;
+        yo.setPosition(mGps.getLatLng());
+
+    }
 
     /**
      * Manipulates the map once available.
@@ -91,7 +98,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 LatLng aqui;
                 aqui = gps.getLatLng();
                 LoadPlaces();
-                mMap.addMarker(new MarkerOptions().position(aqui).title("Yo")
+                yo = mMap.addMarker(new MarkerOptions().position(aqui).title("Yo")
                         .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(aqui, 15));
 
@@ -173,21 +180,45 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      * @param view
      */
     public void onClickImIn(View view) {
-        //TODO what if it is not near any bus // STOPSHIP: 29/01/2016
-        //todo What if we detect mor than one
+        final FindCallback<WeaconParse> oneParadaCallback = new FindCallback<WeaconParse>() {
+            @Override
+            public void done(List<WeaconParse> list, ParseException e) {
+                if (e == null) {
+                    if (list.size() > 0) {
+                        String s = "hemos detectado " + list.size() + " paradas en este radio  " +
+                                stringUtils.Listar(list);
+                        myLog.add(s, "aut");
+                        Toast.makeText(mContext, s, Toast.LENGTH_SHORT).show();
+                        //nos quedamos con el primero que suponemso que es el mas cercvano
+                        paradaId = list.get(0).getParadaId();
+                        onClickSendWifis(null);
+                        ParseActions.getSpots(false, 4, mGps, mContext);
+                    } else {
+                        String s = "no hemos detectado ninguna parada";
+                        myLog.add(s, "aut");
+                        Toast.makeText(mContext, s, Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    myLog.add("error en listener oneparadacallbadk" + e.getLocalizedMessage(), "aut");
+                }
 
+            }
+        };
         LocationCallback locationCallback = new LocationCallback() {
             @Override
             public void LocationReceived(GPSCoordinates gps) {
-                myLog.add("tenemos localización  " + gps, "aut");
-                //TODO
+                myLog.add("tenemos localización   pero sin accuracy" + gps, "aut");
+
             }
 
             @Override
             public void LocationReceived(GPSCoordinates gps, double accuracy) {
                 myLog.add("en maps, ya tenemos la loclizacion con precicion:" + accuracy, "aut");
+                UpdateMyPosition(gps);
+                ParseActions.getParadaHere(gps, accuracy, oneParadaCallback);
             }
         };
         new LocationAsker(mContext, locationCallback, 10);
     }
+
 }
