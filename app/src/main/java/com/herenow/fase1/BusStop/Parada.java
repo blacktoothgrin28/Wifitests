@@ -1,4 +1,4 @@
-package com.herenow.fase1;
+package com.herenow.fase1.BusStop;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -68,7 +68,7 @@ public class Parada {
         int stopCode;
 
         public LineTime(JSONObject json) throws JSONException {
-            arrivalTime = json.getInt("arrivalTime");
+            arrivalTime = json.getInt("arrivalTimeMins");
             lineCode = json.getString("lineCode");
             roundedTime = json.getString("roundedArrivalTime");
             stopCode = json.getInt("stopCode");
@@ -77,7 +77,7 @@ public class Parada {
         @Override
         public String toString() {
             return "LineTime{" +
-                    "arrivalTime=" + arrivalTime +
+                    "arrivalTimeMins=" + arrivalTime +
                     ", lineCode='" + lineCode + '\'' +
                     ", roundedTime='" + roundedTime + '\'' +
                     ", stopCode=" + stopCode +

@@ -42,8 +42,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private String paradaId;
     private Context mContext;
     private Marker selectedMarker;
-    private List<WeaconParse> places;
+
     private HashSet<Marker> hashMarkersPlaces = new HashSet();
+
     private boolean placesVisible;
     private Marker yo;
 
@@ -58,10 +59,33 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        //Own position
+        myLog.add("onresume", "aut");
+        LocationCallback call = new LocationCallback() {
+
+            @Override
+            public void LocationReceived(GPSCoordinates gps) {
+                UpdateMyPosition(gps);
+            }
+
+            @Override
+            public void LocationReceived(GPSCoordinates gps, double accuracy) {
+                myLog.add("recibida con procision, pero no lo requerimamos" + accuracy, "aut");
+            }
+        };
+        new LocationAsker(mContext, call);
+
+    }
+
     public void UpdateMyPosition(GPSCoordinates gps) {
         mGps = gps;
-        yo.setPosition(mGps.getLatLng());
+        LatLng aqui = gps.getLatLng();
 
+        yo.setPosition(aqui);
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(aqui, 15));
     }
 
     /**
@@ -95,8 +119,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void LocationReceived(GPSCoordinates gps) {
                 mGps = gps;
-                LatLng aqui;
-                aqui = gps.getLatLng();
+                LatLng aqui = gps.getLatLng();
                 LoadPlaces();
                 yo = mMap.addMarker(new MarkerOptions().position(aqui).title("Yo")
                         .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
@@ -159,6 +182,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void done(List<WeaconParse> list, ParseException e) {
                 if (list != null) {
+
+                    if (list.size() == 0) {
+                        String s = "no hemos cargadowacons en el mmap";
+                        myLog.add(s, "aut");
+                        Toast.makeText(mContext, s, Toast.LENGTH_SHORT).show();
+                    }
                     for (WeaconParse we : list) {
                         placesVisible = false;
                         Marker marker = mMap.addMarker(new MarkerOptions().position(we.getGPSLatLng()).title(we.getName())
@@ -169,6 +198,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //                                marker.getId() + "| parada=" + we.getParadaId());
                     }
 
+                } else {
+                    String s = "La listade weacios es null";
+                    myLog.add(s, "aut");
+                    Toast.makeText(mContext, s, Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -204,6 +237,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             }
         };
+
         LocationCallback locationCallback = new LocationCallback() {
             @Override
             public void LocationReceived(GPSCoordinates gps) {

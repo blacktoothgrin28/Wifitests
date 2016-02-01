@@ -6,8 +6,10 @@ import android.widget.Toast;
 
 import com.herenow.fase1.Notifications.Notifications;
 import com.herenow.fase1.fetchers.fetchEsade;
+import com.herenow.fase1.fetchers.fetchParadaSantiago;
 import com.herenow.fase1.fetchers.fetchParadaStCugat;
 import com.parse.ParseException;
+import com.parse.ParseGeoPoint;
 import com.parse.ParsePush;
 import com.parse.SaveCallback;
 
@@ -132,10 +134,16 @@ public abstract class LogInManagement {
             for (final WeaconParse we : weaconsToNotify) {
                 if (we.notificationRequiresFetching()) {
                     if (we.getType().equals("bus_stop")) {
-                        (new fetchParadaStCugat(listener, we)).execute();
-                    } else if (we.getName().equals("ESADECREAPOLIS")) {
-                        (new fetchEsade(listener, we)).execute();
+                        ParseGeoPoint stCugat = new ParseGeoPoint(41.474722, 2.086667);
+                        ParseGeoPoint santiago = new ParseGeoPoint(-33.45, -70.666667);
+                        if (we.getGPS().distanceInKilometersTo(stCugat) < 20) {
+                            (new fetchParadaStCugat(listener, we)).execute();
+                        } else if (we.getGPS().distanceInKilometersTo(santiago) < 20) {
+                            (new fetchParadaSantiago(listener, we)).execute();
+                        }
                     }
+                } else if (we.getName().equals("ESADECREAPOLIS")) {
+                    (new fetchEsade(listener, we)).execute();
                 }
             }
         }

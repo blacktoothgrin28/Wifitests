@@ -44,8 +44,7 @@ public class ScheduleCardFetch extends FetchingCardNew {
     protected ArrayList<ListObject> convertToListObjects(ArrayList fetchedElements) {
         ArrayList<ListObject> arr = new ArrayList<>();
         for (Object o : fetchedElements) {
-            Leccion le = (Leccion) o;
-            arr.add(new ScheduleObject(mParentCard, le));
+            arr.add(new ScheduleObject(mParentCard, (Leccion) o));
         }
         return arr;
     }
@@ -100,8 +99,8 @@ public class ScheduleCardFetch extends FetchingCardNew {
         //Setup the ui elements inside the item
         TextView title = (TextView) convertView.findViewById(R.id.destination);
         TextView time = (TextView) convertView.findViewById(R.id.time);
-        TextView place = (TextView) convertView.findViewById(R.id.estimated);
-        TextView speaker = (TextView) convertView.findViewById(R.id.company_and_flight);
+        TextView room = (TextView) convertView.findViewById(R.id.estimated);
+        TextView assig = (TextView) convertView.findViewById(R.id.company_and_flight);
         ImageView file = (ImageView) convertView.findViewById(R.id.image_ppt);
 
 
@@ -109,8 +108,8 @@ public class ScheduleCardFetch extends FetchingCardNew {
         final ScheduleObject so = (ScheduleObject) object;
         title.setText(so.title);
         time.setText(so.getTime());
-        place.setText(so.location);
-        speaker.setText(so.speaker);
+        room.setText(so.location);
+        assig.setText(so.speaker);
 
         if (so.fileUrl != null && !so.fileUrl.equals("")) {
             file.setClickable(true);
@@ -167,10 +166,16 @@ public class ScheduleCardFetch extends FetchingCardNew {
         public ScheduleObject(Card mParentCard, Leccion le) {
             super(mParentCard);
             title = le.getTitle();
-            hour = le.getHora();
             location = le.getAula();
             description = le.getAssig();
-            speaker = le.getOtro();
+//            speaker = le.getOtro();
+            speaker = le.getAssig();
+
+            hour = le.getHora();
+            String[] split = hour.split(":");
+            h = Integer.parseInt(split[0]);
+            min = Integer.parseInt(split[1]);
+
             //TODO poner imagen en el si es que tiene;
             imgUrl = le.getImgUrl();
             //TODO vincular con el enlace de la informacion del  curso

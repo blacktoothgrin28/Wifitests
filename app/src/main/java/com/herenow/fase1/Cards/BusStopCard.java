@@ -10,7 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.herenow.fase1.LineTime;
+import com.herenow.fase1.BusStop.LineTimeStCgOld;
 import com.herenow.fase1.R;
 import com.herenow.fase1.Wifi.WifiAsker;
 import com.herenow.fase1.Wifi.preguntaWifi;
@@ -144,7 +144,7 @@ public class BusStopCard extends FetchingCard implements preguntaWifi {
         int id;
         double distance;
         GPSCoordinates gps;
-        private ArrayList<LineTime> lineTimes;
+        private ArrayList<LineTimeStCgOld> lineTimes;
 
         public BusStop(Card parentCard) {
             super(parentCard);
@@ -270,7 +270,7 @@ public class BusStopCard extends FetchingCard implements preguntaWifi {
 
             for (String parte : partes) {
                 if (parte.length() > 3) {
-                    LineTime lineTime = new LineTime(new JSONObject("{" + parte + "}"));
+                    LineTimeStCgOld lineTime = new LineTimeStCgOld(new JSONObject("{" + parte + "}"));
                     lineTimes.add(lineTime);
                     myLog.add(lineTime.toString());
                 }

@@ -9,9 +9,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.herenow.fase1.Activities.CardLoadedInterface;
+import com.herenow.fase1.BusStop.Parada;
 import com.herenow.fase1.CardData.ProductItem;
 import com.herenow.fase1.CardData.ProductsData;
-import com.herenow.fase1.Parada;
 import com.herenow.fase1.R;
 import com.herenow.fase1.actions.Actions;
 import com.squareup.picasso.Picasso;

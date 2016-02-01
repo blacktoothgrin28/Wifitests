@@ -14,7 +14,8 @@ public class Leccion {
 
     public Leccion(Element clase) {
 
-        hora = clase.select("td[class=horatd]").first().text();
+//        hora = clase.select("td[class=horatd]").first().text();
+        hora = clase.select("font[class=hora]").first().text();
         title = clase.select("font[class=programa]").first().text();
         assig = clase.select("font[class=assig]").first().text();
         Elements otroEl = clase.select("font[class=ealsec]");

@@ -110,7 +110,7 @@ public class LocationAsker implements GoogleApiClient.ConnectionCallbacks, Googl
         this.mGoogleApiClient.disconnect();
 
         if (mLastLocation == null) {
-            myLog.add("Last location is null");
+            myLog.add("Last location is null", "aut");
             mLocationCallback.LocationReceived(new GPSCoordinates(41.474722, 2.086667));
         } else {
             GPSCoordinates gps = new GPSCoordinates(mLastLocation);

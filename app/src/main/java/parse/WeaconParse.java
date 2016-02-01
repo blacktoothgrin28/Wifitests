@@ -7,7 +7,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 
 import com.google.android.gms.maps.model.LatLng;
-import com.herenow.fase1.LineTime;
+import com.herenow.fase1.BusStop.LineTimeStCgOld;
 import com.parse.ParseClassName;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -298,7 +298,7 @@ public class WeaconParse extends ParseObject {
 
     public void resetFetchingResults() {
         for (Object o : fetchedElements) {
-            LineTime lineTime = (LineTime) o;
+            LineTimeStCgOld lineTime = (LineTimeStCgOld) o;
             lineTime.setRoundedTime("-");
         }
     }

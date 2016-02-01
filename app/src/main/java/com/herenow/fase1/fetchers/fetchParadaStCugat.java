@@ -1,6 +1,6 @@
 package com.herenow.fase1.fetchers;
 
-import com.herenow.fase1.LineTime;
+import com.herenow.fase1.BusStop.BusLineTimesStCugat;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -28,13 +28,14 @@ public class fetchParadaStCugat extends notificationFetcher {
         String s = response.body();
         String[] partes = s.split("\\}\\,\\{|\\[\\{|\\}\\]");
 
-        ArrayList lineTimes = new ArrayList();
+        ArrayList<BusLineTimesStCugat> lineTimes = new ArrayList();
 
         for (String parte : partes) {
             if (parte.length() > 3) {
-                LineTime lineTime = null;
+                BusLineTimesStCugat lineTime = null;
                 try {
-                    lineTime = new LineTime(new JSONObject("{" + parte + "}"));
+//                    lineTime = new LineTimeStCgOld(new JSONObject("{" + parte + "}"));
+                    lineTime = new BusLineTimesStCugat(new JSONObject("{" + parte + "}"));
                 } catch (JSONException e) {
                     multiTaskCompleted.OnError(e);
                 }

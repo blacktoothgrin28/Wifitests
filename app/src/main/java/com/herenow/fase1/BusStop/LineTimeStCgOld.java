@@ -1,4 +1,4 @@
-package com.herenow.fase1;
+package com.herenow.fase1.BusStop;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -6,13 +6,13 @@ import org.json.JSONObject;
 /**
  * Created by Milenko on 21/12/2015.
  */
-public class LineTime {
+public class LineTimeStCgOld {
     public String lineCode;
     public String roundedTime;
     int arrivalTime;
     int stopCode;
 
-    public LineTime(JSONObject json) throws JSONException {
+    public LineTimeStCgOld(JSONObject json) throws JSONException {
         arrivalTime = json.getInt("arrivalTime");
         lineCode = json.getString("lineCode");
         roundedTime = json.getString("roundedArrivalTime");
@@ -22,7 +22,7 @@ public class LineTime {
     @Override
     public String toString() {
         return "LineTime{" +
-                "arrivalTime=" + arrivalTime +
+                "arrivalTimeMins=" + arrivalTime +
                 ", lineCode='" + lineCode + '\'' +
                 ", roundedTime='" + roundedTime + '\'' +
                 ", stopCode=" + stopCode +

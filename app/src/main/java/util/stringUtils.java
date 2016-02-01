@@ -2,7 +2,7 @@ package util;
 
 import android.support.annotation.NonNull;
 
-import com.herenow.fase1.LineTime;
+import com.herenow.fase1.BusStop.LineTimeStCgOld;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -49,13 +49,13 @@ public class stringUtils {
      *
      * @return
      */
-    public static String TimesSummarySorted(ArrayList<LineTime> lineTimes) {
+    public static String TimesSummarySorted(ArrayList<LineTimeStCgOld> lineTimes) {
         String substring = "No info";
 
         if (lineTimes.size() > 0) {
             try {
                 formatter form = new formatter(lineTimes);
-                HashMap<String, ArrayList<LineTime>> tableLines = form.getTable();
+                HashMap<String, ArrayList<LineTimeStCgOld>> tableLines = form.getTable();
 
                 StringBuilder sb = new StringBuilder();
                 for (String name : tableLines.keySet()) {
@@ -72,9 +72,9 @@ public class stringUtils {
         return substring;
     }
 
-    public static String summaryLineTimes(String name, ArrayList<LineTime> lineTimes) {
+    public static String summaryLineTimes(String name, ArrayList<LineTimeStCgOld> lineTimes) {
         StringBuilder sb = new StringBuilder(name + ": ");
-        for (LineTime lineTime : lineTimes) {
+        for (LineTimeStCgOld lineTime : lineTimes) {
             sb.append(lineTime.roundedTime + ", ");
         }
         String s = sb.toString();

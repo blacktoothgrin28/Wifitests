@@ -8,15 +8,15 @@ import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 
-import com.herenow.fase1.LineTime;
+import com.herenow.fase1.BusStop.LineTimeStCgOld;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
 public class formatter {
-    HashMap<String, ArrayList<LineTime>> tableLines;
+    HashMap<String, ArrayList<LineTimeStCgOld>> tableLines;
 
-    public formatter(ArrayList<LineTime> lineTimes) {
+    public formatter(ArrayList<LineTimeStCgOld> lineTimes) {
         tableLines = organizeLines(lineTimes);
     }
 
@@ -27,13 +27,13 @@ public class formatter {
      * @return
      */
     @NonNull
-    private static HashMap<String, ArrayList<LineTime>> organizeLines(ArrayList<LineTime> lineTimes) {
-        HashMap<String, ArrayList<LineTime>> tableLines = new HashMap<>();
+    private static HashMap<String, ArrayList<LineTimeStCgOld>> organizeLines(ArrayList<LineTimeStCgOld> lineTimes) {
+        HashMap<String, ArrayList<LineTimeStCgOld>> tableLines = new HashMap<>();
         ArrayList arr;
 
         if (lineTimes == null) return null;
 
-        for (LineTime lineTime : lineTimes) {
+        for (LineTimeStCgOld lineTime : lineTimes) {
             String lc = lineTime.lineCode;
             if (tableLines.containsKey(lc)) {
                 //add a time to the line
@@ -109,10 +109,10 @@ public class formatter {
         } else {
 
             for (String name : tableLines.keySet()) {
-                ArrayList<LineTime> arrTimes = tableLines.get(name);
+                ArrayList<LineTimeStCgOld> arrTimes = tableLines.get(name);
                 StringBuilder sb = new StringBuilder(name + " ");
 
-                for (LineTime lineTime : arrTimes) {
+                for (LineTimeStCgOld lineTime : arrTimes) {
                     sb.append(lineTime.roundedTime + ", ");
                 }
 
@@ -131,7 +131,7 @@ public class formatter {
         return arr;
     }
 
-    public HashMap<String, ArrayList<LineTime>> getTable() {
+    public HashMap<String, ArrayList<LineTimeStCgOld>> getTable() {
         return tableLines;
     }
 }
