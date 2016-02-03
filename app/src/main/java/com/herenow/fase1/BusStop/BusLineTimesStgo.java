@@ -32,15 +32,41 @@ public class BusLineTimesStgo extends BusLineTimes {
     }
 
     @Override
+    protected String lineSummary() {
+        StringBuilder sb = new StringBuilder();
+        for (Bus bus : buses) {
+            sb.append(bus.arrivalTimeMins + " mins ");
+        }
+        return sb.toString();
+    }
+
+    @Override
+    protected String shortSummary() {
+        return null;
+    }
+
+    @Override
     protected void processJson(JSONObject json) throws JSONException {
-        arrivalTimeText = json.getString("horaprediccionbus1");
-        arrivalTimeMins = ExtractMinsFromText(arrivalTimeText);
         color = Color.parseColor(json.getString("color"));
         lineCode = json.getString("servicio");
         destination = json.getString("destino");
-        distanceMts = Integer.parseInt(json.getString("distanciabus1"));
-        lineCode = json.getString("servicio");
-        plate = json.getString("ppubus1");
+
+        String arrivalTimeText = json.getString("horaprediccionbus1");
+        int arrivalTimeMins = ExtractMinsFromText(arrivalTimeText);
+        int distanceMts = Integer.parseInt(json.getString("distanciabus1"));
+        String plate = json.getString("ppubus1");
+        BusStgo busStgo = new BusStgo(arrivalTimeMins, arrivalTimeText, plate, distanceMts);
+        addBus(busStgo);
+
+
+        if (json.getString("codigorespuesta").equals("00")) { //dos autobuses por línea
+            arrivalTimeText = json.getString("horaprediccionbus2");
+            arrivalTimeMins = ExtractMinsFromText(arrivalTimeText);
+            distanceMts = Integer.parseInt(json.getString("distanciabus2"));
+            plate = json.getString("ppubus2");
+            busStgo = new BusStgo(arrivalTimeMins, arrivalTimeText, plate, distanceMts);
+            addBus(busStgo);
+        }
     }
 
     private int ExtractMinsFromText(String arrivalTimeText) {
@@ -56,5 +82,19 @@ public class BusLineTimesStgo extends BusLineTimes {
         }
 
         return i / count;
+    }
+
+    class BusStgo extends Bus {
+
+        public String plate;
+        public int distanceMts;
+
+        public BusStgo(int arrivalTimeMins, String arrivalTimeText, String plate, int distanceMts) {
+            this.arrivalTimeMins = arrivalTimeMins;
+            this.arrivalTimeText = arrivalTimeText;
+
+            this.plate = plate;
+            this.distanceMts = distanceMts;
+        }
     }
 }

@@ -13,10 +13,29 @@ public class BusLineTimesStCugat extends BusLineTimes {
     }
 
     @Override
+    protected String lineSummary() {
+//TODO
+        return null;
+    }
+
+    @Override
+    protected String shortSummary() {
+        //TODO
+        return null;
+    }
+
+    @Override
     protected void processJson(JSONObject json) throws JSONException {
+
         arrivalTimeMins = json.getInt("arrivalTime") / 60;
         lineCode = json.getString("lineCode");
-        roundedTime = json.getString("roundedArrivalTime");
-        stopCode = String.valueOf(json.getInt("stopCode"));
+//        stopCode = String.valueOf(json.getInt("stopCode"));
+//        updatedTime = json.getString("updatedTime");
+//        arrivalTimeText = json.getString("roundedArrivalTime"); //ej "13 min", "IMMINENT".
+//
+//        lineState = json.getInt("lineState");
+//        routeId = json.getInt("routeId");
+
+//        roundedTime = json.getString("roundedArrivalTime");
     }
 }

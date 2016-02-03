@@ -16,6 +16,7 @@ import com.herenow.fase1.Activities.BrowserActivity;
 import com.herenow.fase1.Activities.CardsActivity;
 import com.herenow.fase1.Activities.ConnectToWifi;
 import com.herenow.fase1.Activities.WeaconListActivity;
+import com.herenow.fase1.BusStop.NewBusStop;
 import com.herenow.fase1.R;
 import com.herenow.fase1.Wifi.LogInManagement;
 
@@ -24,7 +25,6 @@ import java.util.Collections;
 import java.util.HashMap;
 
 import parse.WeaconParse;
-import util.formatter;
 import util.myLog;
 
 /**
@@ -145,20 +145,35 @@ public abstract class Notifications {
 
         // Bus stop
         if (we.getType().equals("bus_stop")) {
-            formatter form = new formatter(we.getFetchedElements());
-
-            notif.setContentText("BUS STOP. " + we.getOneLineSummary());
+//            formatter form = new formatter(we.getFetchedElements());
+//            NewBusStop busStop = null;
+//            if (we.near(parameters.stCugat, 20)) {
+//                busStop = (NewBusStopStCg) we.getFetchedElements().get(0);
+//            } else if (we.near(parameters.santiago, 20)) {
+//                busStop = (NewBusStopSantiago) we.getFetchedElements().get(0);
+//
+//            }
+//            notif.setContentText("BUS STOP. " + we.getOneLineSummary());
+            NewBusStop busStop = (NewBusStop) we.getFetchedElements().get(0);
+            notif.setContentText("BUS STOP. " + busStop.summarizeAllLines());
 
             //InboxStyle
             NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
             inboxStyle.setBigContentTitle(we.getName());
             inboxStyle.setSummaryText("Currently " + LogInManagement.getActiveWeacons().size() + " weacons active");
 
+//            StringBuilder sb = new StringBuilder();
+//            for (SpannableString s : form.summarizeByOneLine()) {
+//                inboxStyle.addLine(s);
+//                sb.append("   " + s + "\n");
+//            }
+
             StringBuilder sb = new StringBuilder();
-            for (SpannableString s : form.summarizeByOneLine()) {
+            for (SpannableString s : busStop.summarizeByOneLine()) {
                 inboxStyle.addLine(s);
                 sb.append("   " + s + "\n");
             }
+
             notif.setStyle(inboxStyle);
             myLog.notificationMultiple(we.getName(), sb.toString(), "Currently " + LogInManagement.getActiveWeacons().size() + " weacons active", String.valueOf(sound));
         } else {

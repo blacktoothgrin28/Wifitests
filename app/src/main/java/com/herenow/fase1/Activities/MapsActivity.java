@@ -51,6 +51,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mContext = this;
         hashMarkers = new HashMap<>();
         setContentView(R.layout.activity_maps);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -100,7 +101,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        mContext = this;
 
         //click on marker event
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
@@ -156,7 +156,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 myLog.add("Recibidos los wifis forzados para parada");
 
                 try {
-                    ParseActions.assignSpotsToWeacon(paradaId, sr, mGps);
+                    ParseActions.assignSpotsToWeacon(paradaId, sr, mGps, mContext);
                     selectedMarker.setVisible(false);
                 } catch (Exception e) {
                     myLog.add("error in assign spot to weacon:" + e.getLocalizedMessage());
@@ -213,6 +213,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      * @param view
      */
     public void onClickImIn(View view) {
+        Toast.makeText(mContext, "buscando parada en el lugar", Toast.LENGTH_SHORT).show();
         final FindCallback<WeaconParse> oneParadaCallback = new FindCallback<WeaconParse>() {
             @Override
             public void done(List<WeaconParse> list, ParseException e) {
@@ -247,7 +248,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             @Override
             public void LocationReceived(GPSCoordinates gps, double accuracy) {
-                myLog.add("en maps, ya tenemos la loclizacion con precicion:" + accuracy, "aut");
+                Toast.makeText(mContext, "r=" + accuracy, Toast.LENGTH_SHORT).show();
+                myLog.add("en maps, ya tenemos la loclizacion con precicion:" + accuracy + gps, "aut");
                 UpdateMyPosition(gps);
                 ParseActions.getParadaHere(gps, accuracy, oneParadaCallback);
             }

@@ -209,7 +209,7 @@ public class BusStopCard extends FetchingCard implements preguntaWifi {
                     myLog.add("recibidos los wifis forzados para autobus");
 
                     try {
-                        ParseActions.assignSpotsToWeacon(getObjectId(), sr, gps);
+                        ParseActions.assignSpotsToWeacon(getObjectId(), sr, gps, mContext);
                     } catch (Exception e) {
                         myLog.add("error in assign spot to weacon:" + e.getLocalizedMessage());
                     }

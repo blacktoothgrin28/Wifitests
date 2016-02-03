@@ -9,7 +9,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.herenow.fase1.Activities.CardLoadedInterface;
-import com.herenow.fase1.BusStop.Parada;
+import com.herenow.fase1.BusStop.ParadaOld;
 import com.herenow.fase1.CardData.ProductItem;
 import com.herenow.fase1.CardData.ProductsData;
 import com.herenow.fase1.R;
@@ -173,11 +173,11 @@ public class ParadaCard extends CardWithList implements OnTaskCompleted {
 
     }
 
-    class readParada extends AsyncTask<GPSCoordinates, Void, ArrayList<Parada>> {
+    class readParada extends AsyncTask<GPSCoordinates, Void, ArrayList<ParadaOld>> {
 
         @Override
-        protected ArrayList<Parada> doInBackground(GPSCoordinates... gpsS) {
-            ArrayList<Parada> paradasUpdated = null;
+        protected ArrayList<ParadaOld> doInBackground(GPSCoordinates... gpsS) {
+            ArrayList<ParadaOld> paradasUpdated = null;
             GPSCoordinates gps = gpsS[0];
 
             String q = "http://www.santqbus.santcugat.cat/consultasae.php?x=" +
@@ -190,7 +190,7 @@ public class ParadaCard extends CardWithList implements OnTaskCompleted {
                         .followRedirects(true)
                         .execute();
 
-                ArrayList<Parada> ParadasCercanas = GetParadas(response.body());
+                ArrayList<ParadaOld> ParadasCercanas = GetParadas(response.body());
 
                 //Pedimos info de esta parada
 //                InfoParada(ParadasCercanas.get(0));
@@ -209,21 +209,21 @@ public class ParadaCard extends CardWithList implements OnTaskCompleted {
         }
 
         @Override
-        protected void onPostExecute(ArrayList<Parada> paradas) {
+        protected void onPostExecute(ArrayList<ParadaOld> paradas) {
             super.onPostExecute(paradas);
             //TODO abrir la ventana con las paradas
         }
 
-        private ArrayList<Parada> UpdateParadas(ArrayList<Parada> paradas) throws IOException, JSONException {
-            ArrayList<Parada> arr = new ArrayList<>();
+        private ArrayList<ParadaOld> UpdateParadas(ArrayList<ParadaOld> paradas) throws IOException, JSONException {
+            ArrayList<ParadaOld> arr = new ArrayList<>();
 
-            for (Parada parada : paradas) {
+            for (ParadaOld parada : paradas) {
                 arr.add(UpdateParada(parada));
             }
             return arr;
         }
 
-        private Parada UpdateParada(Parada parada) throws IOException, JSONException {
+        private ParadaOld UpdateParada(ParadaOld parada) throws IOException, JSONException {
             Connection.Response response;
             int id = parada.getId();
             String q2 = "http://www.santqbus.santcugat.cat/consultatr.php?idparada=" + id + "&idliniasae=-1&codlinea=-1";
@@ -239,13 +239,13 @@ public class ParadaCard extends CardWithList implements OnTaskCompleted {
         }
 
 
-        private ArrayList<Parada> GetParadas(String s) throws JSONException {
+        private ArrayList<ParadaOld> GetParadas(String s) throws JSONException {
             String[] partes = s.split("\\}\\,\\{|\\[\\{|\\}\\]");
-            ArrayList<Parada> arr = new ArrayList();
+            ArrayList<ParadaOld> arr = new ArrayList();
 
             for (String parte : partes) {
                 if (parte.length() > 3) {
-                    Parada parada = new Parada(new JSONObject("{" + parte + "}"));
+                    ParadaOld parada = new ParadaOld(new JSONObject("{" + parte + "}"));
                     arr.add(parada);
                     myLog.add(parada.toString());
                     if (arr.size() == 3) break;

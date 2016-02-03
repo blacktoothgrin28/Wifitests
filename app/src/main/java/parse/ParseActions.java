@@ -36,11 +36,11 @@ public abstract class ParseActions {
     /**
      * create in parse the SSID not already created, an assign the weacon of the bustop.
      * Also register the intensities
-     *
-     * @param paradaId
+     *  @param paradaId
      * @param sr
+     * @param ctx
      */
-    public static void assignSpotsToWeacon(final String paradaId, final List<ScanResult> sr, final GPSCoordinates gps) {
+    public static void assignSpotsToWeacon(final String paradaId, final List<ScanResult> sr, final GPSCoordinates gps, final Context ctx) {
         final ArrayList<String> macs = new ArrayList<>();
         for (ScanResult r : sr) {
             macs.add(r.BSSID);
@@ -50,7 +50,7 @@ public abstract class ParseActions {
         query.whereEqualTo("paradaId", paradaId);
         query.getFirstInBackground(new GetCallback<WeaconParse>() {
             @Override
-            public void done(WeaconParse weaconParse, ParseException e) {
+            public void done(final WeaconParse weaconParse, ParseException e) {
                 if (e == null) {
                     final String weParadaId = weaconParse.getObjectId();
 
@@ -83,6 +83,7 @@ public abstract class ParseActions {
                                     public void done(ParseException e) {
                                         if (e == null) {
                                             myLog.add("subidos varios wifispots " + newOnes.size());
+                                            Toast.makeText(ctx, "se ha subido la parada:" + weaconParse.getName(), Toast.LENGTH_SHORT).show();
 
                                             //create the weMeasured
                                             final ParseObject weMeasured = ParseObject.create("WeMeasured");
@@ -366,7 +367,7 @@ public abstract class ParseActions {
 
     public static void getParadasFree(FindCallback<WeaconParse> call, ParseGeoPoint center) {
         try {
-            myLog.add("getting Paradas Done 2  sant cugat");
+            myLog.add("parse: getting paradas already scanned insant cugat");
             ParseQuery<WeaconParse> query = ParseQuery.getQuery(WeaconParse.class);
             query.whereEqualTo("Type", "bus_stop");
             query.whereDoesNotExist("n_scannings");
@@ -385,7 +386,6 @@ public abstract class ParseActions {
         ParseQuery<WeaconParse> query = ParseQuery.getQuery(WeaconParse.class);
         query.whereEqualTo("Type", "bus_stop");
         query.whereWithinKilometers("GPS", gps.getGeoPoint(), accuracy / 1000);
-        query.fromPin(parameters.pinWeacons);
         query.findInBackground(oneParadaCallback);
     }
 }

@@ -1,11 +1,7 @@
 package com.herenow.fase1.fetchers;
 
-import com.herenow.fase1.BusStop.BusLineTimes;
-import com.herenow.fase1.BusStop.BusLineTimesStgo;
+import com.herenow.fase1.BusStop.NewBusStopSantiago;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.jsoup.Connection;
 
 import java.util.ArrayList;
@@ -24,21 +20,23 @@ public class fetchParadaSantiago extends notificationFetcher {
     @Override
     protected ArrayList processResponse(Connection.Response response) {
         if (response == null) return null;
-        ArrayList<BusLineTimes> lineTimes = new ArrayList();
 
-        try {
-            JSONObject j = new JSONObject(response.body());
-            JSONArray jsonArray = j.getJSONObject("servicios").getJSONArray("item");
-
-            for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject jItem = jsonArray.getJSONObject(i);
-                BusLineTimesStgo blt = new BusLineTimesStgo(jItem);
-                lineTimes.add(blt);
-            }
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return lineTimes;
+        NewBusStopSantiago busStopSantiago = new NewBusStopSantiago(response.body());
+//        ArrayList<BusLineTimes> lineTimes = new ArrayList();
+//
+//        try {
+//            JSONObject j = new JSONObject(response.body());
+//            JSONArray jsonArray = j.getJSONObject("servicios").getJSONArray("item");
+//
+//            for (int i = 0; i < jsonArray.length(); i++) {
+//                JSONObject jItem = jsonArray.getJSONObject(i);
+//                BusLineTimesStgo blt = new BusLineTimesStgo(jItem);
+//                lineTimes.add(blt);
+//            }
+//
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
+        return busStopSantiago.embedInArray();
     }
 }

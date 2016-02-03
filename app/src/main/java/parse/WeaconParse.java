@@ -8,6 +8,7 @@ import android.graphics.drawable.Drawable;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.herenow.fase1.BusStop.LineTimeStCgOld;
+import com.herenow.fase1.BusStop.NewBusStop;
 import com.parse.ParseClassName;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -21,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import util.RoundImage;
-import util.formatter;
 import util.myLog;
 import util.parameters;
 
@@ -271,12 +271,18 @@ public class WeaconParse extends ParseObject {
     }
 
     public String getOneLineSummary() {
-        StringBuilder sb = new StringBuilder(getName());
-        if (this.notificationRequiresFetching()) {
-            formatter form = new formatter(fetchedElements);
-            sb.append(": " + form.summarizeAllLines(true));
+        if (getType().equals("bus_stop")) {
+            NewBusStop busStop = (NewBusStop) fetchedElements.get(0);
+            return busStop.summarizeAllLines(true);
+        } else {
+            return "no summary";
         }
-        return sb.toString();
+//        StringBuilder sb = new StringBuilder(getName());
+//        if (this.notificationRequiresFetching()) {
+//            formatter form = new formatter(fetchedElements);
+//            sb.append(": " + form.summarizeAllLines(true));
+//        }
+//        return sb.toString();
     }
 
     //Fetching for notification
@@ -321,6 +327,10 @@ public class WeaconParse extends ParseObject {
 //            fetchingUrl = "http://www.santqbus.santcugat.cat/consultatr.php?idparada=" + getParadaId() + "&idliniasae=-1&codlinea=-1";
 //        }
         return fetchingUrl;
+    }
+
+    public boolean near(ParseGeoPoint point, int kms) {
+        return getGPS().distanceInKilometersTo(point) < kms;
     }
 
 

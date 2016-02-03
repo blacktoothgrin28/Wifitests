@@ -1,5 +1,7 @@
 package util;
 
+import com.parse.ParseGeoPoint;
+
 /**
  * Created by Milenko on 20/07/2015.
  */
@@ -43,6 +45,9 @@ public class parameters {
     public static int repeatedOffToChatOff = 4;
     public static int repeatedOnToChatOn = 3;
 
+    //Coords
+    public static ParseGeoPoint stCugat = new ParseGeoPoint(41.474722, 2.086667);
+    public static ParseGeoPoint santiago = new ParseGeoPoint(-33.45, -70.666667);
 
     public enum CardType {COMPANY, SCHEDULE, LINKEDIN, NEWS, FLIGHTS}
 

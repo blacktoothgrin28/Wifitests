@@ -3,6 +3,8 @@ package com.herenow.fase1.BusStop;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+
 import util.myLog;
 
 /**
@@ -10,16 +12,15 @@ import util.myLog;
  */
 public abstract class BusLineTimes {
     protected String lineCode;
-    protected String roundedTime;
-    protected int arrivalTimeMins;
-    protected String stopCode;
 
-    protected String plate;
     protected String destination;
     protected int color;
-    protected int distanceMts;
+    //todoeliminar
     protected String arrivalTimeText;
-
+    protected int arrivalTimeMins;
+    protected String roundedTime;
+    ArrayList<Bus> buses = new ArrayList<>();
+    //END eliminar
 
     public BusLineTimes(JSONObject json) {
         try {
@@ -30,22 +31,21 @@ public abstract class BusLineTimes {
         }
     }
 
-    public BusLineTimes(String lineCode, String roundedTime, int arrivalTimeMins, String stopCode) {
-        this.lineCode = lineCode;
-        this.roundedTime = roundedTime;
-        this.arrivalTimeMins = arrivalTimeMins;
-        this.stopCode = stopCode;
+    public BusLineTimes() {
     }
 
-    @Override
-    public String toString() {
-        return "BusLineTimes{" +
-                "lineCode='" + lineCode + '\'' +
-                ", roundedTime='" + roundedTime + '\'' +
-                ", arrivalTimeMins=" + arrivalTimeMins +
-                ", stopCode='" + stopCode + '\'' +
-                '}';
+    protected abstract String lineSummary();
+
+    protected abstract String shortSummary();
+
+    protected void addBus(Bus bus) {
+        buses.add(bus);
     }
 
     protected abstract void processJson(JSONObject json) throws JSONException;
+
+    protected abstract class Bus {
+        protected String arrivalTimeText;
+        protected int arrivalTimeMins;
+    }
 }

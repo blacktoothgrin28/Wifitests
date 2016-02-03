@@ -2,6 +2,7 @@ package com.herenow.fase1.fetchers;
 
 import android.os.AsyncTask;
 
+import org.json.JSONException;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 
@@ -37,10 +38,16 @@ public abstract class notificationFetcher extends AsyncTask<Void, Void, ArrayLis
 
     @Override
     protected ArrayList doInBackground(Void... params) {
-        myLog.add("URL = " + mWe.getFetchingUrl());
-        Connection.Response response = getResponse(mWe.getFetchingUrl());
-        ArrayList elements = processResponse(response);
-        if (elements == null) return null;
+        ArrayList elements = null;
+        try {
+            myLog.add("URL = " + mWe.getFetchingUrl());
+            Connection.Response response = getResponse(mWe.getFetchingUrl());
+            elements = processResponse(response);
+            if (elements == null) return null;
+        } catch (JSONException e) {
+            e.printStackTrace();
+            myLog.add("--error in doin bg in notification fetcher");
+        }
 
         return elements;
     }
@@ -78,6 +85,6 @@ public abstract class notificationFetcher extends AsyncTask<Void, Void, ArrayLis
      * @param response
      * @return
      */
-    protected abstract ArrayList processResponse(Connection.Response response);
+    protected abstract ArrayList processResponse(Connection.Response response) throws JSONException;
 
 }

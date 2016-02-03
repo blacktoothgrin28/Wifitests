@@ -11,15 +11,15 @@ import util.myLog;
 /**
  * Created by Milenko on 03/12/2015.
  */
-public class Parada {
+public class ParadaOld {
     GPSCoordinates gps;
     int id;
     String address;
     double distance;
     String reference;
-    ArrayList<LineTime> lineTimes;
+    ArrayList<BusLineTimesStCugat> lineTimes;
 
-    public Parada(JSONObject json) {
+    public ParadaOld(JSONObject json) {
         try {
             gps = new GPSCoordinates(json.getDouble("CoordX"), json.getDouble("CoordY"));
             id = json.getInt("Id");
@@ -46,42 +46,18 @@ public class Parada {
                 '}';
     }
 
-    public Parada updateTimes(String s) throws JSONException {
+    public ParadaOld updateTimes(String s) throws JSONException {
         String[] partes = s.split("\\}\\,\\{|\\[\\{|\\}\\]");
 
         lineTimes = new ArrayList();
 
         for (String parte : partes) {
             if (parte.length() > 3) {
-                LineTime lineTime = new LineTime(new JSONObject("{" + parte + "}"));
+                BusLineTimesStCugat lineTime = new BusLineTimesStCugat(new JSONObject("{" + parte + "}"));
                 lineTimes.add(lineTime);
                 myLog.add(lineTime.toString());
             }
         }
         return this;
-    }
-
-    class LineTime {
-        int arrivalTime;
-        String lineCode;
-        String roundedTime;
-        int stopCode;
-
-        public LineTime(JSONObject json) throws JSONException {
-            arrivalTime = json.getInt("arrivalTimeMins");
-            lineCode = json.getString("lineCode");
-            roundedTime = json.getString("roundedArrivalTime");
-            stopCode = json.getInt("stopCode");
-        }
-
-        @Override
-        public String toString() {
-            return "LineTime{" +
-                    "arrivalTimeMins=" + arrivalTime +
-                    ", lineCode='" + lineCode + '\'' +
-                    ", roundedTime='" + roundedTime + '\'' +
-                    ", stopCode=" + stopCode +
-                    '}';
-        }
     }
 }

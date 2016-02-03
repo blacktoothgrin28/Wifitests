@@ -28,6 +28,7 @@ public class LocationAsker implements GoogleApiClient.ConnectionCallbacks, Googl
 
     public LocationAsker(Context ctx, final LocationCallback locationCallback) {
         mContext = ctx;
+        myLog.add("en location aske, the contesxt is " + ctx, "aut");
         mLocationCallback = locationCallback;
         buildGoogleApiClient();
     }
@@ -48,14 +49,14 @@ public class LocationAsker implements GoogleApiClient.ConnectionCallbacks, Googl
                     double accuracy = location.getAccuracy();
                     if (accuracy < accuracyNeeded) {
 
-                        String s = "estamos a con precision mejor de 5 mtes " + accuracy;
+                        String s = "estamos a con precision mejor de 10 mtes " + accuracy;
                         myLog.add(s, "aut");
 
 //                        Toast.makeText(mContext, s, Toast.LENGTH_SHORT).show();
 //                        mLocationCallback.LocationReceived(new GPSCoordinates(location), accuracy);
                         removerListener(location);
                     } else {
-                        String text = "estamos a con precision peor de 5 mtes " + accuracy;
+                        String text = "estamos a con precision peor de 10 mtes " + accuracy;
                         myLog.add(text, "aut");
 //                        Toast.makeText(mContext, text, Toast.LENGTH_SHORT).show();
                     }
@@ -87,22 +88,6 @@ public class LocationAsker implements GoogleApiClient.ConnectionCallbacks, Googl
         mLocationCallback.LocationReceived(new GPSCoordinates(location), location.getAccuracy());
         mGoogleApiClient.disconnect();
     }
-
-    public void DoSomethingWithPosition(Context context) {
-
-        mContext = context;
-        buildGoogleApiClient();
-    }
-
-    /**
-     * @param context
-     * @param precision in meters
-     */
-    public void DoSomethingWithPosition(Context context, double precision) {
-        mPrecision = precision;
-        DoSomethingWithPosition(context);
-    }
-
 
     @Override
     public void onConnected(Bundle bundle) {
