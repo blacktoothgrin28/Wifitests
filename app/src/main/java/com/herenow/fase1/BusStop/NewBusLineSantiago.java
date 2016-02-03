@@ -20,25 +20,27 @@ public class NewBusLineSantiago extends NewBusLine {
         super();
 
         try {
-            color = Color.parseColor(json.getString("color"));
-            lineCode = json.getString("servicio");
-            destination = json.getString("destino");
 
-            String arrivalTimeText = json.getString("horaprediccionbus1");
-            int arrivalTimeMins = ExtractMinsFromText(arrivalTimeText);
-            int distanceMts = Integer.parseInt(json.getString("distanciabus1"));
-            String plate = json.getString("ppubus1");
+            if (json.getString("codigorespuesta").equals("01") || json.getString("codigorespuesta").equals("00")) {
+                color = Color.parseColor(json.getString("color"));
+                lineCode = json.getString("servicio");
+                destination = json.getString("destino");
 
-            NewBusSantiago busStgo = new NewBusSantiago(arrivalTimeMins, arrivalTimeText, plate, distanceMts);
-            addBus(busStgo);
+                String arrivalTimeText = json.getString("horaprediccionbus1");
+                int arrivalTimeMins = ExtractMinsFromText(arrivalTimeText);
+                int distanceMts = Integer.parseInt(json.getString("distanciabus1"));
+                String plate = json.getString("ppubus1");
 
-            if (json.getString("codigorespuesta").equals("00")) { //dos autobuses por línea
-                arrivalTimeText = json.getString("horaprediccionbus2");
-                arrivalTimeMins = ExtractMinsFromText(arrivalTimeText);
-                distanceMts = Integer.parseInt(json.getString("distanciabus2"));
-                plate = json.getString("ppubus2");
-                NewBusSantiago busStgo2 = new NewBusSantiago(arrivalTimeMins, arrivalTimeText, plate, distanceMts);
-                addBus(busStgo2);
+                NewBusSantiago busStgo = new NewBusSantiago(arrivalTimeMins, arrivalTimeText, plate, distanceMts);
+                addBus(busStgo);
+                if (json.getString("codigorespuesta").equals("00")) { //dos autobuses por línea
+                    arrivalTimeText = json.getString("horaprediccionbus2");
+                    arrivalTimeMins = ExtractMinsFromText(arrivalTimeText);
+                    distanceMts = Integer.parseInt(json.getString("distanciabus2"));
+                    plate = json.getString("ppubus2");
+                    NewBusSantiago busStgo2 = new NewBusSantiago(arrivalTimeMins, arrivalTimeText, plate, distanceMts);
+                    addBus(busStgo2);
+                }
             }
 
 

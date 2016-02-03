@@ -6,6 +6,8 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import util.myLog;
+
 /**
  * Created by Milenko on 03/02/2016.
  */
@@ -26,16 +28,22 @@ public class NewBusStopSantiago extends NewBusStop {
             description = json.getString("nomett");
             updateTime = json.getString("fechaprediccion") + "|" + json.getString("horaprediccion");
 
-            JSONArray services = json.getJSONArray("servicios");
+            JSONObject services = json.getJSONObject("servicios");
+            JSONArray items = services.getJSONArray("item");
+            myLog.add("tenemos algunso servicios de bus:" + items.length(), "aut");
 
-            for (int i = 0; i < services.length(); i++) {
-                JSONObject item = services.getJSONObject(i);
+            for (int i = 0; i < items.length(); i++) {
+                JSONObject item = items.getJSONObject(i);
+                if (!(item.getString("codigorespuesta").equals("00") || item.getString("codigorespuesta").equals("01")))
+                    continue;
+                myLog.add("oneitem: " + item.toString(), "aut");
                 NewBusLineSantiago line = new NewBusLineSantiago(item);
                 arr.add(line);
             }
 
         } catch (JSONException e) {
             e.printStackTrace();
+            myLog.add("--error en create array de santaugao de chile " + e.getLocalizedMessage());
         }
         return arr;
     }

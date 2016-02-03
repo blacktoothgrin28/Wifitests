@@ -46,7 +46,7 @@ public abstract class notificationFetcher extends AsyncTask<Void, Void, ArrayLis
             if (elements == null) return null;
         } catch (JSONException e) {
             e.printStackTrace();
-            myLog.add("--error in doin bg in notification fetcher");
+            myLog.add("--error in doin bg in notification fetcher" + e.getLocalizedMessage());
         }
 
         return elements;

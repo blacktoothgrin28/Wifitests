@@ -8,6 +8,7 @@ import java.util.ArrayList;
 
 import parse.WeaconParse;
 import util.MultiTaskCompleted;
+import util.myLog;
 
 /**
  * Created by Milenko on 31/01/2016.
@@ -21,6 +22,7 @@ public class fetchParadaSantiago extends notificationFetcher {
     protected ArrayList processResponse(Connection.Response response) {
         if (response == null) return null;
 
+        myLog.add("the response of the fetcher is " + response.body(), "aut");
         NewBusStopSantiago busStopSantiago = new NewBusStopSantiago(response.body());
 //        ArrayList<BusLineTimes> lineTimes = new ArrayList();
 //

@@ -7,11 +7,11 @@ import java.util.ArrayList;
  */
 public abstract class NewBusLine {
     protected String lineCode;
-    protected ArrayList<NewBus> buses;
+    protected ArrayList<NewBus> buses = new ArrayList<>();
 
     public NewBusLine(String lineCode, NewBusStCg bus) {
         this.lineCode = lineCode;
-        buses = new ArrayList<>();
+//        buses = new ArrayList<>();
         addBus(bus);
     }
 
@@ -34,7 +34,7 @@ public abstract class NewBusLine {
     }
 
     public int getShortestTime() {
-        int min = -1;
+        int min = 1100;
         for (NewBus bus : buses) {
             if (bus.arrivalTimeMins < min) min = bus.arrivalTimeMins;
         }

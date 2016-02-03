@@ -82,11 +82,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     public void UpdateMyPosition(GPSCoordinates gps) {
-        mGps = gps;
-        LatLng aqui = gps.getLatLng();
+        myLog.add("en update my position:" + gps, "aut");
+        try {
+            mGps = gps;
+            LatLng aqui = gps.getLatLng();
 
-        yo.setPosition(aqui);
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(aqui, 15));
+            yo.setPosition(aqui);
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(aqui, 15));
+        } catch (Exception e) {
+            //TODO arreglar esto que se carga antes de que se cree el yo
+            myLog.add("--eeror updating my posityion" + e.getLocalizedMessage(), "aut");
+        }
     }
 
     /**

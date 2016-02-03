@@ -7,6 +7,8 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import util.myLog;
+
 /**
  * Created by Milenko on 02/02/2016.
  */
@@ -31,7 +33,7 @@ public class NewBusStopStCg extends NewBusStop {
                 }
 
                 String lineCode = bus.getLineCode();
-                if (!tableLines.containsKey(lineCode)) {
+                if (tableLines.containsKey(lineCode)) {
                     NewBusLine busLine = tableLines.get(lineCode);
                     busLine.addBus(bus);
                 } else {
@@ -40,6 +42,7 @@ public class NewBusStopStCg extends NewBusStop {
             }
         } catch (JSONException e) {
             e.printStackTrace();
+            myLog.add("--error en createarray", "aut");
         }
 
         ArrayList<NewBusLine> arr = new ArrayList<>();
